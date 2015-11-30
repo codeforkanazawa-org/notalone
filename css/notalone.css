@@ -1,0 +1,91 @@
+/* notalone.css *****/
+
+body{
+	padding : 0px;
+	margin : 0px;
+}
+#top-menu{
+	position : fixed;
+	top : 0;
+	left : 0;
+
+	width : 100%;
+	text-align : center;
+
+	background-color : yellow;
+	padding : 0px;
+	margin : 0px;
+
+	z-index : 1;
+}
+#menu-back{
+	/*height : 30px;*/
+	padding : 0px;
+	margin : 0px;
+}
+
+
+/**** for index ****/
+#privert{
+	position : relative;
+	padding : 0px;
+	margin : 0px;
+}
+#photo{
+	/*width : 50%;*/
+	float : left;
+	padding : 0px;
+	margin : 0px;
+}
+#info{
+	padding : 0px;
+	margin : 0px;
+}
+#info img,input{
+	vertical-align : top;
+}
+
+#setting{
+	display : none;
+	clear : both;
+}
+.jobmenu{
+	clear : both;
+	position : relative;
+	text-align : center;
+	padding : 0px;
+	margin  : 0px;
+}
+#menu1{
+	background-color : lightgreen;
+}
+#menu2{
+	background-color : lightyellow;
+}
+#menu3{
+	background-color : lightblue;
+}
+
+
+/**** for events.html ****/
+#calendar {
+}
+
+.calendar-event-even {
+	height : 40px;
+	line-height : 40px;
+	padding-left : 10px;
+
+	background-color : lightblue;	
+}
+.calendar-event-odd {
+	height : 40px;
+	line-height : 40px;
+	padding-left : 10px;
+
+	background-color : lightyellow;	
+}
+.calendar-event-cont {
+	padding-left : 20px;
+	display:none;
+}

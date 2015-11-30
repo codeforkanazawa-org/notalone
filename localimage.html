@@ -1,0 +1,76 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+
+<title>画像ファイル</title>
+
+<script src="js/jquery-1.11.3.min.js"></script>
+<link rel="stylesheet" href="js/jquery-ui-1.11.4.custom/jquery-ui.min.css">
+<script type="text/javascript" src="js/jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
+
+
+</head>
+<body>
+
+<img width="200" src="" />
+<br />
+<!-- フォーム -->
+<input type="file" multiple="multiple" id="form">
+
+<!-- 画像を出力するエリア [id=result] -->
+<div id="result"></div>
+
+<div id="enc64" style="width:500px;"></div>
+
+</body>
+
+<script type="text/javascript">
+// [#form]が変更された時にイベントを実行する
+document.getElementById( "form" ).onchange = function()
+{
+	// 変数の宣言
+	var fileList , file , fr , src , result ;
+
+	// ファイルリストを取得
+	fileList = this.files ;
+
+	// 結果エリアのエレメントを取得
+	result = document.getElementById( "result" ) ;
+
+	// 結果エリアを一度リセット
+	result.innerHTML = "" ;
+
+	// ローカル画像を表示する (枚数分)
+	for( var i=0,l=fileList.length; l>i; i++ )
+	{
+		
+		// 対象のファイルを取得
+		file = fileList[i] ;
+
+
+		// [FileReader]クラスを起動
+		fr = new FileReader() ;
+
+		// ファイルを[base64エンコード]として読み込む
+		fr.readAsDataURL( file ) ;
+
+		// 読み込み後の処理
+		fr.onload = function()
+		{
+			// HTMLに書き出し
+			result.innerHTML += '<img src="' + this.result + '" width="auto" height="100">' ;
+			
+			document.getElementById("enc64").innerText = this.result;
+
+		}
+
+	}
+
+}
+
+
+</script>
+
+</html>

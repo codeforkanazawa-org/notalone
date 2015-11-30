@@ -1,0 +1,231 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+<!-- キャッシュしない -->
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="cache-control" content="no-cache" />
+<meta http-equiv="expires" content="0" />
+<!--               -->
+
+<title>能登ノットアローン｜トップ</title>
+
+<link rel="stylesheet" href="js/jquery-ui-1.11.4.custom/jquery-ui.min.css">
+
+<script src="js/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
+
+
+<script type="text/javascript" src="js/notalone.js"></script>
+
+</head>
+
+<body onload="init();">
+<!-- fix start -->
+<div id="top-menu" onClick="top_index()">能登ノットアローン</div>
+<!-- fix end -->
+<!-- fix div 調整用　-->
+<div id="menu-back"></div>
+
+
+<div id="privert">
+  <div id="photo"><img src="uploads/images/IMG_0763.jpg" height="150" /></div>
+  <div id="info">
+	・あゆみ<br />　３年３ケ月<br />
+	・はじめ<br />　１年２ケ月<br />
+	・まして<br />　３００日<br />
+
+	<a href="https://www.google.com/calendar/" target="_blank"><img src="images/ico_calendar.png"/></a>
+	<input type="button" value="設定" onClick="setting()" /><br />
+  </div>
+</div>
+<div id="setting">
+	お子さんの名前、誕生日を設定します<br />
+	<form>
+	<input type="text" id="name1" value="">
+	<input type="text" id="bday1" value=""><br />
+	<input type="text" id="name2" value="">
+	<input type="text" id="bday2" value=""><br />
+	<input type="text" id="name3" value="">
+	<input type="text" id="bday3" value=""><br />
+
+	<input type="file" id="bphoto" ><br />
+
+	<input type="reset"  value="消去"/>
+	<input type="submit" value="保存" />
+	</form>
+</div>
+<div class="jobmenu" id="menu1" onClick="snd_index('events')">イベント</div>
+<div class="jobmenu" id="menu2" onClick="snd_index('aidmap')">子育て応援Map</div>
+<div class="jobmenu" id="menu3" onClick="snd_index('advice')">相談</div>
+</body>
+
+
+<script type="text/javascript">
+/*
+//window risize 時の処理
+$(window).resize(function(){
+	init();
+});
+
+//誕生日入力用カレンダー（detepicker）
+$(function() {
+	for(var i=1 ; i<=3 ; i++){
+		var idname = "#bday" + i;
+
+		$(idname).datepicker({
+			//showButtonPanel: true,
+			changeMonth: true,
+			changeYear: true,
+			dateFormat:'yy/mm/dd'
+		});
+
+		$(idname).datepicker("option", "showOn", 'button');
+		$(idname).datepicker("option", "buttonImageOnly", true);
+		$(idname).datepicker("option", "buttonImage", 'images/ico_calendar.png');
+	}
+});
+
+//ブラウザ初期化
+function init(){
+	//ブラウザ表示設定********
+	//for menu
+	var DeviceWidth    = window.innerWidth;
+	var DeviceHeight   = window.innerHeight;
+	var TopHeight = 30;
+	var PrivertHeight  = Math.round(DeviceHeight * 0.35);
+	var PhotoPadding = 5;
+	var PcWidth = 480;
+	//*********************
+
+	if(screen.width >= 480){
+		//var BodyWidth = screen.width>=480? "480px" : "100%";
+		var BodyWidth = PcWidth + "px";
+
+		$("body").width(BodyWidth);
+		var BodyWhite = parseInt(DeviceWidth,10) - parseInt(BodyWidth,10);
+
+		var BodyLeftMargin = BodyWhite > 0 ? (BodyWhite / 2) + "px" : "0px";
+		$("body").css({"margin-left" : BodyLeftMargin });
+
+		$("#top-menu").width(BodyWidth);
+		$("#top-menu").css({"left" : BodyLeftMargin });
+	}else{
+		var BodyWidth = DeviceWidth + "px";
+	}
+
+	$("#top-menu").height(TopHeight);
+	$("#top-menu").css({"line-height" : TopHeight + "px"});
+
+	$("#menu-back").height(TopHeight);
+	$("#menu-back").css({"line-height" : TopHeight + "px"});
+
+	$("#privert").height(PrivertHeight);
+
+	var MenuHeight = ( DeviceHeight - TopHeight - PrivertHeight ) / 3;
+
+	$(".jobmenu").height(MenuHeight);
+	$(".jobmenu").css({"line-height" : MenuHeight + "px"});
+
+	$("#photo > img").css({"height" : (PrivertHeight - PhotoPadding * 2) + "px" , "padding" : PhotoPadding + "px"});
+}
+
+
+function setting(){
+	var flg = $("#setting").css("display");
+
+	if(flg == "none"){
+		$("#setting").show("blind", "", 1000 );
+	}else{
+		$("#setting").hide("bling", "", 1000 );
+	}
+}
+
+function top_index(){
+	location.href = "index.html";
+}
+function snd_index(link){
+	switch(link){
+		case "events" : location.href="events.html";
+				break;
+ 		case "aidmap" :	location.href="http://tadachan.github.io/prepass2/map.html";
+				break;
+		case "advice" :
+	}
+}
+*/
+</script>
+
+
+<style>
+body{
+	padding : 0px;
+	margin : 0px;
+}
+#top-menu{
+	position : fixed;
+	top : 0;
+	left : 0;
+
+	width : 100%;
+	text-align : center;
+
+	background-color : yellow;
+	padding : 0px;
+	margin : 0px;
+
+	z-index : 1;
+}
+#menu-back{
+	/*height : 30px;*/
+	padding : 0px;
+	margin : 0px;
+}
+
+//for index ****
+#privert{
+	position : relative;
+	padding : 0px;
+	margin : 0px;
+}
+#photo{
+	/*width : 50%;*/
+	float : left;
+	padding : 0px;
+	margin : 0px;
+}
+#info{
+	padding : 0px;
+	margin : 0px;
+}
+#info img,input{
+	vertical-align : top;
+}
+
+#setting{
+	display : none;
+	clear : both;
+}
+.jobmenu{
+	clear : both;
+	position : relative;
+	text-align : center;
+	padding : 0px;
+	margin  : 0px;
+}
+#menu1{
+	background-color : lightgreen;
+}
+#menu2{
+	background-color : lightyellow;
+}
+#menu3{
+	background-color : lightblue;
+}
+//************
+
+</style>
+</html>

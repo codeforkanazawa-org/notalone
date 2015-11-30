@@ -1,0 +1,68 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+<!-- キャッシュしない -->
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="cache-control" content="no-cache" />
+<meta http-equiv="expires" content="0" />
+<!--               -->
+
+<title>能登ノットアローン｜トップ</title>
+
+<link rel="stylesheet" href="css/notalone.css">
+
+<link rel="stylesheet" href="js/jquery-ui-1.11.4.custom/jquery-ui.min.css">
+
+<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
+
+
+<script type="text/javascript" src="js/notalone.js"></script>
+
+</head>
+
+<body onload="init();">
+<!-- fix start -->
+<div id="top-menu" onClick="top_index()">能登ノットアローン</div>
+<!-- fix end -->
+<!-- fix div 調整用　-->
+<div id="menu-back"></div>
+
+
+<div id="privert">
+  <div id="photo"><img src="uploads/images/IMG_0763.jpg" height="150" /></div>
+  <div id="info">
+	・あゆみ<br />　３年３ケ月<br />
+	・はじめ<br />　１年２ケ月<br />
+	・まして<br />　３００日<br />
+
+	<a href="https://www.google.com/calendar/" target="_blank"><img src="images/ico_calendar.png"/></a>
+	<input type="button" value="設定" onClick="setting()" /><br />
+  </div>
+</div>
+<div id="setting">
+	お子さんの名前、誕生日を設定します<br />
+	<form>
+	<input type="text" id="name1" value="">
+	<input type="text" id="bday1" value=""><br />
+	<input type="text" id="name2" value="">
+	<input type="text" id="bday2" value=""><br />
+	<input type="text" id="name3" value="">
+	<input type="text" id="bday3" value=""><br />
+
+	<input type="file" id="bphoto" ><br />
+
+	<input type="reset"  value="消去"/>
+	<input type="submit" value="保存" />
+	</form>
+</div>
+<div class="jobmenu" id="menu1" onClick="snd_index('events')">イベント</div>
+<div class="jobmenu" id="menu3" onClick="snd_index('advice')">相談</div>
+<div class="jobmenu" id="menu2" onClick="snd_index('aidmap')">子育て応援Map</div>
+
+</body>
+</html>
