@@ -75,6 +75,9 @@ function init(){
 	var calendar_div = $("#calendar").height();
 
 	$("#menu-back").height(TopHeight + calendar_div);
+
+	//イベント欄ダミーの高さ(px)
+	$("#dummy").height(DeviceHeight - calendar_div - $("#top_menu").height());
 	//***************************
 }
 
