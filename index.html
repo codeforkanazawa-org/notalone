@@ -25,7 +25,7 @@
 
 </head>
 
-<body onload="init();">
+<body onload="init()">
 <!-- fix start -->
 <div id="top-menu" onClick="top_index()">能登ノットアローン</div>
 <!-- fix end -->
@@ -41,18 +41,23 @@
 	・まして<br />　３００日<br />
 
 	<a href="https://www.google.com/calendar/" target="_blank"><img src="images/ico_calendar.png"/></a>
-	<input type="button" value="設定" onClick="setting()" /><br />
+	<input type="button" value="設定" onClick="setting();" /><br />
   </div>
 </div>
 <div id="setting">
 	お子さんの名前、誕生日を設定します<br />
 	<form>
-	<input type="text" id="name1" value="">
-	<input type="text" id="bday1" value=""><br />
-	<input type="text" id="name2" value="">
-	<input type="text" id="bday2" value=""><br />
-	<input type="text" id="name3" value="">
-	<input type="text" id="bday3" value=""><br />
+	<input type="text" id="name1" size="12" value="">
+	<input type="text" id="bday1" size="12" value=""><br />
+	<input type="text" id="name2" size="12" value="">
+	<input type="text" id="bday2" size="12" value=""><br />
+	<input type="text" id="name3" size="12" value="">
+	<input type="text" id="bday3" size="12" value=""><br />
+
+	<input type="button" onClick="favInit()" value="読み出し" />
+	<input type="button" onClick="myfavSet()" value="保存" />
+	<input type="button" onClick="myfavDel_all()" value="クリア" />
+	<br />
 
 	<input type="file" id="bphoto" ><br />
 

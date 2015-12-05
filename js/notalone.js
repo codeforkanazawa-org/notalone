@@ -44,7 +44,8 @@ function brows_init(){
 	var PcWidth = 480;				//パソコンの場合の横幅
 	//*****************************
 
-	if(screen.width >= 480){
+	//if(screen.width >= 480){
+	if(DeviceWidth >= 480){
 		//var BodyWidth = screen.width>=480? "480px" : "100%";
 		var BodyWidth = PcWidth + "px";
 
@@ -56,6 +57,7 @@ function brows_init(){
 
 		$("#top-menu").width(BodyWidth);
 		$("#top-menu").css({"left" : BodyLeftMargin });
+
 	}else{
 		var BodyWidth = DeviceWidth + "px";
 	}
@@ -175,20 +177,12 @@ $(function() {
 
 
 //******* cookie ********
-//favorite max 10個
-var MyFav_count = 10;
-var MyFav_tab   = 4;
-var MyFavStop = new Array();
-MyFavStop[1] = {root: 2 , stop:  5 , name: '堀内東'};
-MyFavStop[2] = {root: 4 , stop: 10 , name: '万葉台'};
-MyFavStop[3] = {root: 5 , stop: 15 , name: '白山野々市広域消防本部Ａ'};
-MyFavStop[4] = {root: 6 , stop:  4 , name: '粟田'};
-MyFavStop[5] = {root: 6 , stop:  4 , name: '粟田'};
-MyFavStop[6] = {root: 6 , stop:  4 , name: '粟田'};
-MyFavStop[7] = {root: 6 , stop:  4 , name: '粟田'};
-MyFavStop[8] = {root: 6 , stop:  4 , name: '粟田'};
-MyFavStop[9] = {root: 6 , stop:  4 , name: '粟田'};
-MyFavStop[10] = {root: 6 , stop:  4 , name: '粟田'};
+//favorite max 3個
+var MyFav_count = 3;
+var MyFavFamily = new Array();
+MyFavFamily[1] = {name: "" , bday: "" };
+MyFavFamily[2] = {name: "" , bday: "" };
+MyFavFamily[3] = {name: "" , bday: "" };
 //***********************
 
 function getCookie(key) {
@@ -213,17 +207,9 @@ function getCookie(key) {
 }
 
 function getMyFav(){
-	var emt;
-	for(var s = 1 ; s<= MyFav_tab ; s++){
-		emt = document.getElementById("fav" + s);
-		emt.innerHTML = "☆" + s;
-		emt.style.cssText = document.getElementById("fav0").style.cssText;
-	}
-
-	for(var i = 1; i<= MyFav_count ; i++){		
-		MyFavStop[i]['root'] = getCookie("root"+i);
-		MyFavStop[i]['stop'] = getCookie("stop"+i);
-		MyFavStop[i]['name'] = getCookie("name"+i);
+	for(var i = 1; i<= MyFav_count ; i++){	
+		MyFavFamily[i]['name'] = getCookie("name"+i);
+		MyFavFamily[i]['bday'] = getCookie("bday"+i);
 	}
 }
 
@@ -232,81 +218,18 @@ function favInit(){
 	//*** cookie *****
 	getMyFav();
 
-	var fav_i;
 	var fav_name;
-	var st;
+	var fav_bday;
 
-	//お気に入りのタブ表示は４つまで
-	for(i=1 ; i<=MyFav_tab ;i++){
-		if(MyFavStop[i]['name'] != ""){
-			//document.getElementById("fav"+i).innerHTML = MyFavStop[i]['name'].substr(0,4);
-			fav_i = document.getElementById("fav"+i);
 
-			//バス停名から頭の数字：を削除する
-			fav_name = MyFavStop[i]['name'];
-			//: の位置を見つける
-			st = fav_name.indexOf(":",0);
-			if(st > 0) st++;
-
-			//バス停名の長さを制限　５文字
-			fav_i.innerHTML = fav_name.substr(st,5);
-
-			fav_i.style.background = bc[MyFavStop[i]['root']]['bg'];			
-			fav_i.style.color      = bc[MyFavStop[i]['root']]['txt'];			
+	for(i=1 ; i<=MyFav_count ;i++){
+		fav_name = MyFavFamily[i]['name'];
+		fav_bday = MyFavFamily[i]['bday'];
+		if(fav_name != ""){
+			$("#name" + i).val(fav_name);
+			$("#bday" + i).val(fav_bday);		
 		}
 	}
-}
-
-//お気に入り
-function myfavMenu(){
-	//cookie error 時強制的に削除する
-	//alert(document.cookie);
-	//mayfavDel_all();
-
-	if (!navigator.cookieEnabled) {
-		alert("ブラウザの設定にてクッキーの受け入れを有効にしてください。");
-		return;
-	}
-
-	//var MyFav_count = 4;
-	//MyFavStop[1] = {root: 2 , stop:  5 , name: '堀内東'};
-
-	var info = "お気に入りのバス停<br />";
-
-	var stopName = "";
-	var divStyle = "";
-	var favLink  = "";
-
-
- 	for(var i = 1 ; i <=MyFav_count ; i++){
-
-		stopName = MyFavStop[i]['name'];
-		if(stopName == ""){
-			stopName = "☆" + i;
-			divStyle = "";
-			favLink  = "";
-		}else{
-			divStyle  = "margin-left:50px; padding-left:10px; background-color:" + bc[MyFavStop[i]['root']]['bg'] + ";";
-			divStyle += "color:" + bc[MyFavStop[i]['root']]['txt'] + ";";
-			favLink   = "onclick='myfav(" + i + ")' ";
-		}
-
-		info += "<div style='clear:left;'>";
-		info += 	"<div style='float:left'>";
-		info += 		"<input name='mfset' type='radio' value='" + i + "' />";
-		info += 	"</div>";
-
-		info += 	"<div style='" + divStyle + "' " + favLink + ">";
-		info += 		stopName;
-		info += 	"</div>";
-		info += "</div>";
-	}
-
-	info += "<input type='button' onclick='myfavSet()' value='登録' />";
-	info += "<input type='button' onclick='myfavDel()' value='削除' />";
-	info += "<input type='button' onclick='myfavClose()' value='中止' />";
-	
-	document.getElementById("favInfo").innerHTML = info;
 }
 
 function myfavSet(){
@@ -315,47 +238,17 @@ function myfavSet(){
 	var date1 = new Date(2030, 1).toUTCString();
 	//2030年1月 日付データをセットする
 
-	if(Root_no == null || Root_no == 0 || Root_stop_no == null || Root_stop_no == 0){
-		alert("バス停を指定してください");
-	}else{
-		//Root_no
-		//Root_stop_no
-		//Root_stop_name
-		/*
-		var emt   = document.getElementById("stop");
-		var index = emt.selectedIndex;
-		var stop_name = emt.options[index].text;
-		*/
-		var stop_name = Root_stop_no + ":" + Root_stop_name;
-
-		var radioList  = document.getElementsByName("mfset");
-		var fno;
-		var str = stop_name + "登録できません。";
-
-		for(var i=0; i<radioList.length; i++){
-			if (radioList[i].checked) {
-				
-				//** cookie set
-				fno = radioList[i].value;
-				document.cookie = "root" + fno + "=" + Root_no + ";expires=" + date1;
-				document.cookie = "stop" + fno + "=" + Root_stop_no + ";expires=" + date1; 
-				document.cookie = "name" + fno + "=" + escape(stop_name) + ";expires=" + date1;
-			
-				str = stop_name + "を☆" +  radioList[i].value + "に登録しました。";
-				//favInfo を閉じてからリセットルート
-				myfavClose();
-				//resetRoot();
-				favInit();
-
-				break;
-			}
-		}
-		//alert(str);
+	for(var i=1; i<=MyFav_count; i++){		
+		//** cookie set
+		document.cookie = "name" + i + "=" + $("#name" + i).val() + ";expires=" + date1;
+		document.cookie = "bday" + i + "=" + $("#bday" + i).val() + ";expires=" + date1; 
 	}
+
+	favInit();
 }
 
 //cookie 強制削除
-function mayfavDel_all(){
+function myfavDel_all(){
 	//日付データを作成する
 	var date1 = new Date();
 	//1970年1月1日00:00:00の日付データをセットする
@@ -364,86 +257,11 @@ function mayfavDel_all(){
 	for(var i=1; i<= MyFav_count ; i++){
 		//** cookie set
 		fno = i;
-		document.cookie = "root" + fno + "=;expires=" + date1.toGMTString();
-		document.cookie = "stop" + fno + "=;expires=" + date1.toGMTString(); 
-		document.cookie = "name" + fno + "=;expires=" + date1.toGMTString();
+		document.cookie = "name" + i + "=;expires=" + date1.toGMTString();
+		document.cookie = "bday" + i + "=;expires=" + date1.toGMTString(); 
 	}
 
-}
-
-
-function myfavDel(){
-	//日付データを作成する
-	var date1 = new Date();
-	//1970年1月1日00:00:00の日付データをセットする
-	date1.setTime(0);
-  	//有効期限を過去にして書き込む
-
-	var radioList  = document.getElementsByName("mfset");
-	var fno;
-	var str = "削除できません。";
-
-	for(var i=0; i<radioList.length; i++){
-		if (radioList[i].checked) {
-			//** cookie set
-			fno = radioList[i].value;
-			document.cookie = "root" + fno + "=;expires=" + date1.toGMTString();
-			document.cookie = "stop" + fno + "=;expires=" + date1.toGMTString(); 
-			document.cookie = "name" + fno + "=;expires=" + date1.toGMTString();
-			
-			str = "☆" +  radioList[i].value + "から削除しました。";
-			//document.cookie = "counts=;expires="+date1.toGMTString();
-
-			//favInfo を閉じてからリセットルート
-			myfavClose();
-			//resetRoot();
-			favInit();
-
-			break;
-		}
-	}
-	//alert(str);
-}
-
-
-function myfavClose(){
-	$("#favInfo").slideUp("slow");
-
-	//document.getElementById("favInfo").innerHTML = "";
-}
-
-function myfav(no){
-	var f_root = MyFavStop[no]['root'];
-	var f_stop = MyFavStop[no]['stop'];
-
-	if(f_root == "" || f_stop == "" || f_stop == 0){
-		return;
-	}
-
-	//すべての選択を閉じる。フラグのリセット
-	$("#stop_data_" + Root_stop_no).slideUp("slow");
-	$("#root_data_" + Root_no).slideUp("slow");
-	Root_open_flg = false;
-	Stop_open_flg = false;
-
-
-	selectRoot(f_root);
-
-	setTimeout('selectStop(' + f_stop + ')' , 1000);
-
-	//selectStop(f_stop);
-
-	//サイトでは、バス停リストの作成に遅延あり。一定タイミング後に実施
-	//setTimeout('myfav_later()' , 1000);
-
-	myfavClose();
-}
-
-//myfav() 後処理
-function myfav_later(){
-	//バス停位置をトップにスライドする
-	var targetY = $('#stop_' + Root_stop_no).offset().top;
-	$("html,body").animate({scrollTop:targetY});
+	favInit();
 }
 
 //****************************
@@ -767,13 +585,13 @@ function events_init(){
 			*/
 
 			//イベントのクリック
-			eventClick (event){
+			eventClick : function(event){
 				selectEvent(event.id);
-			},
+			}
 
 			/*
 			//日のクリック
-			dayClick (){
+			dayClick : function(){
 				alert("day click");
 			},
 			*/
