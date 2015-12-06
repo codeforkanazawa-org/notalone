@@ -105,6 +105,8 @@ function brows_init(){
 	//カレンダー表示の高さを規定（いずれかを設定）
 	//縦横比率（数値が大きいほど縦が縮む）
 	$('#calendar').fullCalendar('option', 'aspectRatio', 1.7);
+	//カレンダーの高さ
+	//$('#calendar').fullCalendar('option', 'contentHeight', 300);
 
 	// コンテンツの高さ(px)
 	var calendar_div = $("#calendar").height();
@@ -535,8 +537,9 @@ function events_init(){
 
 			//タイトルのフォーマット
 	        	titleFormat: {
-        	    	month: 'YYYY年M月',	// 2013年9月
+        	    		month: 'YYYY年M月',	// 2013年9月			
 			},
+
  	       		// ボタン文字列
         		buttonText: {
             			prev:     '前月', // <
@@ -555,6 +558,8 @@ function events_init(){
         		monthNamesShort: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
 	        	// 曜日略称
         		dayNamesShort: ['日', '月', '火', '水', '木', '金', '土'],
+			//more表示の書式
+			dayPopoverFormat:'YYYY年 M月 D日[(]ddd[)]',
 
 			/* 
 	       		// イベントソース（例）
@@ -587,7 +592,7 @@ function events_init(){
 			//イベントのクリック
 			eventClick : function(event){
 				selectEvent(event.id);
-			}
+			},
 
 			/*
 			//日のクリック
@@ -595,6 +600,15 @@ function events_init(){
 				alert("day click");
 			},
 			*/
+
+			//イベントの最大表示数
+    			eventLimit: true,
+    			views: {
+        			agenda: {
+            				eventLimit: 1,
+        			}
+    			},
+			eventLimitText: '件あり'
 		});
 
 		//イベント情報の設定（eventArrayへのデータ設定完了までの十分な時間を確保する）

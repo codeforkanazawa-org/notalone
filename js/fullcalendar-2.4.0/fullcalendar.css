@@ -647,6 +647,10 @@ a.fc-more {
 	font-size: .85em;
 	cursor: pointer;
 	text-decoration: none;
+
+	/* tada custom */
+	background : yellow;
+	/***************/
 }
 
 a.fc-more:hover {
