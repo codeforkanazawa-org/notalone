@@ -11,6 +11,9 @@ $(window).resize(function(){
 //実行ページ名の格納変数
 var thispage ="";
 
+//デフォルトのメッセージ
+var Def_info ="	<br />みんなで遊そぼ！<br /><br />まずは写真を<br />クリック！！<br />";
+
 //初期化
 function init(){
 	//実行ページのチェック
@@ -58,9 +61,13 @@ function brows_init(){
 		$("#top-menu").width(BodyWidth);
 		$("#top-menu").css({"left" : BodyLeftMargin });
 
+		$("#myCalendar").width(BodyWidth);
+		$("#myCalendar").css({"left" : BodyLeftMargin });
+
 	}else{
 		var BodyWidth = DeviceWidth + "px";
 	}
+
 
 	$("#top-menu").height(TopHeight);
 	$("#top-menu").css({"line-height" : TopHeight + "px"});
@@ -72,6 +79,7 @@ function brows_init(){
 		//****************
 		case "index.html" :
 
+	//縦幅 0.35
 	var PrivertHeight  = Math.round(DeviceHeight * 0.35);	//個人情報欄の縦幅確保
 	var PhotoPadding = 5;				//個人情報　写真の余白
 
@@ -86,7 +94,19 @@ function brows_init(){
 	$(".jobmenu").height(MenuHeight);
 	$(".jobmenu").css({"line-height" : MenuHeight + "px"});
 
-	$("#photo > img").css({"height" : (PrivertHeight - PhotoPadding * 2) + "px" , "padding" : PhotoPadding + "px"});
+	//$("#photo > img").css({"height" : (PrivertHeight - PhotoPadding * 2) + "px" , "padding" : PhotoPadding + "px"});
+	//$("#photo > img").css({"height" : (PrivertHeight * 0.7 - PhotoPadding * 2) + "px" , "padding" : PhotoPadding + "px"});
+
+	//canvasサイズは縦を基準、横幅は元画像から比率で設定
+	$("#myCanvas").css({"height" : (PrivertHeight - PhotoPadding * 2) + "px" , "padding" : PhotoPadding + "px"});
+
+	//canvas内に初期画像を表示
+	ImageSet('myCanvas','uploads/images/IMG_0763.jpg');
+
+
+	//個人情報の読み出し　指標を表示
+	favInit(0);
+
 
 		break;
 
@@ -174,6 +194,9 @@ $(function() {
 		$(idname).datepicker("option", "showOn", 'button');
 		$(idname).datepicker("option", "buttonImageOnly", true);
 		$(idname).datepicker("option", "buttonImage", 'images/ico_calendar.png');
+
+		$(idname).datepicker("option", "showButtonPanel", true);
+
 	}
 });
 
@@ -239,23 +262,156 @@ function getMyFav(){
 }
 
 //お気に入り初期化
-function favInit(){
+function favInit(type){
+	//type : 0 指標のみ表示
+	//type : 1 入力データも表示
+
 	//*** cookie *****
 	getMyFav();
 
 	var fav_name;
 	var fav_bday;
 
+	var count = 0;
+	var setdata = "";
 
 	for(i=1 ; i<=MyFav_count ;i++){
 		fav_name = MyFavFamily[i]['name'];
 		fav_bday = MyFavFamily[i]['bday'];
+
 		if(fav_name != ""){
-			$("#name" + i).val(fav_name);
-			$("#bday" + i).val(fav_bday);		
+			if(type == 1){
+				//入力欄に表示
+				$("#name" + i).val(fav_name);
+				$("#bday" + i).val(fav_bday);		
+			}
+
+			//子育て指標の表示
+			count ++;
+			setdata += fav_name + "<br />";
+			setdata += "・" + calculateAge(fav_bday) + "<br />";
+		}else{
+			//入力欄クリア
+			$("#name" + i).val('');
+			$("#bday" + i).val('');		
+		}
+	}
+
+	if(count>0){
+		$("#myFavFamily").html(setdata);
+	}else{
+		//設定がない場合（デフォルトメッセージ)
+		$("#myFavFamily").html(Def_info);
+	}
+}
+
+//誕生日からの経過年月日を算出（出産予定日対応）
+function calculateAge(birthday) {
+	// birth[0]: year, birth[1]: month, birth[2]: day
+	var  birth = birthday.split('/');
+	// 文字列型に明示変換後にparseInt
+	var _birth = parseInt("" + birth[0] + birth[1] + birth[2]);
+
+	var  today = new Date();
+	// 文字列型に明示変換後にparseInt
+	var _today = parseInt("" + today.getFullYear() + affixZero(today.getMonth() + 1) + affixZero(today.getDate()));
+
+
+
+
+
+
+    	//経過月、日数を算出
+	//今年の誕生日までの日数
+	var  strToday    = today.getFullYear() + "/" + affixZero(today.getMonth() + 1) + "/" +  affixZero(today.getDate());
+	//var  thisBirthday = today.getFullYear() + "/" + birth[1] + "/" + birth[2];
+
+	if(_birth > _today){
+		//出産予定の場合（未来月）		
+		var  diffDays = getDiff(strToday , birthday) - 1;
+
+		//平均月数(365/12)
+		var diffMonth = diffDays / (365 / 12);
+		//return diffDays + "日後（" + diffMonth.toFixed(1) + "月）"; 		
+		return diffDays + "日後"; 		
+	}else{
+		//誕生日の場合
+		//年数確定
+		var Age = parseInt((_today - _birth) / 10000);
+
+		//今年の誕生日
+		var  thisBirthday = today.getFullYear() + "/" + birth[1] + "/" + birth[2];
+		var  diffDays = getDiff(thisBirthday , strToday);
+
+		//誕生日前の場合（うるう年考慮せず）
+		if(strToday < thisBirthday){
+			diffDays = 365 - diffDays;
+		} 
+
+		//平均月数(365/12)
+		var diffMonth = parseInt(diffDays / (365 / 12));
+
+		if(Age < 1){
+			if(diffMonth <= 3){
+				//return diffDays + "日目（" + diffMonth + "月）";
+				return diffDays + "日目";
+			}else{
+				//return diffMonth + "ケ月（" + diffDays + "日）";
+				return diffMonth + "ケ月";
+			}
+		}else{
+			//return Age + "歳" + diffMonth + "月（" + diffDays + "日）"; 
+			return Age + "歳" + diffMonth + "ケ月"; 
 		}
 	}
 }
+
+function affixZero(int) {
+    if (int < 10) int = "0" + int;
+    return "" + int;
+}
+
+
+//日付の差分日数を返却します。
+function getDiff(date1Str, date2Str) {
+	var date1 = new Date(date1Str);
+	var date2 = new Date(date2Str);
+ 
+	// getTimeメソッドで経過ミリ秒を取得し、２つの日付の差を求める
+	var msDiff = date2.getTime() - date1.getTime();
+ 
+	// 求めた差分（ミリ秒）を日付へ変換します（経過ミリ秒÷(1000ミリ秒×60秒×60分×24時間)。端数切り捨て）
+	var daysDiff = Math.floor(msDiff / (1000 * 60 * 60 *24));
+ 
+	// 差分へ1日分加算して返却します
+	return ++daysDiff;
+}
+
+/*
+年間 365日　４年に１回　366日
+月
+   1  2  3   4   5   6   7   8   9  10  11  12
+  31 28 31  30  31  30  31  31  30  31  30  31
+    (29)
+  31 59 90 120 151 181 212 243 273 304 334 365
+
+  誕生日から今日までの日数を算出する　・・・　総日数
+　日数を365日で割る　・・・　年数を算出
+　　総日数から、年数分の日数を減算する
+　　年数を４で割る　・・・　割れた回数分　総日数から減算する（うるう年対策）
+　　　０の場合（４年未満）、誕生年から現在年まで、西暦でうるう年を判断し
+　　　　
+
+うるう年
+（1）西暦年号が4で割り切れる年をうるう年とする。
+（2）（1）の例外として、西暦年号が100で割り切れて400で割り切れない年は平年とする。
+
+　２月２９日生まれは、２８日を起算日とする　
+*/
+
+
+
+
 
 function myfavSet(){
 	//日付データを作成する
@@ -265,11 +421,11 @@ function myfavSet(){
 
 	for(var i=1; i<=MyFav_count; i++){		
 		//** cookie set
-		document.cookie = "name" + i + "=" + $("#name" + i).val() + ";expires=" + date1;
-		document.cookie = "bday" + i + "=" + $("#bday" + i).val() + ";expires=" + date1; 
+		document.cookie = "name" + i + "=" + escape($("#name" + i).val()) + ";expires=" + date1;
+		document.cookie = "bday" + i + "=" + escape($("#bday" + i).val()) + ";expires=" + date1; 
 	}
 
-	favInit();
+	favInit(1);
 }
 
 //cookie 強制削除
@@ -286,9 +442,74 @@ function myfavDel_all(){
 		document.cookie = "bday" + i + "=;expires=" + date1.toGMTString(); 
 	}
 
-	favInit();
+	favInit(1);
 }
 
+
+//ローカル画像ファイルの表示
+function localImageSet(){
+$("#uploadFile").change(function() {
+    var canvas = $("#myCanvas");
+    var ctx = canvas[0].getContext("2d");
+
+    // 選択されたファイルを取得
+    var file = this.files[0];
+
+    // 画像ファイル以外は処理中止
+    if (!file.type.match(/^image\/(png|jpeg|gif)$/)) return;
+
+    var image = new Image();
+    var reader = new FileReader();
+
+    // File APIを使用し、ローカルファイルを読み込む
+    reader.onload = function(evt) {
+
+      // 画像がloadされた後に、canvasに描画する
+      image.onload = function() {
+        //ctx.drawImage(image, 0, 0);
+      }
+
+      // 画像のURLをソースに設定
+      image.src = evt.target.result;
+
+      ImageSet('myCanvas' , image.src);
+
+      //
+      //$('#urldata').val(image.src);
+      //alert(image.src);
+
+    }
+
+    // ファイルを読み込み、データをBase64でエンコードされたデータURLにして返す
+    reader.readAsDataURL(file);
+
+  });
+}
+
+//canvasに指定の画像を表示する
+function ImageSet(canvasname,imagename){
+    var canvas  = $('#' + canvasname);
+    var context = canvas[0].getContext('2d');
+
+    var image = new Image();
+    image.src = imagename;
+
+    image.addEventListener('load', function() {
+	var swidth  = image.width;
+	var sheight = image.height;
+	var sexp    = swidth / sheight;
+
+        var iheight = canvas.height();
+        var iwidth  = parseInt(iheight * sexp);
+ 
+	//canvasのサイズ変更は　css は NG（縦長） --> attr　で設定
+	$(canvas).attr('width'  , iwidth);
+	$(canvas).attr('height' , iheight);
+
+        //context.drawImage(image, 100, 100);
+        context.drawImage(image, 0 , 0 , iwidth , iheight);
+    }, false);
+}
 //****************************
 
 

@@ -28,41 +28,54 @@
 <body onload="init()">
 <!-- fix start -->
 <div id="top-menu" onClick="top_index()">能登ノットアローン</div>
+
+<div id="myCalendar">
+	<a href="https://www.google.com/calendar/" target="_blank">
+		<img src="images/ico_calendar.png" />
+	</a>
+</div>
 <!-- fix end -->
+
 <!-- fix div 調整用　-->
 <div id="menu-back"></div>
 
-
 <div id="privert">
-  <div id="photo"><img src="uploads/images/IMG_0763.jpg" height="150" /></div>
-  <div id="info">
-	・あゆみ<br />　３年３ケ月<br />
-	・はじめ<br />　１年２ケ月<br />
-	・まして<br />　３００日<br />
+  <canvas id="myCanvas" onClick="setting()">
+  </canvas>	
 
-	<a href="https://www.google.com/calendar/" target="_blank"><img src="images/ico_calendar.png"/></a>
-	<input type="button" value="設定" onClick="setting();" /><br />
+  <div id="info">
+	<div id="myFavFamily">
+ 	</div>
   </div>
 </div>
+
 <div id="setting">
-	お子さんの名前、誕生日を設定します<br />
+	<h5>
+	（注）端末のブラウザに情報を保存しますので、ブラウザ初期化などにより、情報が消える場合があります。</h5>
 	<form>
+	家族の名前、誕生日の設定<br />
 	<input type="text" id="name1" size="12" value="">
-	<input type="text" id="bday1" size="12" value=""><br />
+	<input type="text" id="bday1" size="12" value="" readonly="readonly"><br />
 	<input type="text" id="name2" size="12" value="">
-	<input type="text" id="bday2" size="12" value=""><br />
+	<input type="text" id="bday2" size="12" value="" readonly="readonly"><br />
 	<input type="text" id="name3" size="12" value="">
-	<input type="text" id="bday3" size="12" value=""><br />
+	<input type="text" id="bday3" size="12" value="" readonly="readonly"><br />
 
-	<input type="button" onClick="favInit()" value="読み出し" />
 	<input type="button" onClick="myfavSet()" value="保存" />
-	<input type="button" onClick="myfavDel_all()" value="クリア" />
-	<br />
+	<input type="button" onClick="myfavDel_all()" value="消去" />
+	｜<input type="button" onClick="favInit(1)" value="表示" />
+	<input type="reset"  value="非表示"/>
+	</form>
+	<hr />
+	<form>
+	お気に入り写真の登録<br />
+	<input type="button" onClick="localImageSet()" value="画像選択" />
+	<input id="uploadFile" name="image" type="file" />
 
-	<input type="file" id="bphoto" ><br />
+	<!--input type="file" id="bphoto" ><br />
 
-	<input type="reset"  value="消去"/>
-	<input type="submit" value="保存" />
+	<input type="submit" value="登録" />
+	<input type="reset"  value="クリア"/-->
 	</form>
 </div>
 <div class="jobmenu" id="menu1" onClick="snd_index('events')">イベント</div>
