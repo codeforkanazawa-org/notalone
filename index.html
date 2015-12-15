@@ -52,6 +52,17 @@
 <div id="setting">
 	<h5>
 	（注）端末のブラウザに情報を保存しますので、ブラウザ初期化などにより、情報が消える場合があります。</h5>
+	<form id="imgupload">
+	お気に入り写真の登録<br />
+	<!--input type="button" onClick="localImageSet()" value="画像選択" /-->
+	<input id="uploadFile" name="image" type="file" />
+
+	<!--input type="file" id="bphoto" ><br /-->
+
+	<input type="submit" value="登録" />
+	<input type="reset"  value="クリア"/>
+	</form>
+	<hr />
 	<form>
 	家族の名前、誕生日の設定<br />
 	<input type="text" id="name1" size="12" value="">
@@ -61,29 +72,20 @@
 	<input type="text" id="name3" size="12" value="">
 	<input type="text" id="bday3" size="12" value="" readonly="readonly"><br />
 
-	<input type="button" onClick="myfavSet()" value="保存" />
-	<input type="button" onClick="myfavDel_all()" value="消去" />
-	｜<input type="button" onClick="favInit(1)" value="表示" />
+	<input type="button" onClick="favInit(1)" value="表示" />
 	<input type="reset"  value="非表示"/>
-	</form>
-	<hr />
-	<form>
-	お気に入り写真の登録<br />
-	<input type="button" onClick="localImageSet()" value="画像選択" />
-	<input id="uploadFile" name="image" type="file" />
-
-	<!--input type="file" id="bphoto" ><br />
-
-	<input type="submit" value="登録" />
-	<input type="reset"  value="クリア"/-->
+	｜<input type="button" onClick="myfavSet()" value="保存" />
+	<input type="button" onClick="myfavDel_all()" value="消去" />
 	</form>
 </div>
 <div class="jobmenu" id="menu1" onClick="snd_index('events')">イベント</div>
-<div class="jobmenu" id="menu3" onClick="snd_index('advice')">相談</div>
+<div class="jobmenu" id="menu3" onClick="snd_index('inquiry')">相談</div>
 <div class="jobmenu" id="menu2" onClick="snd_index('aidmap')">子育て応援Map</div>
 
 <!-- Page Checker (style display:none)-->
 <div id="thispage">index.html</div>
+
+<!--textarea id="result"></textarea-->
 
 </body>
 </html>

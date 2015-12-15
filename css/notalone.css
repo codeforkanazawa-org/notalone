@@ -70,6 +70,8 @@ body{
 	display : none;
 	clear : both;
 }
+
+/*** index / inquiry common */
 .jobmenu{
 	clear : both;
 	position : relative;
@@ -81,11 +83,35 @@ body{
 	background-color : lightgreen;
 }
 #menu2{
-	background-color : lightyellow;
+	background-color : #FAFAD2;
 }
 #menu3{
-	background-color : lightblue;
+	background-color : #E0FFFF;
 }
+
+#menu4,#inqid_1_title{
+	background-color : lightgreen;
+}
+#menu5,#inqid_2_title{
+	background-color : #FFDEAD;
+}
+#menu6,#inqid_3_title{
+	background-color : #FAFAD2;
+}
+#menu7,#inqid_4_title{
+	background-color : #E0FFFF;
+}
+#menu8,#inqid_5_title{
+	background-color : #FFE4E1;
+}
+
+#inqid_close{
+	text-align : center;
+	background-color : lightgray;
+	/* border : solid 1px; */
+}
+
+
 
 
 /**** for events.html ****/
@@ -111,3 +137,24 @@ body{
 	display:none;
 }
 
+.eventclass{
+	width : 100%;
+	border-collapse: collapse;
+}
+.eventclass th,td{
+	padding-left : 6px;
+	padding-right: 6px;
+	background-color: #fff;
+	border: 1px solid #b9b9b9;
+}
+.eventclass th{
+	width : 80px;
+	background : #F5F5F5;
+}
+
+
+/**** for inquiry.html ****/
+.inquiry-cont {
+	padding-left : 20px;
+	display:none;
+}

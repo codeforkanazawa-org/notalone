@@ -1,0 +1,166 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+<!-- キャッシュしない -->
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="cache-control" content="no-cache" />
+<meta http-equiv="expires" content="0" />
+<!--               -->
+
+<title>能登ノットアローン｜子育て相談</title>
+
+<link rel="stylesheet" href="css/notalone.css">
+
+<link rel="stylesheet" href="js/jquery-ui-1.11.4.custom/jquery-ui.min.css">
+
+<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
+
+
+<script type="text/javascript" src="js/notalone.js"></script>
+
+</head>
+
+<body onload="init()">
+<!-- fix start -->
+<div id="top-menu" onClick="top_index()">能登ノットアローン</div>
+
+<!--div id="myCalendar">
+	<a href="https://www.google.com/calendar/" target="_blank">
+		<img src="images/ico_calendar.png" />
+	</a>
+</div-->
+<!-- fix end -->
+
+<!-- fix div 調整用　-->
+<div id="menu-back"></div>
+
+
+<div id="setting">
+</div>
+
+<div class="jobmenu" id="inqid_1_title" onClick="selectInquiry(1)">相談ごとなんでも</div>
+	<div id="inqid_1" class="inquiry-cont">
+<h3>◎子育て全般に関すること</h3>
+子育て支援センター<br />
+・児童センター（２２−８０３１）<br />
+
+<h4>子育て全般</h4>
+輪島市子育て支援センター・児童館	0768-22-8031<br />	
+
+
+	</div>
+
+<div class="jobmenu" id="inqid_2_title" onClick="selectInquiry(2)">健康・発育</div>
+	<div id="inqid_2" class="inquiry-cont">
+<h3>◎子育て子どもの発育・健康のこと</h3>
+健康推進課（２３−１１３６）<br />
+門前保健センター（４２−１３１３）<br />
+
+<h3>◎子どもの発達、心身の障害など</h3>
+能登北部保健福祉センター（２２−２０１１）<br />
+
+<h4>子どもの健康</h4>
+輪島市健康推進課　	0768-23-1136<br />	
+輪島市門前保険センター	0768-42-1313<br />	
+石川県能登北部保険福祉センター	0768-22-2011<br />	
+<h4>病院</h4>
+輪島市立輪島病院	0768-22-2222	輪島市山岸町は1-1<br />
+珠洲市総合病院	0768-82-1181	珠洲市野々江町ユ部1-1<br />
+公立穴水総合病院	0768-52-0511	鳳珠郡穴水町字川島夕-8<br />
+公立宇出津総合病院	0768-62-1311	鳳珠郡能登町宇出津夕97<br />
+
+	</div>
+
+<div class="jobmenu" id="inqid_3_title" onClick="selectInquiry(3)">保育所・幼稚園</div>
+	<div id="inqid_3" class="inquiry-cont">
+<h3>◎保育所、家庭児童相談、ひとり親家庭、児童虐待相談</h3>
+福祉課（２３−１１６１）<br />
+
+<h4>保育所、家庭児童相談など</h4>
+輪島市福祉課	0768-23-1161<br />	
+
+	</div>
+
+<div class="jobmenu" id="inqid_4_title" onClick="selectInquiry(4)">学校</div>
+	<div id="inqid_4" class="inquiry-cont">
+<h3>◎入学、通学区域など学校のこと</h3>
+教育委員会（学校教育課２３−１１７１）<br />
+
+<h4>学校</h4>
+輪島市教育委員会	0768-23-1171<br />	
+
+	</div>
+
+<div class="jobmenu" id="inqid_5_title" onClick="selectInquiry(5)">助成制度・その他</div>
+	<div id="inqid_5" class="inquiry-cont">
+<h3>◎出生届、チャイルドシート購入助成</h3>
+市民課（２３−１１３１）<br />
+門前総合支所（４２−１１１１（代））<br />
+支所・出張所<br />
+　町野（３２−０００１）<br />
+　西保（３６−２００１）<br />
+　南志見（３４−１００１）<br />
+　三井（２６−１２１１）<br />
+
+<h3>◎助成制度等の窓口</h3>
+<h4>妊娠</h4>
+・母子手帳交付<br />
+　　県内で使用できる妊産婦・乳児健康診断無料券が交付されます<br />
+・妊産婦検診<br />
+　　上記無料券で、妊婦健診１４回、産婦健診１回を県内医療機関で受診できます<br />
+　　＊県外での受診費用の助成は、別途手続きが必要です。<br />
+<h4>出産</h4>
+・出産費<br />
+　　出産予定の医療機関へお問い合わせください<br />
+・出生届<br />
+・乳児健診<br />
+　　上記無料券で２回県内医療機関で受診できます<br />
+<h4>育児</h4>
+・子ども手当<br />
+・チャイルドシート購入助成<br />
+<h4>医療</h4>
+・乳幼児医療費<br />
+・子宝支援（不妊治療費助成）<br />
+・公費負担医療制度（未熟児、小児慢性特定疾患等）<br />
+・ひとり親家庭等医療費助成<br />
+<h4>その他</h4>
+・身体障がい児童手当・療育手帳の交付<br />
+
+<h4>出生届、チャイルドシート助成</h4>
+輪島市市民課	0768-23-1131<br />	
+輪島市門前総合支所	0768-41-1111<br />	
+輪島市町野支所	0768-32-0001<br />	
+輪島市西保出張所	0768-36-2001<br />	
+輪島市南志見出張所	0768-34-1001<br />	
+輪島市三井出張所	0768-26-1211<br />	
+
+<h4>子ども手当</h4>
+輪島市福祉課	0768-23-1161<br />	
+<h4>乳幼児医療費</h4>
+輪島市福祉課	0768-23-1161<br />	
+<h4>公費負担医療制度</h4>
+石川県能登北部保険福祉センター	0768-22-2011<br />	
+<h4>ひとり親支援</h4>
+輪島市福祉課	0768-23-1161<br />	
+<h4>子宝支援（不妊治療費助成）</h4>
+輪島市健康推進課　	0768-23-1136<br />	
+<h4>障がい児手帳・療育手帳交付</h4>
+輪島市福祉課	0768-23-1161<br />	
+
+	</div>
+
+<div id="inqid_close" onClick="selectInquiry(0)">⇧</div>
+
+<div id="dummy">
+</div>
+
+<!-- Page Checker (style display:none)-->
+<div id="thispage">inquiry.html</div>
+
+</body>
+</html>

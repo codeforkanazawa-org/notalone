@@ -32,6 +32,11 @@ function init(){
 			brows_init();
 
 			break;
+
+		case "inquiry.html" :
+			brows_init();
+
+			break;
 	}	 
 }
 
@@ -103,6 +108,8 @@ function brows_init(){
 	//canvas内に初期画像を表示
 	ImageSet('myCanvas','uploads/images/IMG_0763.jpg');
 
+	//選択画像の表示準備
+	//localImageSet();
 
 	//個人情報の読み出し　指標を表示
 	favInit(0);
@@ -137,11 +144,29 @@ function brows_init(){
 	$("#dummy").height(DeviceHeight - calendar_div - $("#top_menu").height());
 
 		break;
+
 		//***************************
+		case "inquiry.html" :
 
+	$("#menu-back").height(TopHeight);
+	$("#menu-back").css({"line-height" : TopHeight + "px"});
+
+	//var MenuHeight = ( DeviceHeight - TopHeight - PrivertHeight ) / 3;
+	var MenuHeight = ( DeviceHeight - TopHeight ) / 5;
+
+	$(".jobmenu").height(MenuHeight);
+	$(".jobmenu").css({"line-height" : MenuHeight + "px"});
+
+	//イベント欄ダミーの高さ(px)
+	$("#dummy").height(DeviceHeight - $("#top_menu").height());
+
+		break;
+
+		//***************************
 	}
-	//***************************
 
+
+	//***************************
 }
 
 
@@ -164,7 +189,8 @@ function snd_index(link){
 				break;
  		case "aidmap" :	location.href="sub/map.html";
 				break;
-		case "advice" :
+		case "inquiry" : location.href="inquiry.html";
+				break;
 	}
 }
 
@@ -333,7 +359,7 @@ function calculateAge(birthday) {
 		//平均月数(365/12)
 		var diffMonth = diffDays / (365 / 12);
 		//return diffDays + "日後（" + diffMonth.toFixed(1) + "月）"; 		
-		return diffDays + "日後"; 		
+		return "あと" + diffDays + "日"; 		
 	}else{
 		//誕生日の場合
 		//年数確定
@@ -447,7 +473,8 @@ function myfavDel_all(){
 
 
 //ローカル画像ファイルの表示
-function localImageSet(){
+//function localImageSet(){
+$(function(){
 $("#uploadFile").change(function() {
     var canvas = $("#myCanvas");
     var ctx = canvas[0].getContext("2d");
@@ -484,7 +511,9 @@ $("#uploadFile").change(function() {
     reader.readAsDataURL(file);
 
   });
-}
+//}
+});
+
 
 //canvasに指定の画像を表示する
 function ImageSet(canvasname,imagename){
@@ -510,6 +539,28 @@ function ImageSet(canvasname,imagename){
         context.drawImage(image, 0 , 0 , iwidth , iheight);
     }, false);
 }
+
+
+//画像ファイルのアップロード
+$(function(){
+    $('#imgupload').submit(function(){
+	var fd = new FormData($('#imgupload').get(0));
+        $.ajax({
+            url: "photouploader.php",
+	    type: 'POST',
+	    data : fd,
+	    processData : false,
+	    contentType : false,
+            dataType: 'json'
+        })
+        .done(function( data ) {
+            $('#result').text(data.width + "x" + data.height);
+        });
+
+        return false;	//表示をリフレッシュしない
+
+    });
+});
 //****************************
 
 
@@ -575,8 +626,42 @@ function readEvents(target){
 			}
 			eventArray.push(rensou);
 		}
+
+
+		//eventArray を日付、開始時間で昇順ソートする
+		//降順は、-1 , 1 を逆にする
+		//ev_when : 年月 ev_open : 開始時間
+		eventArray.sort(function(a,b){
+			if(a[ev_when] < b[ev_when]) return -1;
+			if(a[ev_when] > b[ev_when]) return 1;
+			if(a[ev_open] < b[ev_open]) return -1;
+			if(a[ev_open] > b[ev_open]) return 1;
+			return 0;
+		});
 	});
 }
+
+
+
+/***  event csv format 変換テーブル  ****/
+var ev_title = "eventtitle";	//タイトル
+var ev_where = "where";		//開催場所
+var ev_whom  = "whom";		//対象者
+var ev_what  = "what";		//内容
+var ev_who   = "who";		//主催者
+var ev_cont  = "contact";	//申し込み先
+var ev_fee   = "fee";		//参加費
+var ev_when  = "when";		//開催日　　yyyy/mm/dd
+var ev_open  = "openTime";	//開始時間　hh:mm:ss  or  hh:mm
+var ev_close = "closeTime";	//終了時間　hh:mm:ss  or  hh:mm
+var ev_cat   = "tag1";		//識別・カテゴリー
+
+//スクリプト内で作成
+var ev_no    = "no";		//必須
+var ev_year  = "year";		//イベント年　ev_when から取得
+var ev_month = "month";		//イベント月
+var ev_day   = "day";		//イベント日
+/*********/
 
 //eventArrayのデータをFullCalendarに設定する（月単位）
 function eventSetCalendar(){
@@ -585,21 +670,27 @@ function eventSetCalendar(){
 
 	var evtclass , evttitle , evtday , weekday;
 	var evtcont;
+	var tg1 = "<tr><th>";
+	var tg2 = "</th><td>";
+	var tg3 = "</td></tr>"; 
 	var bcolor , tcolor;
 
 	for(var i =0 ; i < eventArray.length ; i++){
 		var edata = new Object();
 
-		edata['id']    = eventArray[i]['no'];
-		edata['title'] = eventArray[i]['eventname'];
-		edata['start'] = eventArray[i]['year'] + "-" + eventArray[i]['month'] + "-" + eventArray[i]['day'];
+		//FullCalendar 用のデータセット
+		edata['id']    = i + 1;
+		edata['title'] = eventArray[i][ev_title];
+
+		//開催日 yyyy/mm/dd -> yyyy-mm-dd  FullCalendar formatに合わせる
+		edata['start'] = eventArray[i][ev_when].replace(/\//g,"-");
 
 		//対象年齢によって色設定 ************
 		//define化が必要
 		//color: 'yellow',   // an option!
 	    	//textColor: 'black' // an option!
 
-		switch(eventArray[i]['icon']){
+		switch(eventArray[i][ev_cat]){
 			case 'over5'  : bcolor = "green";	break;
 			case 'over8'  : bcolor = "blue";	break;
 			case 'over10' : bcolor = "red";		break;
@@ -611,6 +702,8 @@ function eventSetCalendar(){
 
 		source.push(edata);
 
+
+
 		//イベント欄に一覧表示する
 		if((i % 2) == 0){
 			evtclass = "calendar-event-even";
@@ -620,31 +713,52 @@ function eventSetCalendar(){
 
 		var ev = eventArray[i];
 
+		//アコーディオン用のデータセット
+		ev['no'] = i + 1;
+
+		//when から　年月日取得
+		buff = ev[ev_when].split("/"),
+		ev[ev_year]  = buff[0];
+		ev[ev_month] = buff[1];
+		ev[ev_day]   = buff[2];	
+
 		//イベント日から曜日を取得
-		evtday  = new Date(ev['year'] + "/" + ev['month'] + "/" + ev['day']);
+		evtday  = new Date(ev[ev_year] + "/" + ev[ev_month] + "/" + ev[ev_day]);
 		weekday = JpWeekday[evtday.getDay()];
 
 		//イベントのタイトル
-		evttitle  = "<div id='evtid_" + ev['no'] + "_title' ";
-		evttitle += "onClick='selectEvent(" + ev['no'] + ")' ";
+		evttitle  = "<div id='evtid_" + ev[ev_no] + "_title' ";
+		evttitle += "onClick='selectEvent(" + ev[ev_no] + ")' ";
 		evttitle += "class='" + evtclass + "'>";
-		evttitle += ev['day'] + "日(" + weekday + ")　";
-		evttitle += ev['starttime'] + "〜　";
-		evttitle += ev['eventname'];
+		evttitle += ev[ev_day] + "日(" + weekday + ")　";
+		evttitle += ev[ev_open].substr(0,5) + "〜　";
+		evttitle += ev[ev_title].substr(0,16);
 		evttitle += "</div>";
 
 		$("#events-title").append(evttitle);
 
 		//イベントの詳細
-		evtcont  = "<div id='evtid_" + ev['no'] +"' ";
+		evtcont  = "<div id='evtid_" + ev[ev_no] +"' ";
 		evtcont += "class='calendar-event-cont'>";
-		evtcont += "時間　"  + ev['starttime'] + "〜" + ev['endtime'] + "<br />";
-		evtcont += "内容　"  + ev['contents'] + "<br />";
-		evtcont += "場所　"  + ev['place'] + "<br />";
-		evtcont += "対象者　" + ev['target'] + "<br />";
-		evtcont += "申込み　" + ev['entry'] + "<br />";
-		evtcont += "参加非　" + ev['fee'] + "<br />";
-		evtcont += "画像　"  + ev['icon'];
+
+		evtcont += "<table class='eventclass'>";
+
+		evtcont += tg1 + "名称"  + tg2 + ev[ev_title] + tg3;
+		evtcont += tg1 + "時間"  + tg2 + ev[ev_open].substr(0,5) + "〜" + ev[ev_close].substr(0,5) + tg3;
+		evtcont += tg1 + "内容"  + tg2 + ev[ev_what] + tg3;
+		evtcont += tg1 + "場所"  + tg2 + ev[ev_where] + tg3;
+		evtcont += tg1 + "対象者" + tg2 + ev[ev_whom] + tg3;
+		evtcont += tg1 + "主催者" + tg2 + ev[ev_who] + tg3;
+		if(ev[ev_fee] == 0 || ev[ev_fee] ==""){
+			evtcont += tg1 + "参加費" + tg2 + "無料" + tg3;
+		}else{
+			evtcont += tg1 + "参加費" + tg2 + ev[ev_fee] + "円" + tg3;
+		}
+		evtcont += tg1 + "連絡先" + tg2 + ev[ev_cont] + tg3;
+		evtcont += tg1 + "識別子"   + tg2 + ev[ev_cat] + tg3;
+
+		evtcont +="</table>";
+
 		evtcont += "</div>";	
 
 		$("#events-title").append(evtcont);	
@@ -859,3 +973,51 @@ function events_init(){
 		setTimeout("eventSetCalendar()" , 1000);
 	});
 }
+
+
+//**** for inquiry.html *******
+//相談ごとの選択 アコーディオン機能
+var openInq = "";
+function inqScroll(callInq){
+	
+	//スクロール量の計算
+	var targetY  = $(callInq).offset().top;		//タイトルの現在位置
+	targetY -= $(callInq + "_title").height();	//タイトルの高さ減算
+	targetY -= $("#menu-back").height(); 		//メニューバックの高さ減算
+	targetY -= 18;					//調整減算（原因未追求）
+
+	//スクロール実施
+	$("html,body").animate({scrollTop:targetY},{duration: 1000});
+
+}
+
+function selectInquiry(idno){
+	var callInq = '#inqid_' + idno;
+
+	if(openInq != ""){
+		//イベント詳細が開いている場合は、閉じてから次のオープンに進む
+		$(openInq).hide("blind" , "" , 200 ).promise().done(function(){
+
+			if(openInq == callInq || idno == 0){
+				openInq = "";
+
+				//topに戻る
+				var targetY = 0;
+				$("html,body").animate({scrollTop:targetY},{duration: 1000});
+			}else{
+				$(callInq).show("blind", "", 500 );
+				openInq = '#inqid_' + idno;
+
+				inqScroll(openInq);
+			}
+
+		});	
+	}else{
+		//イベント詳細が開いていない場合
+		$(callInq).show("blind", "", 1000 );
+		openInq = '#inqid_' + idno;
+
+		inqScroll(openInq);
+	}
+}
+
