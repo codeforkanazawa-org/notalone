@@ -123,12 +123,16 @@ body{
 	line-height : 40px;
 	padding-left : 10px;
 
-	background-color : lightblue;	
+	overflow: auto;
+
+	background-color : lightblue;
 }
 .calendar-event-odd {
 	height : 40px;
 	line-height : 40px;
 	padding-left : 10px;
+
+	overflow: auto;
 
 	background-color : lightyellow;	
 }

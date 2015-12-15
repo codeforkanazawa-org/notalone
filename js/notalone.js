@@ -731,8 +731,9 @@ function eventSetCalendar(){
 		evttitle += "onClick='selectEvent(" + ev[ev_no] + ")' ";
 		evttitle += "class='" + evtclass + "'>";
 		evttitle += ev[ev_day] + "日(" + weekday + ")　";
-		evttitle += ev[ev_open].substr(0,5) + "〜　";
-		evttitle += ev[ev_title].substr(0,16);
+		evttitle += ev[ev_open].substr(0,5) + "　";
+		//evttitle += ev[ev_title].substr(0,16);
+		evttitle += ev[ev_title];
 		evttitle += "</div>";
 
 		$("#events-title").append(evttitle);
