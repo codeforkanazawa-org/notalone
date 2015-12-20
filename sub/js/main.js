@@ -1,8 +1,11 @@
 $(function(){
     initlaize();
 
-    var KANAZAWA_STATION_LAT = 36.578273;
-    var KANAZAWA_STATION_LNG = 136.647763;
+    //var KANAZAWA_STATION_LAT = 36.578273;
+    //var KANAZAWA_STATION_LNG = 136.647763;
+    //輪島市役所
+    var DEFAULT_LAT = 37.390556;
+    var DEFAULT_LNG = 136.899167;
     var FARAWAY_DISTANCE     = 0.8;
 
     function initlaize() {
@@ -45,8 +48,10 @@ mapTypeId: google.maps.MapTypeId.ROADMAP
 
         //石川から大きく離れた場所の場合、現在地情報を金沢駅に設定
         if (getDistanceFromKanazawaStation(lat, lng) > FARAWAY_DISTANCE) {
-            lat = KANAZAWA_STATION_LAT;
-            lng = KANAZAWA_STATION_LNG;
+            //lat = KANAZAWA_STATION_LAT;
+            //lng = KANAZAWA_STATION_LNG;
+            lat = DEFAULT_LAT;
+            lng = DEFAULT_LNG;
         }
         $('#loading').hide();
         showGoogleMap(lat, lng);
@@ -56,7 +61,8 @@ mapTypeId: google.maps.MapTypeId.ROADMAP
         $('#loading').hide();
 
         //位置情報取得不可の場合も現在地情報を金沢駅に補正
-        showGoogleMap(KANAZAWA_STATION_LAT, KANAZAWA_STATION_LNG);
+        //showGoogleMap(KANAZAWA_STATION_LAT, KANAZAWA_STATION_LNG);
+        showGoogleMap(DEFAULT_LAT, DEFAULT_LNG);
     }
 
     function getDistance(x1, x2, y1, y2) {
@@ -66,7 +72,8 @@ mapTypeId: google.maps.MapTypeId.ROADMAP
 
     function getDistanceFromKanazawaStation(lat, lng)
     {
-        var distance = getDistance(lat, KANAZAWA_STATION_LAT, lng, KANAZAWA_STATION_LNG);
+        //var distance = getDistance(lat, KANAZAWA_STATION_LAT, lng, KANAZAWA_STATION_LNG);
+        var distance = getDistance(lat, DEFAULT_LAT, lng, DEFAULT_LNG);
         return distance;
     }
 
