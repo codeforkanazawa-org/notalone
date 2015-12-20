@@ -260,9 +260,9 @@ a:active {
 .content {
   position: absolute;
 
-  /*top: 0;*/
+  top: 0;
   /* notalone */
-  top:16px;
+  /*top:16px;*/
   /************/
 
   right: 0;
@@ -280,7 +280,10 @@ a:active {
 }
 
 .bar-nav ~ .content {
-  padding-top: 44px;
+  /*padding-top: 44px;*/
+  /* notalone */
+  padding-top: 30px;
+  /*****************/
 }
 
 .bar-header-secondary ~ .content {
@@ -497,8 +500,8 @@ input[type="button"] {
 
   /*height: 44px;*/
   /* notalone */
-  height:60px;
-  padding-top:22px;
+  /*height:30px;*/
+  /*padding-top:22px;*/
   /************/
 
   padding-right: 10px;

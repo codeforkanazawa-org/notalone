@@ -119,25 +119,26 @@ body{
 }
 
 .calendar-event-even {
-	height : 40px;
-	line-height : 40px;
+	height : 30px;
+	line-height : 30px;
 	padding-left : 10px;
 
-	overflow: auto;
+	overflow: hidden;
 
 	background-color : lightblue;
 }
 .calendar-event-odd {
-	height : 40px;
-	line-height : 40px;
+	height : 30px;
+	line-height : 30px;
 	padding-left : 10px;
 
-	overflow: auto;
+	overflow: hidden;
 
 	background-color : lightyellow;	
 }
 .calendar-event-cont {
-	padding-left : 20px;
+	padding-left : 10px;
+	font-size : 14px;
 	display:none;
 }
 
@@ -152,7 +153,7 @@ body{
 	border: 1px solid #b9b9b9;
 }
 .eventclass th{
-	width : 80px;
+	width : 50px;
 	background : #F5F5F5;
 }
 

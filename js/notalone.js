@@ -2,11 +2,12 @@
 
 //**********************
 //window risize 時の処理
+/*
 $(window).resize(function(){
 	brows_init();
 });
+*/
 //**********************
-
 
 //実行ページ名の格納変数
 var thispage ="";
@@ -16,6 +17,7 @@ var Def_info ="	<br />みんなで遊そぼ！<br /><br />まずは写真を<br 
 
 //初期化
 function init(){
+
 	//実行ページのチェック
 	thispage = $("#thispage").html();
 
@@ -62,18 +64,13 @@ function brows_init(){
 
 		var BodyLeftMargin = BodyWhite > 0 ? (BodyWhite / 2) + "px" : "0px";
 		$("body").css({"margin-left" : BodyLeftMargin });
-
-		$("#top-menu").width(BodyWidth);
-		$("#top-menu").css({"left" : BodyLeftMargin });
-
-		$("#myCalendar").width(BodyWidth);
-		$("#myCalendar").css({"left" : BodyLeftMargin });
-
 	}else{
 		var BodyWidth = DeviceWidth + "px";
 	}
 
 
+	$("#top-menu").width(BodyWidth);
+	$("#top-menu").css({"left" : BodyLeftMargin });
 	$("#top-menu").height(TopHeight);
 	$("#top-menu").css({"line-height" : TopHeight + "px"});
 
@@ -83,6 +80,10 @@ function brows_init(){
 	switch(thispage){
 		//****************
 		case "index.html" :
+
+	$("#myCalendar").width(BodyWidth);
+	$("#myCalendar").css({"left" : BodyLeftMargin });
+
 
 	//縦幅 0.35
 	var PrivertHeight  = Math.round(DeviceHeight * 0.35);	//個人情報欄の縦幅確保
@@ -120,20 +121,56 @@ function brows_init(){
 		//***************************
 		case "events.html" :
 
+	//for android fixed bug
+	//下部ブロックの　onClick　イベントが検出できないため 
+
+	//カレンダー表示の高さを規定（いずれかを設定）
+	//縦横比率（数値が大きいほど縦が縮む）1.7
+	//$('#calendar').fullCalendar('option', 'aspectRatio', 1.7);
+
+	//カレンダーの高さ
+	$('#calendar').fullCalendar('option', 'contentHeight', DeviceHeight * 0.5);
+
+	// コンテンツの高さ(px)
+	var calendar_div = $("#calendar").height();
+
+	$("#menu-back").height(TopHeight);
+
+
 	$("#calendar").css({
+		"display"  : "block",
 		"position" : "fixed",
-		"top"    : TopHeight + "px",
+		"top"      : DeviceHeight * 0.5,
+		"width"  : BodyWidth,
+		"font-size" : "14px",
+		"background-color" : "#F5F5F5",
+		"border"   : "1px solid #DCDCDC",
+		"z-index"  : 1 
+	});
+
+
+	//イベント欄ダミーの高さ(px)
+	$("#dummy").height(DeviceHeight);
+
+/*
+	//iphone 問題なし
+	$("#calendar").css({
+		"display"  : "block",
+		"position" : "fixed",
+		"top"    : TopHeight,
+		//"top"    : 400,
 		"width"  : BodyWidth,
 		"font-size" : "14px",
 		"background-color" : "white",
-		"z-index" : 1 
+		"z-index" : 0 
 	});
 
 	//カレンダー表示の高さを規定（いずれかを設定）
 	//縦横比率（数値が大きいほど縦が縮む）
 	$('#calendar').fullCalendar('option', 'aspectRatio', 1.7);
+
 	//カレンダーの高さ
-	//$('#calendar').fullCalendar('option', 'contentHeight', 300);
+	//$('#calendar').fullCalendar('option', 'contentHeight', 200);
 
 	// コンテンツの高さ(px)
 	var calendar_div = $("#calendar").height();
@@ -142,6 +179,26 @@ function brows_init(){
 
 	//イベント欄ダミーの高さ(px)
 	$("#dummy").height(DeviceHeight - calendar_div - $("#top_menu").height());
+*/
+
+
+	//FullCalendar デザインの一部変更 *****
+	$('.fc-toolbar').css({
+		"height"  : "15px",
+		"line-height" : "15px",
+		"padding" : "5px"
+	 });
+	$('.fc-left').css({
+		"height"  : "15px",
+		"line-height" : "15px",
+		"padding" : "5px",
+	 });
+	$('.fc-left h2').css({
+		"font-size" : "20px"
+	});
+
+	//**********************************
+
 
 		break;
 
@@ -683,7 +740,9 @@ function eventSetCalendar(){
 		edata['title'] = eventArray[i][ev_title];
 
 		//開催日 yyyy/mm/dd -> yyyy-mm-dd  FullCalendar formatに合わせる
+		//edata['start'] = eventArray[i][ev_when].replace(/\//g,"-");
 		edata['start'] = eventArray[i][ev_when].replace(/\//g,"-");
+		edata['start'] += " " + eventArray[i][ev_open];
 
 		//対象年齢によって色設定 ************
 		//define化が必要
@@ -730,8 +789,11 @@ function eventSetCalendar(){
 		evttitle  = "<div id='evtid_" + ev[ev_no] + "_title' ";
 		evttitle += "onClick='selectEvent(" + ev[ev_no] + ")' ";
 		evttitle += "class='" + evtclass + "'>";
-		evttitle += ev[ev_day] + "日(" + weekday + ")　";
-		evttitle += ev[ev_open].substr(0,5) + "　";
+		evttitle += ev[ev_day] + "日(" + weekday + ") ";
+
+		//evttitle += ev[ev_open].substr(0,5) + " ";
+		evttitle += (ev[ev_open].substr(0,2) < 12 ? 'Am' : 'Pm') + " ";
+
 		//evttitle += ev[ev_title].substr(0,16);
 		evttitle += ev[ev_title];
 		evttitle += "</div>";
@@ -848,22 +910,31 @@ function events_init(){
 		$('#calendar').fullCalendar({
 
 			//カスタムボタンによるヘッダーの設定
-			customButtons: {
+			customButtons: {				
         			myCustomToday: {
-            				text: '今日',
+            				text: '今月',
 					size: 'small',
             				click: function() {
                					//alert('今日へ');
+						$('#calendar').fullCalendar('changeView','month');
 						$('#calendar').fullCalendar('today');
 
 						readEvents(0);
 						setTimeout("eventSetCalendar()" , 1000);
             				}
 	        		},
-        			myCustomPrev: {
-            				text: '＜前月',
+        			myCustomMonth: {
+            				text: '月',
             				click: function() {
                					//alert('前月へ');
+						$('#calendar').fullCalendar('changeView','month');
+            				}
+	        		},
+        			myCustomPrev: {
+            				text: '＜',
+            				click: function() {
+               					//alert('前月へ');
+						$('#calendar').fullCalendar('changeView','month');
 						$('#calendar').fullCalendar('prev');
 
 						readEvents(-1);
@@ -871,9 +942,10 @@ function events_init(){
             				}
 	        		},
         			myCustomNext: {
-            				text: '翌月＞',
+            				text: '＞',
             				click: function() {
                					//alert('翌月へ');
+						$('#calendar').fullCalendar('changeView','month');
 						$('#calendar').fullCalendar('next');
 
 						readEvents(1);
@@ -884,25 +956,31 @@ function events_init(){
 
 
 			header: {
+
         			//left: 'prev,next today myCustomButton',
+        			//left: 'prev,next today',
 				left: 'title',
+
         			//center: 'title',
 				center: '',
-        			//right: 'month,agendaWeek,agendaDay'
-				right: 'myCustomToday myCustomPrev,myCustomNext'
+
+        			//right: 'month,basicDay'
+				right: 'myCustomMonth myCustomPrev,myCustomToday,myCustomNext'
 			},
 			//******************
 
 
 			//タイトルのフォーマット
 	        	titleFormat: {
-        	    		month: 'YYYY年M月',	// 2013年9月			
+        	    		month: 'YYYY年M月',	// 2013年9月
+				week:  'YYYY年M月',
+				day:   'YYYY年M月',
 			},
 
  	       		// ボタン文字列
         		buttonText: {
-            			prev:     '前月', // <
-            			next:     '翌月', // >
+            			prev:     '＜', // <
+            			next:     '＞', // >
             			prevYear: '前年',  // <<
             			nextYear: '翌年',  // >>
             			today:    '今日',
@@ -916,10 +994,19 @@ function events_init(){
 	        	// 月略称
         		monthNamesShort: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
 	        	// 曜日略称
+        		dayNames: ['日', '月', '火', '水', '木', '金', '土'],
         		dayNamesShort: ['日', '月', '火', '水', '木', '金', '土'],
 			//more表示の書式
 			dayPopoverFormat:'YYYY年 M月 D日[(]ddd[)]',
 
+		        timeFormat: 'T',	//AM PM
+		        // 列の書式
+        		columnFormat: {
+            			month: 'ddd',    // 月
+            			week:  'DD日[(]ddd[)]', // 7(月)
+            			day:   'DD日[(]ddd[)]'    // 7(月)
+        		},
+ 
 			/* 
 	       		// イベントソース（例）
         		eventSources: [
@@ -953,21 +1040,111 @@ function events_init(){
 				selectEvent(event.id);
 			},
 
-			/*
 			//日のクリック
+			/*
 			dayClick : function(){
-				alert("day click");
+				//alert("day click");
+				var moment = $('#calendar').fullCalendar('getDate');
+				//alert(moment.format('YYYY-M-D'));
+				$('#calendar').fullCalendar('gotoDate',moment.format('YYYY-M-D'));
+				$('#calendar').fullCalendar('changeView','basicDay');
 			},
 			*/
-
 			//イベントの最大表示数
     			eventLimit: true,
     			views: {
         			agenda: {
-            				eventLimit: 1,
+            				eventLimit: 1
         			}
     			},
-			eventLimitText: '件あり'
+			eventLimitText: '件あり',
+
+			//eventLimitClick : 'popover',
+			eventLimitClick : 'day',
+
+/*			eventLimitClick : function(){
+
+				var elm = $('#calendar');
+				elm.fullCalendar('changeView','basicDay');
+				elm.fullCalendar({
+					header:{
+						right:''
+					}
+				});
+			}
+*/
+/*			eventLimitClick: function(cellInfo,jsEvent) {
+
+				//scrollTo(0,1);
+
+				var row = jsEvent.pageX;
+				var col = jsEvent.pageY;
+				var moreLink = cellInfo.moreEl;
+				//var segs = cellInfo.hiddenSegs;
+				var segs = cellInfo.segs;
+
+				var FC = $.fullCalendar;
+				var DayGrid = FC.DayGrid;
+				var CustomClick;
+
+				  
+				
+
+				//fullcalendar/src/common/DayGrid.limit.js
+				//***************************
+				//row, col, moreLink, segs
+
+				function(row, col, moreEL, reslicedAllSegs) {
+
+				var _this = $('#calendar').fullCalendar;	//this;
+				var view  = _this.view;		//this.view;
+alert(view);
+				var moreWrap = moreLink.parent();
+
+				// the <div> wrapper around the <a>
+				var topEl;
+				// the element we want to match the top coordinate of
+				var options;
+
+				if (this.rowCnt == 1) {
+					topEl = view.el;
+					// will cause the popover to cover any sort of header
+				}else {
+					topEl = this.rowEls.eq(row);
+					// will align with top of row
+				}
+
+				options = {
+					className: 'fc-more-popover',
+					content: this.renderSegPopoverContent(row, col, segs),
+					parentEl: this.el,
+					top: topEl.offset().top,
+					autoHide: true, // when the user clicks elsewhere, hide the popover
+					viewportConstrain: view.opt('popoverViewportConstrain'),
+					hide: function() {
+						// kill everything when the popover is hidden
+						_this.segPopover.removeElement();
+							_this.segPopover = null;
+						_this.popoverSegs = null;
+					}
+				};
+
+				// Determine horizontal coordinate.
+				// We use the moreWrap instead of the <td> to avoid border confusion.
+				if (this.isRTL) {
+					options.right = moreWrap.offset().left + moreWrap.outerWidth() + 1; // +1 to be over cell border
+				}else {
+					options.left = moreWrap.offset().left - 1; // -1 to be over cell border
+				}
+
+				this.segPopover = new Popover(options);
+				this.segPopover.show();
+				//}
+				//***************************
+
+			},
+*/
+
 		});
 
 		//イベント情報の設定（eventArrayへのデータ設定完了までの十分な時間を確保する）
