@@ -46,6 +46,7 @@ mapTypeId: google.maps.MapTypeId.ROADMAP
         var lat = pos.coords.latitude;
         var lng = pos.coords.longitude;
 
+	/* FARAWAY? 
         //石川から大きく離れた場所の場合、現在地情報を金沢駅に設定
         if (getDistanceFromKanazawaStation(lat, lng) > FARAWAY_DISTANCE) {
             //lat = KANAZAWA_STATION_LAT;
@@ -53,6 +54,8 @@ mapTypeId: google.maps.MapTypeId.ROADMAP
             lat = DEFAULT_LAT;
             lng = DEFAULT_LNG;
         }
+	*/
+
         $('#loading').hide();
         showGoogleMap(lat, lng);
     }
