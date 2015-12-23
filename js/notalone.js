@@ -188,12 +188,13 @@ function brows_init(){
 		"line-height" : "15px",
 		"padding" : "5px"
 	 });
-	$('.fc-left').css({
+/*	$('.fc-left').css({
 		"height"  : "15px",
 		"line-height" : "15px",
 		"padding" : "5px",
 	 });
-	$('.fc-left h2').css({
+*/
+	$('.fc-center h2').css({
 		"font-size" : "20px"
 	});
 
@@ -248,6 +249,36 @@ function snd_index(link){
 				break;
 		case "inquiry" : location.href="inquiry.html";
 				break;
+	}
+}
+
+//settingMenuの切り替え
+function setMenu(tab){
+	var activ_css = {
+		"background-color" : "#FFFFCC" ,
+	};
+	var stanby_css ={
+		"background-color" : "#EEEEEE" ,
+	};
+	var activ_block={
+		"display" : "block",
+		"background-color" : "#FFFFCC" ,
+	};
+	var stanby_block={
+		"display" : "none",
+		"background-color" : "#EEEEEE" ,
+	};
+
+	if(tab == 1){
+		$("#settingMenu1").css(activ_css);
+		$("#favSetting").css(activ_block);
+		$("#settingMenu2").css(stanby_css);
+		$("#imageSetting").css(stanby_block);
+	}else{
+		$("#settingMenu2").css(activ_css);
+		$("#imageSetting").css(activ_block);
+		$("#settingMenu1").css(stanby_css);
+		$("#favSetting").css(stanby_block);
 	}
 }
 
@@ -924,7 +955,7 @@ function events_init(){
             				}
 	        		},
         			myCustomMonth: {
-            				text: '月',
+            				text: '月暦',
             				click: function() {
                					//alert('前月へ');
 						$('#calendar').fullCalendar('changeView','month');
@@ -959,13 +990,13 @@ function events_init(){
 
         			//left: 'prev,next today myCustomButton',
         			//left: 'prev,next today',
-				left: 'title',
+				left: 'myCustomMonth',
 
-        			//center: 'title',
-				center: '',
+        			center: 'title',
+				//center: '',
 
         			//right: 'month,basicDay'
-				right: 'myCustomMonth myCustomPrev,myCustomToday,myCustomNext'
+				right: 'myCustomPrev,myCustomToday,myCustomNext'
 			},
 			//******************
 

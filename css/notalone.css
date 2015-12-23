@@ -56,20 +56,72 @@ body{
 	margin : 0px;
 }
 #info{
-	padding : 0px;
+	padding-top  : 10px;
+	padding-left : 10px;
 	margin : 0px;
 }
 #info img,input{
 	vertical-align : top;
 }
+
+#setting{
+	display : none;
+	clear : both;
+	font-size : 12px;
+	text-align : left;
+}
+#settingMenu{
+}
+#settingMenu li{
+	float : left;
+
+	list-style-type: none;
+	font-size:12px;
+	margin : 0px;
+	padding : 10px 0px 10px 0px;
+	text-align : center;
+}
+#settingMenu1{
+	width : 45%;
+	background-color: #FFFFCC;
+	border-left : 1px #FFFFCC solid;
+	border-top  : 1px #FFFFCC solid;
+	border-bottom  : 1px #FFFFCC solid;
+}
+#settingMenu2{
+	width : 45%;
+	background-color: #EEEEEE;
+	border-left   : 1px #FFFFCC solid;
+	border-top    : 1px #FFFFCC solid;
+	border-right  : 1px #FFFFCC solid;
+	border-bottom : 1px #FFFFCC solid;
+}
+
+#favSetting{
+	clear : both;
+	display : block;
+	padding : 10px;
+	border-left  : 1px #FFFFCC solid;
+	border-right : 1px #FFFFCC solid;
+	background : #FFFFCC;
+}
+#imageSetting{
+	clear : both;
+	display : none;
+	padding : 10px;
+	border-left  : 1px #FFFFCC solid;
+	border-right : 1px #FFFFCC solid;
+}
+#settingInfo{
+	background : #FFFFCC;
+	padding-left  : 10px;
+	padding-right : 10px;
+}
 #myFavFamily{
 	/*padding-left : 20px;*/
 	/*clear : both;*/
 }
-#setting{
-	display : none;
-	clear : both;
-}
+
 
 /*** index / inquiry common */
 .jobmenu{
