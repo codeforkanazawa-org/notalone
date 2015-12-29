@@ -1,0 +1,18 @@
+#cont_area{
+	display : none;
+	position : fixed;
+	top  : 30px;
+	left : 50px;
+	background : lightyellow;
+	padding : 10px;
+	border : 2px solid #000000;
+}
+#list{
+
+}
+.nofield{
+	text-align : center;
+}
+.Mydata{
+	width : 400px;
+}

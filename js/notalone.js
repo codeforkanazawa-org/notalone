@@ -906,6 +906,11 @@ function selectEvent(idno){
 
 //CSVファイルの読み込み
 function csvToArray(filename, cb) {
+	//キャッシュしない
+	$.ajaxSetup({
+		cache: false
+	});
+
 	$.get(filename, function(csvdata) {
 		//CSVのパース作業
 		//CRの解析ミスがあった箇所を修正しました。
