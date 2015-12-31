@@ -33,6 +33,7 @@ if(isset($_GET['fname'])){
 }
 $db_Table = $db_Dir . "/" . $db_Head . "." . $db_Ext;
 
+
 common_header("control EventTable");
 
 $user_level = Access_check( $acc_level ,1,1,$ReturnFile);
@@ -44,20 +45,45 @@ if(!file_exists($db_Table)){
 	exit();
 }
 
+//一般ユーザーで他者のファイルにアクセスする場合は、読み出し専用（閲覧）
+//javascript ReadOnly とセット
+$id = $_SESSION[$USER_session];
+$id_length   = strlen($id);
+$head_length = strlen($db_Head);
+$myfile = FALSE;
+if($id_length <= $head_length){
+	if(substr($db_Head,0,$id_length) == $id){
+		$myfile = TRUE;
+	}
+}
+
+$ReadOnly = 'false';
+if($user_level == 1){
+	if($myfile == FALSE){
+		$ReadOnly = 'true';
+	}
+}
+//***********************
+
 //*************
-echo '
-<ul>
-<li>,（カンマ）"（ダブルクオーテーション）\'（シングルクオーテーション）は使用できません</li>
-<li>データを更新する場合は、必ずファイルに保存してください</li>
-</ul>
-';
+if($ReadOnly == 'true'){
+	echo 'あなたのファイルではありません（閲覧のみ可能）';
+}else{
+	echo '
+	<ul>
+	<li>,（カンマ）"（ダブルクオーテーション）\'（シングルクオーテーション）は使用できません</li>
+	<li>データを更新する場合は、必ずファイルに保存してください</li>
+	</ul>
+	';
+}
 
 //*************
 print("<h3>【ファイル名：" . $db_Table . "】</h3>");
 
 //db内容をjavascript用に読み込む
-$DataString = csvDatabaseRead($db_Table,1);
+$DataString    = csvDatabaseRead($db_Table,1);
 //print($DataString);
+  
 
 ?>
 
@@ -68,6 +94,13 @@ $DataString = csvDatabaseRead($db_Table,1);
 <script type="text/javascript" src="../js/sha256.js"></script>
 
 <script type="text/javascript">
+
+//DataShow Mode Check
+
+<?php
+//ReadOnly mode
+print("var ReadOnly = " . $ReadOnly . ";" ); 
+?>
 
 //DataBase 宣言 ***** php側でデータ読み込み
 
@@ -87,14 +120,12 @@ print("var DataTable ='" . $db_Table . "';" );
 ?>
 
 <?php
-//配列情報の設定
-print("var DataArray =" . $DataString  );
+//配列情報の設定（イベントファイル）
+print("var DataArray    =" . $DataString  );
 ?>
-
 
 //**************
 function setOption(){
-	//オプションなし
 	return "";
 }
 

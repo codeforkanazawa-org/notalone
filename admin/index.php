@@ -11,29 +11,15 @@ user_header("能登ノットアローン index");
 
 ?>
 
+<a href="http://kosodate.df-c.net/loadfiles.php?dir=uploads/events&ftype=text/csv&key=&next=cont_event.php">イベントファイル</a><br>
+<br />
+<a href="http://kosodate.df-c.net/loadfiles.php?dir=events&ftype=text/csv&key=&next=cont_events_admin.php">イベント集計ファイル</a><br>
+<br />
+<a href="cont_location.php">イベント開催場所</a><br>
+<br />
 <a href="cont_user.php">ユーザ管理</a><br>
 <br />
-<a href="cont_location.php">拠点管理</a><br>
-<br />
-<!--a href="template.php?db=fgroup">グループ管理</a><br-->
-	<div>
-	<!-- group     -->
-	　・<!--select name="groupDb" id="groupDb"-->
-		<!-- option        -->
-	<!--/select-->
-	<!--input type="button" onClick="selectGroup()" value="グループ管理簿" /-->
-	</div>
-<br />
-　・<!--a href="groupdatamente.php">一般市民投稿用データベースの整備</a><br /-->
-<br />
-<!--a href="template.php?db=report">レポート管理</a><br-->
-<br />
-<br />
 
-<br />
-サーバーデータ・メンテ<br>
-　・<a href="http://kosodate.df-c.net/loadfiles.php?dir=uploads/events&ftype=text/csv&key=&next=cont_event.php">拠点イベントファイル</a><br>
-　・<a href="http://kosodate.df-c.net/loadfiles.php?dir=events&ftype=text/csv&key=&next=cont_events_admin.php">イベント集計ファイル</a><br>
 <!--
 　・<a href="http://kosodate.apli.nono1.jp/nightview/loadfiles.php?dir=files/apprise&ftype=text/xml&key=" target="nv_mente">評価結果（ｘｍｌ）</a><br>
 　・<a href="http://apli.nono1.jp/nightview/loadfiles.php?dir=log&ftype=text/csv&key=" target="nv_mente">ログ（ｃｓｖ）</a><br>

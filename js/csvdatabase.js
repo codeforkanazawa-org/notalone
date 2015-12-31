@@ -1,5 +1,11 @@
 //csvDataBase controler
 
+//ReadOnly mode のチェック
+if(typeof(ReadOnly) == "undefined"){
+	var ReadOnly = false;
+}
+
+
 //データの一覧表示
 function ShowData(){
 	var buff = "<table border=1>";
@@ -7,31 +13,34 @@ function ShowData(){
 	for(i = 0 ; i < dlength ; i++){
 		buff += "<tr>";
 
-		if(i == 0){
-			//Up Down の列追加
-			buff += "<th>Up</th><th>Dw</th>";
-			//修正、複写、削除の列追加
-			buff += "<th>管理</th>";
-		}else{
-			//Up Down の列追加
-			if( i == 1){
-				buff += "<td></td>";
+		if(!ReadOnly){
+			if(i == 0){
+				//Up Down の列追加
+				buff += "<th>Up</th><th>Dw</th>";
+			
+				//修正、複写、削除の列追加
+				buff += "<th>管理</th>";
 			}else{
-				buff += "<td><input type='button' value='↑' onClick='Myup(" + i + ")' ></td>";
-			}
-			if( i == dlength - 1){
-				buff += "<td></td>";
-			}else{
-				buff += "<td><input type='button' value='↓' onClick='Mydw(" + i + ")' ></td>";
-			}
+				//Up Down の列追加
+				if( i == 1){
+					buff += "<td></td>";
+				}else{
+					buff += "<td><input type='button' value='↑' onClick='Myup(" + i + ")' ></td>";
+				}
+				if( i == dlength - 1){
+					buff += "<td></td>";
+				}else{
+					buff += "<td><input type='button' value='↓' onClick='Mydw(" + i + ")' ></td>";
+				}
 
-			//修正、複写、削除の列追加
-			buff += "<th>";
-			buff += "<input type='button' value='Edit' onClick='Myedit(" + i + ")' >";
-			buff += "<input type='button' value='Copy' onClick='Mycopy(" + i + ")' >";
-			buff += "<input type='button' value='Dele' onClick='Mydele(" + i + ")' >";
-			buff += "</th>";
+				//修正、複写、削除の列追加
+				buff += "<th>";
+				buff += "<input type='button' value='Edit' onClick='Myedit(" + i + ")' >";
+				buff += "<input type='button' value='Copy' onClick='Mycopy(" + i + ")' >";
+				buff += "<input type='button' value='Dele' onClick='Mydele(" + i + ")' >";
+				buff += "</th>";
 
+			}
 		}
 		
 		for(s = 0 ; s < DataArray[i].length ; s++){
@@ -56,9 +65,10 @@ function ShowData(){
 
 	buff += "</table>";
 
-	buff += "<input type='button' value='新規追加' onClick='Myappend()' ><br /><br />";
-	buff += "<input type='button' value='データをファイルに保存する' onClick='Mysave()' ><br />";
-
+	if(!ReadOnly){
+		buff += "<input type='button' value='新規追加' onClick='Myappend()' ><br /><br />";
+		buff += "<input type='button' value='データをファイルに保存する' onClick='Mysave()' ><br />";
+	}
 
 	$('#list').html(buff);
 }
@@ -115,7 +125,7 @@ function MyeditExec(no){
 	for(var i = 0 ; i < field ; i++){
 		if(i == 0){
 		}else{
- 			DataArray[no][i] = $('#Mydata_' + i).val();
+ 			DataArray[no][i] = eraseBanString($('#Mydata_' + i).val());
 		}
 	}
 	MyCansel();
@@ -130,7 +140,7 @@ function MyappendExec(no){
 		if(i == 0){
 			buffArray[0] = dataNo;
 		}else{
- 			buffArray[i] = $('#Mydata_' + i).val();
+ 			buffArray[i] = eraseBanString($('#Mydata_' + i).val());
 		}
 	}
 
@@ -296,13 +306,25 @@ function ArrayToCsv(from){
 	for(var i = 0 ; i < datac ; i++){
 		var fieldc = from[i].length;
 		for(var s = 0 ; s < fieldc ; s++){
- 			buff += from[i][s];
+			//不要な文字を消去
+ 			buff += eraseBanString(from[i][s]);
 			if(s < fieldc - 1){
 				buff += ",";
 			}
 		}
 		buff += cr;
 	}
+	return buff;
+}
+
+//不要な文字の消去
+function eraseBanString(from){
+	var buff = String(from);
+
+	//'", を消去する
+	buff = buff.replace(/,/g,"");
+	buff = buff.replace(/\'|\"/g,"");
+	
 	return buff;
 }
 
