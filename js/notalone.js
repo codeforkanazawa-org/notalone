@@ -33,6 +33,10 @@ function init(){
 			events_init();
 			brows_init();
 
+			//target tableの読み込み
+			var table = "localhost/target.csv";
+			readTarget(table);
+
 			break;
 
 		case "inquiry.html" :
@@ -664,7 +668,8 @@ var SetMonth = Today.getMonth() + 1; 	//month = 0から始まる
 var event_dir = "events/";	//イベントファイルの保存ディレクトリ
 var event_ext = ".csv";		//イベントファイルの拡張子
 
-var eventArray = new Array();	//イベント用配列（２次元：連想配列）
+var eventArray  = new Array();	//イベント用配列（２次元：連想配列）
+var targetArray = new Array(); //対象者用配列（２次元：連想配列） 
 
 var JpWeekday = ['日','月','火','水','木','金','土'];	//日本語曜日
 
@@ -729,6 +734,20 @@ function readEvents(target){
 	});
 }
 
+//target（対象者）ファイルを読み込みtargetArrayに保存
+function readTarget(table){
+	csvToArray( table , function(data) {
+
+		//1行目をフィールド名として扱い連想配列にする
+		for(var i = 1 ; i < data.length ; i++){
+			var rensou = new Object();
+			for(var s = 0; s < data[i].length ; s++){
+				rensou[data[0][s]] = data[i][s]; 
+			}
+			targetArray.push(rensou);
+		}
+	});
+}
 
 
 /***  event csv format 変換テーブル  ****/
@@ -751,6 +770,16 @@ var ev_month = "month";		//イベント月
 var ev_day   = "day";		//イベント日
 /*********/
 
+/***  target csv format 変換テーブル  ****/
+var tar_label = "target_label";	//
+var tar_id    = "target_id";	//
+var tar_color = "color";	//
+var tar_text  = "text_color";	//
+var tar_icon  = "icon";		//
+var default_tar_color = "#4682B4";	//
+var default_tar_text  = "#FFFFFF";	//
+/*********/
+
 //eventArrayのデータをFullCalendarに設定する（月単位）
 function eventSetCalendar(){
 
@@ -761,7 +790,10 @@ function eventSetCalendar(){
 	var tg1 = "<tr><th>";
 	var tg2 = "</th><td>";
 	var tg3 = "</td></tr>"; 
-	var bcolor , tcolor;
+
+	//var bcolor , tcolor;
+	var bcolor = default_tar_color;
+	var tcolor = default_tar_text;
 
 	for(var i =0 ; i < eventArray.length ; i++){
 		var edata = new Object();
@@ -780,6 +812,7 @@ function eventSetCalendar(){
 		//color: 'yellow',   // an option!
 	    	//textColor: 'black' // an option!
 
+		/*
 		switch(eventArray[i][ev_cat]){
 			case 'over5'  : bcolor = "green";	break;
 			case 'over8'  : bcolor = "blue";	break;
@@ -787,19 +820,33 @@ function eventSetCalendar(){
 		}
 		edata['color']     = bcolor;
 		edata['textcolor'] = tcolor;
-		//*******************************
+		*/
 
+		edata['color']     = default_tar_color;
+		edata['textColor'] = default_tar_text;
+
+		for(var s = 0; s < targetArray.length ; s++){
+			if(eventArray[i][ev_cat] == targetArray[s][tar_id]){
+				edata['color']     = targetArray[s][tar_color];
+				edata['textColor'] = targetArray[s][tar_text];
+				break;
+			}
+		}
+		//*******************************
 
 		source.push(edata);
 
 
-
+		/*
 		//イベント欄に一覧表示する
 		if((i % 2) == 0){
 			evtclass = "calendar-event-even";
 		}else{
 			evtclass = "calendar-event-odd";
 		}
+		//target color に変更
+		*/
+		evtclass = "calendar-event";
 
 		var ev = eventArray[i];
 
@@ -819,7 +866,12 @@ function eventSetCalendar(){
 		//イベントのタイトル
 		evttitle  = "<div id='evtid_" + ev[ev_no] + "_title' ";
 		evttitle += "onClick='selectEvent(" + ev[ev_no] + ")' ";
-		evttitle += "class='" + evtclass + "'>";
+
+		//evttitle += "class='" + evtclass + "'>";
+		evttitle += "class='" + evtclass + "' "; 
+		evttitle += "style='background-color:" + edata['color'] + "; ";
+		evttitle += "color:" + edata['textColor'] + ";' >";
+
 		evttitle += ev[ev_day] + "日(" + weekday + ") ";
 
 		//evttitle += ev[ev_open].substr(0,5) + " ";
@@ -842,6 +894,7 @@ function eventSetCalendar(){
 		evtcont += tg1 + "内容"  + tg2 + ev[ev_what] + tg3;
 		evtcont += tg1 + "場所"  + tg2 + ev[ev_where] + tg3;
 		evtcont += tg1 + "対象者" + tg2 + ev[ev_whom] + tg3;
+		evtcont += tg1 + "(tag1)"   + tg2 + ev[ev_cat] + tg3;
 		evtcont += tg1 + "主催者" + tg2 + ev[ev_who] + tg3;
 		if(ev[ev_fee] == 0 || ev[ev_fee] ==""){
 			evtcont += tg1 + "参加費" + tg2 + "無料" + tg3;
@@ -849,7 +902,6 @@ function eventSetCalendar(){
 			evtcont += tg1 + "参加費" + tg2 + ev[ev_fee] + "円" + tg3;
 		}
 		evtcont += tg1 + "連絡先" + tg2 + ev[ev_cont] + tg3;
-		evtcont += tg1 + "識別子"   + tg2 + ev[ev_cat] + tg3;
 
 		evtcont +="</table>";
 

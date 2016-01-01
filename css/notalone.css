@@ -169,7 +169,15 @@ body{
 /**** for events.html ****/
 #calendar {
 }
+.calendar-event {
+	height : 30px;
+	line-height : 30px;
+	padding-left : 10px;
 
+	overflow: hidden;
+	border-top : 1px solid #FFFFFF;
+	opacity : 0.7;
+}
 .calendar-event-even {
 	height : 30px;
 	line-height : 30px;

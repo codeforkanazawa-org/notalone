@@ -1,1 +1,6 @@
-no,target_label,target_id,color,icon,memo
+no,target_label,target_id,color,text_color,icon,memo
+1,乳幼児,baby,#FF99FF,,,
+2,小学生,child,#FFCC33,,,
+3,中高生,hight,#CCFF00,,,
+4,大人,adult,#99FFFF,,,
+5,一般,open,#CCCCCC,,,デフォルト

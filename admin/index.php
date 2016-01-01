@@ -17,6 +17,8 @@ user_header("能登ノットアローン index");
 <br />
 <a href="cont_location.php">イベント開催場所</a><br>
 <br />
+<a href="cont_target.php">イベント対象者</a><br>
+<br />
 <a href="cont_user.php">ユーザ管理</a><br>
 <br />
 

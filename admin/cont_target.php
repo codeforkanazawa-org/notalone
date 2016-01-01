@@ -95,7 +95,7 @@ var colorFieldNo = DataFieldNo(colorFieldName);
 
 var colorCanvas;		//色コード表
 
-function locationInit(){
+function targetInit(){
 	ShowData();		//データの読み込みと表示
 	//setColorCode();		//色コードのセット
 }
@@ -147,7 +147,7 @@ var colorCode = ['#000000','#FFFFEE','#EEFFFF','#FFEEFF','#FF0000','#00FF00','#0
 </script>
 
 
-<body onload="locationInit();">
+<body onload="targetInit();">
 
 <div id="cont_area">
 </div>
