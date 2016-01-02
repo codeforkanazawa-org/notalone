@@ -37,6 +37,10 @@ function init(){
 			var table = "localhost/target.csv";
 			readTarget(table);
 
+			//location tableの読み込み
+			var table = "localhost/location.csv";
+			readLocation(table);
+
 			break;
 
 		case "inquiry.html" :
@@ -201,6 +205,14 @@ function brows_init(){
 	$('.fc-center h2').css({
 		"font-size" : "20px"
 	});
+
+
+	//map_area の表示位置を動的に調整
+	$("#map_area").css({
+		"left" : BodyLeftMargin
+	});
+
+
 
 	//**********************************
 
@@ -461,9 +473,10 @@ function calculateAge(birthday) {
 		var  thisBirthday = today.getFullYear() + "/" + birth[1] + "/" + birth[2];
 		var  diffDays = getDiff(thisBirthday , strToday);
 
+
 		//誕生日前の場合（うるう年考慮せず）
 		if(strToday < thisBirthday){
-			diffDays = 365 - diffDays;
+			diffDays = 365 - Math.abs(diffDays);
 		} 
 
 		//平均月数(365/12)
@@ -670,6 +683,7 @@ var event_ext = ".csv";		//イベントファイルの拡張子
 
 var eventArray  = new Array();	//イベント用配列（２次元：連想配列）
 var targetArray = new Array(); //対象者用配列（２次元：連想配列） 
+var locationArray = new Array(); //開催場所用配列（２次元：連想配列） 
 
 var JpWeekday = ['日','月','火','水','木','金','土'];	//日本語曜日
 
@@ -749,6 +763,94 @@ function readTarget(table){
 	});
 }
 
+//location（開催場所）ファイルを読み込みlocationArrayに保存
+function readLocation(table){
+	csvToArray( table , function(data) {
+
+		//1行目をフィールド名として扱い連想配列にする
+		for(var i = 1 ; i < data.length ; i++){
+			var rensou = new Object();
+			for(var s = 0; s < data[i].length ; s++){
+				rensou[data[0][s]] = data[i][s]; 
+			}
+			locationArray.push(rensou);
+		}
+
+		//googlemap の初期設定
+		mapInit();
+	});
+}
+
+//開催場所から、location情報を取得（確認）
+function getLocationLatLng(where){
+	var loc  = locationArray;
+
+	var nlat = "";
+	var nlng = "";
+
+	for(var i = 0; i < loc.length ; i++){
+		if(loc[i][loc_name] == where){
+			nlat = loc[i][loc_lat];
+			nlng = loc[i][loc_lng];
+			break;
+		}
+	}
+
+	if(nlat != "" && nlng != ""){
+		return i;
+	}else{
+		return -1;
+	}
+}
+
+var now_marker;		//位置表示用マーカー
+function mapInit(){
+	//sub/js/main/js　で定義
+	//どこかで設定ファイルの作成が必要
+	var DEFAULT_LAT = 37.390556;
+    	var DEFAULT_LNG = 136.899167;
+
+	showGoogleMap(DEFAULT_LAT,DEFAULT_LNG);
+}
+
+function showGoogleMap(initLat, initLng) {
+        var latlng = new google.maps.LatLng(initLat, initLng);
+        var opts = {
+            	zoom: 16,
+		center: latlng,
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        //var map = new google.maps.Map(document.getElementById("map_canvas"), opts);
+        mapCanvas = new google.maps.Map(document.getElementById("map_canvas"), opts);
+
+        //現在地のピン
+        var now_latlng = new google.maps.LatLng(initLat, initLng);
+        //var now_marker = new google.maps.Marker({
+        now_marker = new google.maps.Marker({
+            position:now_latlng,
+            title: '位置表示用マーカー',
+	    /*draggable : true,*/
+
+            map: mapCanvas,
+        });
+
+	now_marker.setMap(mapCanvas);
+}
+
+function eventMap_visible(nlat,nlng){
+	//location位置情報
+	var latlng = new google.maps.LatLng(nlat , nlng);
+
+	now_marker.setPosition(latlng);
+	mapCanvas.setCenter(latlng);
+
+	$('#map_area').css('visibility' , 'visible');
+}
+
+function eventMap_hidden(){
+	$('#map_area').css('visibility' , 'hidden');
+}
+
 
 /***  event csv format 変換テーブル  ****/
 var ev_title = "eventtitle";	//タイトル
@@ -778,6 +880,13 @@ var tar_text  = "text_color";	//
 var tar_icon  = "icon";		//
 var default_tar_color = "#4682B4";	//
 var default_tar_text  = "#FFFFFF";	//
+/*********/
+
+/***  location csv format 変換テーブル  ****/
+var loc_name = "location_name";	//
+var loc_id   = "location_idt";	//
+var loc_lat  = "lat";		//
+var loc_lng  = "lng";		//
 /*********/
 
 //eventArrayのデータをFullCalendarに設定する（月単位）
@@ -892,7 +1001,19 @@ function eventSetCalendar(){
 		evtcont += tg1 + "名称"  + tg2 + ev[ev_title] + tg3;
 		evtcont += tg1 + "時間"  + tg2 + ev[ev_open].substr(0,5) + "〜" + ev[ev_close].substr(0,5) + tg3;
 		evtcont += tg1 + "内容"  + tg2 + ev[ev_what] + tg3;
-		evtcont += tg1 + "場所"  + tg2 + ev[ev_where] + tg3;
+
+		//location位置情報の確認
+		var loc = getLocationLatLng(ev[ev_where]);
+		if(loc == -1){
+			evtcont += tg1 + "場所"  + tg2 + ev[ev_where] + tg3;
+		}else{
+			evtcont += tg1 + "場所"  + tg2;
+			var nlat = locationArray[loc][loc_lat];
+			var nlng = locationArray[loc][loc_lng];
+			evtcont += "<input type='button' value='" + ev[ev_where] + "' onClick='eventMap_visible(" + nlat + "," + nlng + ")' >";
+			evtcont += tg3;
+		}
+
 		evtcont += tg1 + "対象者" + tg2 + ev[ev_whom] + tg3;
 		evtcont += tg1 + "(tag1)"   + tg2 + ev[ev_cat] + tg3;
 		evtcont += tg1 + "主催者" + tg2 + ev[ev_who] + tg3;

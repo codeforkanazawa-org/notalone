@@ -26,8 +26,13 @@
 <script type='text/javascript' src='js/fullcalendar-2.4.0/lib/moment.min.js'></script>
 <script type='text/javascript' src='js/fullcalendar-2.4.0/fullcalendar.min.js'></script>
 
+<!--googlemaps api-->
+<!--script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script-->
+<script src="http://maps.googleapis.com/maps/api/js?libraries=geometry,drawing&sensor=false"></script> 
+
 
 <script type="text/javascript" src="js/notalone.js"></script>
+
 
 </head>
 
@@ -49,6 +54,12 @@
 <div id="dummy">
 </div>
 
+</div>
+
+<div id="map_area">
+	<div id="map_canvas">
+	</div>　
+	<input type="button" id="map_hidden" onClick="eventMap_hidden()" value="マップを閉じる" />
 </div>
 
 <!-- Page Checker (style display:none)-->
