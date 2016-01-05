@@ -1,13 +1,13 @@
 <?php
 include_once("include.php");
 
-$ThisFile   = "cont_location.php";
+$ThisFile   = "cont_mapinfo.php";
 //$NextFile   = $_SESSION["NextJob"];
 //$ReturnFile = $_SESSION['CallJob'];
 //$Case1File  = "common_user_append.php";  	//ユーザ登録なしの場合のアクセスファイル名
 
 //=============================
-$acc_level  = 2;			//アクセスレベル
+$acc_level  = 1;			//アクセスレベル
 
 $ReturnFile = $ThisFile;		//戻り先のファイル名
 $_SESSION['CallJob'] = $ThisFile;	//log_in.php　からの戻り用
@@ -16,13 +16,24 @@ include("log_in_check.php");
 
 
 //使用するテキストDB
-$db_Dir   = "../localhost";
-$db_Head = "location";
-$db_Ext  = "csv";
+if(isset($_GET['dir'])){
+	$db_Dir   = "../" . trim($_GET['dir']);
+}else{
+	$db_Dir   = "../uploads/mapinfo";
+}
+if(isset($_GET['fname'])){
+	$db_filename = trim($_GET['fname']);
+	$files = explode("." , $db_filename);
+	$db_Head = $files[0];
+	$db_Ext  = $files[1];
+}else{
+	$db_Head = "201512";
+	$db_Ext  = "csv";
+}
 $db_Table = $db_Dir . "/" . $db_Head . "." . $db_Ext;
 
 
-common_header("control LocationTable");
+common_header("control MapInfoTable");
 
 $user_level = Access_check( $acc_level ,1,1,$ReturnFile);
 print('レベル　＝　1:一般ユーザ　2:管理ユーザ　3:システム管理者<br>');
@@ -33,16 +44,40 @@ if(!file_exists($db_Table)){
 	exit();
 }
 
-//*************
-echo '
-<ul>
-<li>,（カンマ）"（ダブルクオーテーション）\'（シングルクオーテーション）は使用できません</li>
-<li>データを更新する場合は、必ずファイルに保存してください</li>
-<li>lat（緯度）、lng（経度）がない場合は、デフォルト座標が認識されます</li>
-</ul>
-';
+//一般ユーザーで他者のファイルにアクセスする場合は、読み出し専用（閲覧）
+//javascript ReadOnly とセット
+$id = $_SESSION[$USER_session];
+$id_length   = strlen($id);
+$head_length = strlen($db_Head);
+$myfile = FALSE;
+if($id_length <= $head_length){
+	if(substr($db_Head,0,$id_length) == $id){
+		$myfile = TRUE;
+	}
+}
+
+$ReadOnly = 'false';
+if($user_level == 1){
+	if($myfile == FALSE){
+		$ReadOnly = 'true';
+	}
+}
+//***********************
 
 //*************
+if($ReadOnly == 'true'){
+	echo 'あなたのファイルではありません（閲覧のみ可能）';
+}else{
+	echo '
+	<ul>
+	<li>,（カンマ）"（ダブルクオーテーション）\'（シングルクオーテーション）は使用できません</li>
+	<li>データを更新する場合は、必ずファイルに保存してください</li>
+	</ul>
+	';
+}
+
+//*************
+print("<h3>【ファイル名：" . $db_Table . "】</h3>");
 
 //db内容をjavascript用に読み込む
 $DataString = csvDatabaseRead($db_Table,1);
@@ -60,6 +95,13 @@ $DataString = csvDatabaseRead($db_Table,1);
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script src="http://maps.googleapis.com/maps/api/js?libraries=geometry,drawing&sensor=false"></script> 
 <script type="text/javascript">
+
+//DataShow Mode Check
+
+<?php
+//ReadOnly mode
+print("var ReadOnly = " . $ReadOnly . ";" ); 
+?>
 
 //DataBase 宣言 ***** php側でデータ読み込み
 

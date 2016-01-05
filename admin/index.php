@@ -10,7 +10,7 @@ user_header("能登ノットアローン index");
 
 
 ?>
-
+<br />
 <a href="http://kosodate.df-c.net/loadfiles.php?dir=uploads/events&ftype=text/csv&key=&next=cont_event.php">イベントファイル</a><br>
 <br />
 <a href="http://kosodate.df-c.net/loadfiles.php?dir=events&ftype=text/csv&key=&next=cont_events_admin.php">イベント集計ファイル</a><br>
@@ -19,6 +19,14 @@ user_header("能登ノットアローン index");
 <br />
 <a href="cont_target.php">イベント対象者</a><br>
 <br />
+<hr />
+<a href="http://kosodate.df-c.net/loadfiles.php?dir=uploads/mapinfo&ftype=text/csv&key=&next=cont_mapinfo.php">マップファイル</a><br>
+<br />
+<a href="http://kosodate.df-c.net/loadfiles.php?dir=uploads/mapinfo&ftype=text/csv&key=&next=cont_csvdatacoordinator.php">マップファイルの調整</a><br>
+<hr />
+<a href="cont_inquiry.php">相談窓口</a><br>
+<br />
+<hr />
 <a href="cont_user.php">ユーザ管理</a><br>
 <br />
 

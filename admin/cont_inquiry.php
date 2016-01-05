@@ -1,7 +1,7 @@
 <?php
 include_once("include.php");
 
-$ThisFile   = "cont_location.php";
+$ThisFile   = "cont_inquiry.php";
 //$NextFile   = $_SESSION["NextJob"];
 //$ReturnFile = $_SESSION['CallJob'];
 //$Case1File  = "common_user_append.php";  	//ユーザ登録なしの場合のアクセスファイル名
@@ -16,13 +16,13 @@ include("log_in_check.php");
 
 
 //使用するテキストDB
-$db_Dir   = "../localhost";
-$db_Head = "location";
+$db_Dir   = "../inquiry";
+$db_Head = "inquiry";
 $db_Ext  = "csv";
 $db_Table = $db_Dir . "/" . $db_Head . "." . $db_Ext;
 
 
-common_header("control LocationTable");
+common_header("control InquiryTable");
 
 $user_level = Access_check( $acc_level ,1,1,$ReturnFile);
 print('レベル　＝　1:一般ユーザ　2:管理ユーザ　3:システム管理者<br>');
@@ -38,7 +38,6 @@ echo '
 <ul>
 <li>,（カンマ）"（ダブルクオーテーション）\'（シングルクオーテーション）は使用できません</li>
 <li>データを更新する場合は、必ずファイルに保存してください</li>
-<li>lat（緯度）、lng（経度）がない場合は、デフォルト座標が認識されます</li>
 </ul>
 ';
 

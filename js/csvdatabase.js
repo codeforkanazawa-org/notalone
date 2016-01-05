@@ -8,7 +8,15 @@ if(typeof(ReadOnly) == "undefined"){
 
 //データの一覧表示
 function ShowData(){
-	var buff = "<table border=1>";
+	var buff = "";
+
+	if(!ReadOnly){
+		buff += "<input type='button' value='データをファイルに保存する' onClick='Mysave()' >　　";
+		buff += "<input type='button' value='新規追加' onClick='Myappend()' >";
+	}
+
+	buff += "<table border=1>";
+
 	var dlength = DataArray.length;
 	for(i = 0 ; i < dlength ; i++){
 		buff += "<tr>";
@@ -66,8 +74,8 @@ function ShowData(){
 	buff += "</table>";
 
 	if(!ReadOnly){
-		buff += "<input type='button' value='新規追加' onClick='Myappend()' ><br /><br />";
-		buff += "<input type='button' value='データをファイルに保存する' onClick='Mysave()' ><br />";
+		buff += "<input type='button' value='データをファイルに保存する' onClick='Mysave()' >　　";
+		buff += "<input type='button' value='新規追加' onClick='Myappend()' >";
 	}
 
 	$('#list').html(buff);
