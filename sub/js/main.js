@@ -1,5 +1,7 @@
-$(function(){
-    initlaize();
+//$(function(){
+//    initlaize();
+
+    var googlemap;
 
     //var KANAZAWA_STATION_LAT = 36.578273;
     //var KANAZAWA_STATION_LNG = 136.647763;
@@ -15,23 +17,26 @@ $(function(){
     function showGoogleMap(initLat, initLng) {
         var latlng = new google.maps.LatLng(initLat, initLng);
         var opts = {
-            zoom: 16,
-center: latlng,
-mapTypeId: google.maps.MapTypeId.ROADMAP
+            //zoom: 16,
+            zoom: 14,
+	    center: latlng,
+	    mapTypeId: google.maps.MapTypeId.ROADMAP,
+	    mapTypeControl: true
         };
-        var map = new google.maps.Map(document.getElementById("map_canvas"), opts);
+        //var map = new google.maps.Map(document.getElementById("map_canvas"), opts);
+        googlemap = new google.maps.Map(document.getElementById("map_canvas"), opts);
 
         //現在地のピン
-        /*
         var now_latlng = new google.maps.LatLng(initLat, initLng);
         var now_marker = new google.maps.Marker({
             position:now_latlng,
-            title: '現在地',
-            map: map,
+            title: 'ドラッグで移動',
+	    draggable : true,
+            map: googlemap,
         });
-        */
+       
 
-        pushPins(map);
+        pushPins(googlemap);
     }
 
     function getLocation() {
@@ -80,9 +85,16 @@ mapTypeId: google.maps.MapTypeId.ROADMAP
         return distance;
     }
 
+    //var mapNo = 1;
     function pushPins(map)
     {
-        csvToArray('data/prepass.csv', function(data){
+	//select テーブルで切り替え
+	mapConvertTable(mapNo);
+
+	//配列の初期化
+	mapPinsArray = new Array();
+
+        readMapData(_MapTable , function(data){
             for (i in data){
                 if (i == 0) {
                     continue;
@@ -92,10 +104,11 @@ mapTypeId: google.maps.MapTypeId.ROADMAP
         });
     }
 
+
     function pushPin(map, data) {
         //現在地のピン
-        var lat = data[6];
-        var lng = data[7];
+        var lat = data[_Lat];
+        var lng = data[_Lng];
         var latlng = new google.maps.LatLng(lat, lng);
         var marker = new google.maps.Marker({
             position:latlng,
@@ -105,23 +118,25 @@ mapTypeId: google.maps.MapTypeId.ROADMAP
             map: map
         });
 
-        var coid        = data[0];
-        var ofid        = data[1];
-        var name        = data[2];
-        var address     = data[4] + data[5];
-        var tel         = data[8];
-        var url         = data[10];
-        var opentime    = data[11];
-        var restdates   = data[12];
-        var description = data[13];
-        var image       = getSpotImage(coid, ofid);
+        //var coid        = data[0];
+        //var ofid        = data[1];
+        var name        = data[_Name];
+        var address     = data[_Address];
+        var tel         = data[_Tel];
+        var url         = data[_Url];
+        var opentime    = data[_Opentime];
+        var restdates   = data[_Restdates];
+        var description = data[_Description];
+
+        //var image       = getSpotImage(coid, ofid);
         //var image = "http://www.dummyimage.com/160x120";
 
         google.maps.event.addListener(marker, 'click', function() {
+
             var html = "";
             html += "<div style='width:200px;'>"
             html += "<h4>" + name + "</h4>"
-            html += "<p style='text-align:center'><img src='" + image + "' width='160' height='120'></p>";
+            //html += "<p style='text-align:center'><img src='" + image + "' width='160' height='120'></p>";
             //html += "<dl>";
             //html += "<dt>住所</dt><dd>" + address + "</dd>";
             //html += "<dt>電話番号</dt><dd>" + tel + "</dd>";
@@ -133,10 +148,13 @@ mapTypeId: google.maps.MapTypeId.ROADMAP
             html += "<dt>特典内容</dt><dd>" + description + "</dd>";
             html += "</dl>";
             html += "</div>";
+
             var infowindow = new google.maps.InfoWindow();
             infowindow.setContent(html);
             infowindow.open(map, marker);
         });
+
+	markersArray.push(marker);
     }
 
     function getSpotImage(coid, ofid)
@@ -146,6 +164,11 @@ mapTypeId: google.maps.MapTypeId.ROADMAP
     }
 
     function csvToArray(filename, callback) {
+	//キャッシュしない
+	$.ajaxSetup({
+		cache: false
+	});
+
         $.get(filename, function(csvdata) {
             //CSVのパース作業
             //CRの解析ミスがあった箇所を修正しました。
@@ -153,16 +176,35 @@ mapTypeId: google.maps.MapTypeId.ROADMAP
             // var csvdata = csvdata.replace("\r/gm", ""),
             csvdata = csvdata.replace(/\r/gm, "");
             var line = csvdata.split("\n"),
-        ret = [];
-        for (var i in line) {
-            //空行はスルーする。
-            if (line[i].length == 0) continue;
+            ret = [];
+            for (var i in line) {
+            	//空行はスルーする。
+            	if (line[i].length == 0) continue;
 
-            var row = line[i].split(",");
-            ret.push(row);
-        }
-        callback(ret);
+            	var row = line[i].split(",");
+            	ret.push(row);
+            }
+            callback(ret);
         });
     }
-});
+
+
+    function readMapData(table , callback){
+	csvToArray( table , function(data) {
+
+		mapPinsArray = new Array();
+
+		//1行目をフィールド名として扱い連想配列にする
+		for(var i = 1 ; i < data.length ; i++){
+			var rensou = new Object();
+			for(var s = 0; s < data[i].length ; s++){
+				rensou[data[0][s]] = data[i][s]; 
+			}
+			mapPinsArray.push(rensou);
+		}
+		callback(mapPinsArray);
+	});
+    }
+
+//});
 

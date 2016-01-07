@@ -26,7 +26,7 @@
         <link href="css/main.css" rel="stylesheet">
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
         <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
-        <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=TRUE_OR_FALSE"></script>
+        <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js"></script>
         <script src="js/main.js"></script>
 
         <!-- Include bookmark_bubble -->
@@ -35,7 +35,7 @@
 
     </head>
 
-    <body onload="map_fit();">
+    <body onload="initlaize(); map_fit();">
 
         <!-- Make sure all your bars are the first things in your <body> -->
         <header class="bar bar-nav">
@@ -47,7 +47,7 @@
             <div id="loading" style="font-color:#ffffff">Now Loading....</div>
             <div id="map_canvas" style="width:100%; height:480px;"></div>
         </div>
-        <nav class="bar bar-tab">
+        <nav class="bar bar-tab" style="display:none;">
             <a class="tab-item active" href="#">
                 食べる
             </a>
@@ -58,11 +58,16 @@
                 買う
             </a>
         </nav>
-        <nav class="bar bar-tab" style="display:none;">
-	    <select>
-		<option value="1">試験１</option>
-		<option value="2">試験２</option>
+        <nav class="bar bar-tab" style="display:block;">
+	    <select id="mapSelecter" style="text-align:center">
+		<option value="1">子育て安心マップ</option>
+		<option value="2">子どもの公園</option>
+		<option value="3">保育サポート</option>
+		<option value="4">子育て相談施設</option>
+		<option value="5">赤ちゃんの駅</option>
+		<option value="6">プレミアム・パスポート</option>
 	    </select>
+		<input type="button" onClick="clearMapPins()" value="ピンを消す" />
 	</nav>
     </body>
 </html>
@@ -90,7 +95,10 @@ function map_fit(){
 	//ブラウザの縦サイズにフィットさせる
 	//上下に設置するdiv縦幅
 	var ajust = 81;
-	document.getElementById("map_canvas").style.height = (window.innerHeight - ajust) + "px";
+	$('#map_canvas').css({
+		'height' : (window.innerHeight - ajust) + "px",
+		'width'  : window.innerWidth + "px"
+	});
 }
 
 //window risize 時の処理
@@ -98,5 +106,147 @@ $(window).resize(function(){
 	map_fit();
 });
 
+
+
+//****** 複数マップの対応機能 ******
+
+//マップの選択
+var mapNo = 1;
+$('#mapSelecter').change(function(){
+	$('#mapSelecter option:selected').each(function(){
+		mapNo = parseInt($(this).val());
+	});
+	//alert(mapNo);
+	
+	pushPins(googlemap);
+}).change();
+
+//ピン情報保存用の配列
+var markersArray = new google.maps.MVCArray();
+function clearMapPins(){
+	markersArray.forEach(function (marker, idx) { marker.setMap(null); });
+	mapPinsArray = new Array();
+}
+
+//個別マップ対応テーブル
+var _MapTable;
+var _Category;
+var _Name;
+var _Address;
+var _Tel;
+var _Url;
+var _Opentime;
+var _Restdates;
+var _Description;
+var _Lat;
+var _Lng;
+
+function mapConvertTable(mapNo){ 
+
+	switch(mapNo){
+		//子育て安心マップ
+		case 1 :
+	
+		_MapTable	= '../uploads/mapinfo/wajima.csv';
+		_Category 	= '';
+		_Name 		= 'name';
+		_Address	= 'address';
+		_Tel		= 'phone1';
+		_Url		= 'url';
+		_Opentime	= 'servicetime';
+		_Restdates	= 'holiday';
+		_Description	= 'memo1';
+		_Lat		= 'lat';
+		_Lng		= 'lng';
+
+       		break;
+
+		//子どもの公園
+		case 2 :
+	
+		_MapTable	= '../uploads/mapinfo/park.csv';
+		_Category 	= '';
+		_Name 		= 'name';
+		_Address	= 'address';
+		_Tel		= '';
+		_Url		= '';
+		_Opentime	= '';
+		_Restdates	= '';
+		_Description	= 'area';
+		_Lat		= 'lat';
+		_Lng		= 'lng';
+
+       		break;
+
+		//保育サポート
+		case 3 :
+	
+		_MapTable	= '../uploads/mapinfo/leave.csv';
+		_Category 	= '';
+		_Name 		= 'name';
+		_Address	= 'address';
+		_Tel		= 'phone1';
+		_Url		= 'url';
+		_Opentime	= '';
+		_Restdates	= '';
+		_Description	= 'memo1';
+		_Lat		= 'lat';
+		_Lng		= 'lng';
+
+       		break;
+
+		//子育て相談施設
+		case 4 :
+	
+		_MapTable	= '../uploads/mapinfo/consultation.csv';
+		_Category 	= '';
+		_Name 		= 'name';
+		_Address	= 'address';
+		_Tel		= 'phone';
+		_Url		= '';
+		_Opentime	= '';
+		_Restdates	= '';
+		_Description	= '';
+		_Lat		= 'lat';
+		_Lng		= 'lng';
+
+       		break;
+
+		//赤ちゃんの駅
+		case 5 :
+	
+		_MapTable	= '../uploads/mapinfo/openData_baby.csv';
+		_Category 	= '';
+		_Name 		= 'name';
+		_Address	= 'address';
+		_Tel		= 'phone';
+		_Url		= 'url';
+		_Opentime	= 'servicetime';
+		_Restdates	= 'holiday';
+		_Description	= 'op_1';
+		_Lat		= 'lat';
+		_Lng		= 'lng';
+
+       		break;
+
+		//プレミアムパスポート
+		case 6 :
+	
+		_MapTable	= '../uploads/mapinfo/openData_prepass.csv';
+		_Category 	= '';
+		_Name 		= 'name';
+		_Address	= 'address';
+		_Tel		= 'phone';
+		_Url		= 'url';
+		_Opentime	= 'servicetime';
+		_Restdates	= 'holiday';
+		_Description	= 'prepass';
+		_Lat		= 'lat';
+		_Lng		= 'lng';
+
+       		break;
+
+	}
+}
 
 </script>
