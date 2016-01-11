@@ -133,6 +133,7 @@ function user_header($title){
 	print("<!DOCTYPE HTML>");
        	print("<HTML>");
        	print("<META HTTP-EQUIV='Content-Type' CONTENT='text/html; charset=UTF-8'>");
+	print("<meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no'>");
 	print("<TITLE>" . $title . "</TITLE>");
        	print("</HEAD>");
        	print("<BODY>");
@@ -174,6 +175,7 @@ function common_header($title){
        	print("<HTML>");
        	print("<HEAD>");
        	print("<META HTTP-EQUIV='Content-Type' CONTENT='text/html; charset=UTF-8'>");
+	print("<meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no'>");
 	print("<TITLE>" . $title . "</TITLE>");
        	print("</HEAD>");
        	print("<BODY>");

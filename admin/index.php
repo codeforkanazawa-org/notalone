@@ -22,7 +22,11 @@ user_header("能登ノットアローン index");
 <hr />
 <a href="http://kosodate.df-c.net/loadfiles.php?dir=uploads/mapinfo&ftype=text/csv&key=&next=cont_mapinfo.php">マップファイル</a><br>
 <br />
+<a href="http://kosodate.df-c.net/opendata.php?dir=uploads/mapinfo&ftype=text/csv&key=&next=open_mapinfo.php">マップファイル（オープンデータ）</a><br>
+<br />
 <a href="http://kosodate.df-c.net/loadfiles.php?dir=uploads/mapinfo&ftype=text/csv&key=&next=cont_csvdatacoordinator.php">マップファイルの調整</a><br>
+<br />
+<a href="cont_categoryicon.php">カテゴリ別アイコン</a><br>
 <hr />
 <a href="cont_inquiry.php">相談窓口</a><br>
 <br />

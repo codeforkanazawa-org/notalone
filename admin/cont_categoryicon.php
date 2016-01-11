@@ -17,12 +17,12 @@ include("log_in_check.php");
 
 //使用するテキストDB
 $db_Dir   = "../localhost";
-$db_Head = "target";
+$db_Head = "categoryicon";
 $db_Ext  = "csv";
 $db_Table = $db_Dir . "/" . $db_Head . "." . $db_Ext;
 
 
-common_header("control TargetTable");
+common_header("control CategoryIconTable");
 
 $user_level = Access_check( $acc_level ,1,1,$ReturnFile);
 print('レベル　＝　1:一般ユーザ　2:管理ユーザ　3:システム管理者<br>');
