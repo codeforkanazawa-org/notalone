@@ -11,6 +11,12 @@
     var FARAWAY_DISTANCE     = 0.8;
 
     function initlaize() {
+	//カテゴリアイコンの読み出し
+	var table = "../localhost/categoryicon.csv";
+	readCategoryIcon(table , function(data){
+		//alert(data.length);
+	});
+
         getLocation();
     }
 
@@ -31,6 +37,7 @@
         var now_marker = new google.maps.Marker({
             position:now_latlng,
             title: 'ドラッグで移動',
+	    icon : "icons/blue-dot.png",
 	    draggable : true,
             map: googlemap,
         });
@@ -96,72 +103,67 @@
 
         readMapData(_MapTable , function(data){
             for (i in data){
-                if (i == 0) {
-                    continue;
-                }
                 pushPin(map, data[i]);
             }
+	    //alert(mapPinsArray.length);
         });
     }
 
 
     function pushPin(map, data) {
-        //現在地のピン
+        //データ対応のピン
         var lat = data[_Lat];
         var lng = data[_Lng];
+
+	if(_DefPin == ''){alert(data.length);
+		var icon = "icons/red_pin.png";
+	}else{
+		var icon = _DefPin;
+	}
+	
+	//category icon のチェック ******
+	if(_Category != ""){
+		var level  = googlemap.getZoom();
+	
+		var cat    = data[_Category].trim();
+
+		var to_dir = "../";	//subからの相対ディレクトリ
+
+		for(var i = 0 ; i < iconArray.length ; i++){
+			if(cat == iconArray[i][Cat_name]){
+				if(iconArray[i][Big_icon] != "" && level >= iconArray[i][Zoom_level]){
+					icon  = to_dir + iconArray[i][Big_dir];
+					icon += "/"    + iconArray[i][Big_icon];
+				}
+				break;
+			}
+		}
+	}
+	//******************************
+
         var latlng = new google.maps.LatLng(lat, lng);
         var marker = new google.maps.Marker({
             position:latlng,
-
-	    icon : "icons/red_pin.png",
+	    title : data[_Name],
+	    icon  : icon,
+	    draggable : true,
 
             map: map
         });
 
-        //var coid        = data[0];
-        //var ofid        = data[1];
-        var name        = data[_Name];
-        var address     = data[_Address];
-        var tel         = data[_Tel];
-        var url         = data[_Url];
-        var opentime    = data[_Opentime];
-        var restdates   = data[_Restdates];
-        var description = data[_Description];
 
-        //var image       = getSpotImage(coid, ofid);
-        //var image = "http://www.dummyimage.com/160x120";
+	//マップごとのinfoWindowを整形
+	var html = mapMakeInfo(mapNo,data);
+        var infowindow = new google.maps.InfoWindow();
+        infowindow.setContent(html);
 
         google.maps.event.addListener(marker, 'click', function() {
-
-            var html = "";
-            html += "<div style='width:200px;'>"
-            html += "<h4>" + name + "</h4>"
-            //html += "<p style='text-align:center'><img src='" + image + "' width='160' height='120'></p>";
-            //html += "<dl>";
-            //html += "<dt>住所</dt><dd>" + address + "</dd>";
-            //html += "<dt>電話番号</dt><dd>" + tel + "</dd>";
-            //if (url.length) {
-            //    html += "<dt>URL</dt><dd><a target='_blank' href='"+ url + "'>" + url + "</a></dd>";
-            //}
-            //html += "<dt>営業時間</dt><dd>" + opentime + "</dd>";
-            //html += "<dt>定休日</dt><dd>" + restdates + "</dd>";
-            html += "<dt>特典内容</dt><dd>" + description + "</dd>";
-            html += "</dl>";
-            html += "</div>";
-
-            var infowindow = new google.maps.InfoWindow();
-            infowindow.setContent(html);
             infowindow.open(map, marker);
         });
 
 	markersArray.push(marker);
     }
 
-    function getSpotImage(coid, ofid)
-    {
-        var url = "http://www.i-oyacomi.net/prepass/upimages/" + coid + ofid + "ofPic1_small.jpg";
-        return url;
-    }
 
     function csvToArray(filename, callback) {
 	//キャッシュしない
@@ -203,6 +205,24 @@
 			mapPinsArray.push(rensou);
 		}
 		callback(mapPinsArray);
+	});
+    }
+
+    //cagegoryicon ファイルを読み込み iconArrayに保存
+    function readCategoryIcon(table , callback){
+	csvToArray( table , function(data) {
+
+		iconArray = new Array();
+
+		//1行目をフィールド名として扱い連想配列にする
+		for(var i = 1 ; i < data.length ; i++){
+			var rensou = new Object();
+			for(var s = 0; s < data[i].length ; s++){
+				rensou[data[0][s]] = data[i][s]; 
+			}
+			iconArray.push(rensou);
+		}
+		callback(iconArray);
 	});
     }
 

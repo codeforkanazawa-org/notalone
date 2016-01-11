@@ -47,6 +47,12 @@ function init(){
 			brows_init();
 
 			break;
+
+		case "about.html"  :
+			brows_init();
+			//index_init();
+
+			break;
 	}	 
 }
 
@@ -259,11 +265,13 @@ function index_init(){
 //2nd(next) menu link
 function snd_index(link){
 	switch(link){
-		case "events" : location.href="events.html";
+		case "events"  : location.href="events.html";
 				break;
- 		case "aidmap" :	location.href="sub/map.html";
+ 		case "aidmap"  : location.href="sub/map.html";
 				break;
 		case "inquiry" : location.href="inquiry.html";
+				break;
+		case "about"   : location.href="about.html";
 				break;
 	}
 }

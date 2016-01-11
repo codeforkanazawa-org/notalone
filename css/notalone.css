@@ -140,6 +140,12 @@ body{
 #menu3{
 	background-color : #E0FFFF;
 }
+#project{
+	background-color : #FFFFFF;
+	text-align : center;
+	border : solid 1px #cccccc;
+}
+
 
 #menu4,#inqid_1_title{
 	background-color : lightgreen;

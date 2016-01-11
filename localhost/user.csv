@@ -1,3 +1,5 @@
 no,active,user_id,user_pw,user_level,real_name,e_mail,login_count,last_login
-1,1,notalone_system,0103,3,tadatokio,tadachan@navy.plala.or.jp,0,0
-2,1,admin,0103,2,defaultuser,,0,0
+1,1,notalone_system,06843e3f58776ec2eb5e0cc7a44a3c3fc1b4b9af2e75504da3d299dc566cc395,3,tadatokio,tadachan@navy.plala.or.jp,39,2016-01-08 16:25:07
+2,1,admin2,06843e3f58776ec2eb5e0cc7a44a3c3fc1b4b9af2e75504da3d299dc566cc395,2,サイト管理者,,33,2016-01-08 15:58:22
+3,1,customer,06843e3f58776ec2eb5e0cc7a44a3c3fc1b4b9af2e75504da3d299dc566cc395,1,一般ユーザー,,30,2016-01-08 15:55:48
+4,1,testuser,3e6bfcda089c0989d4ba4b83e3565aead8440e35739604ee6601339b477909b5,2,試験用管理者アカウント,,1,2016-01-08 16:28:37

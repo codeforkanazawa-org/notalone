@@ -59,13 +59,14 @@
             </a>
         </nav>
         <nav class="bar bar-tab" style="display:block;">
-	    <select id="mapSelecter" style="text-align:center">
+	    <select id="mapSelecter">
 		<option value="1">子育て安心マップ</option>
 		<option value="2">子どもの公園</option>
 		<option value="3">保育サポート</option>
 		<option value="4">子育て相談施設</option>
 		<option value="5">赤ちゃんの駅</option>
 		<option value="6">プレミアム・パスポート</option>
+		<option value="0">---（ピンを消す）---</option>
 	    </select>
 		<input type="button" onClick="clearMapPins()" value="ピンを消す" />
 	</nav>
@@ -95,10 +96,12 @@ function map_fit(){
 	//ブラウザの縦サイズにフィットさせる
 	//上下に設置するdiv縦幅
 	var ajust = 81;
+	//var ajust = 50;
 	$('#map_canvas').css({
 		'height' : (window.innerHeight - ajust) + "px",
 		'width'  : window.innerWidth + "px"
 	});
+
 }
 
 //window risize 時の処理
@@ -106,6 +109,21 @@ $(window).resize(function(){
 	map_fit();
 });
 
+//****** カテゴリアイコン対応 ******
+var iconArray = new Array(); 		//２次元：連想配列
+
+/***  categoryicon csv format 変換テーブル  ****/
+var Cat_name  = "category";	  	//
+var Def_dir   = "default_directory";	//
+var Def_icon  = "default_icon";		//
+var Big_dir   = "big_directory";	//
+var Big_icon  = "big_icon";		//
+var Zoom_level= "zoom_level";		//
+/*********/
+
+//CategoryIcon tableの読み込み
+//var table = "../localhost/categoryicon.csv";
+//readCategoryIcon(table);
 
 
 //****** 複数マップの対応機能 ******
@@ -117,8 +135,11 @@ $('#mapSelecter').change(function(){
 		mapNo = parseInt($(this).val());
 	});
 	//alert(mapNo);
-	
-	pushPins(googlemap);
+	if(mapNo == 0){
+		clearMapPins();
+	}else{
+		pushPins(googlemap);
+	}
 }).change();
 
 //ピン情報保存用の配列
@@ -130,7 +151,12 @@ function clearMapPins(){
 
 //個別マップ対応テーブル
 var _MapTable;
+var _DefPin;
+var _BigPin;
+
 var _Category;
+var _1st_id;
+var _2nd_id;
 var _Name;
 var _Address;
 var _Tel;
@@ -148,14 +174,17 @@ function mapConvertTable(mapNo){
 		case 1 :
 	
 		_MapTable	= '../uploads/mapinfo/wajima.csv';
-		_Category 	= '';
+		_DefPin		= 'icons/pink-pushpin.png';
+		_BigPin		= '';
+
+		_Category 	= 'category';
 		_Name 		= 'name';
 		_Address	= 'address';
 		_Tel		= 'phone1';
 		_Url		= 'url';
 		_Opentime	= 'servicetime';
 		_Restdates	= 'holiday';
-		_Description	= 'memo1';
+		_Description	= 'memo';	//1〜2 あるので先頭のみ指定
 		_Lat		= 'lat';
 		_Lng		= 'lng';
 
@@ -165,7 +194,10 @@ function mapConvertTable(mapNo){
 		case 2 :
 	
 		_MapTable	= '../uploads/mapinfo/park.csv';
-		_Category 	= '';
+		_DefPin		= 'icons/ltblu-pushpin.png';
+		_BigPin		= '';
+
+		_Category 	= 'category';
 		_Name 		= 'name';
 		_Address	= 'address';
 		_Tel		= '';
@@ -182,14 +214,17 @@ function mapConvertTable(mapNo){
 		case 3 :
 	
 		_MapTable	= '../uploads/mapinfo/leave.csv';
-		_Category 	= '';
+		_DefPin		= 'icons/yellow-pin.png';
+		_BigPin		= '';
+
+		_Category 	= 'category';
 		_Name 		= 'name';
 		_Address	= 'address';
 		_Tel		= 'phone1';
 		_Url		= 'url';
 		_Opentime	= '';
 		_Restdates	= '';
-		_Description	= 'memo1';
+		_Description	= 'memo';	//1〜2 あるので先頭のみ指定
 		_Lat		= 'lat';
 		_Lng		= 'lng';
 
@@ -199,14 +234,17 @@ function mapConvertTable(mapNo){
 		case 4 :
 	
 		_MapTable	= '../uploads/mapinfo/consultation.csv';
-		_Category 	= '';
+		_DefPin		= 'icons/blue-pin.png';
+		_BigPin		= '';
+
+		_Category 	= 'category';
 		_Name 		= 'name';
 		_Address	= 'address';
-		_Tel		= 'phone';
+		_Tel		= 'phone1';
 		_Url		= '';
 		_Opentime	= '';
 		_Restdates	= '';
-		_Description	= '';
+		_Description	= 'memo';	//1〜2 あるので先頭のみ指定
 		_Lat		= 'lat';
 		_Lng		= 'lng';
 
@@ -216,14 +254,19 @@ function mapConvertTable(mapNo){
 		case 5 :
 	
 		_MapTable	= '../uploads/mapinfo/openData_baby.csv';
+		_DefPin		= 'icons/green-pin.png';
+		_BigPin		= '';
+
 		_Category 	= '';
+		_1st_id		= 'co_id';
+		_2nd_id		= 'shop_id';
 		_Name 		= 'name';
 		_Address	= 'address';
 		_Tel		= 'phone';
 		_Url		= 'url';
 		_Opentime	= 'servicetime';
 		_Restdates	= 'holiday';
-		_Description	= 'op_1';
+		_Description	= 'op_';	//1〜13 あるので先頭のみ指定
 		_Lat		= 'lat';
 		_Lng		= 'lng';
 
@@ -233,7 +276,12 @@ function mapConvertTable(mapNo){
 		case 6 :
 	
 		_MapTable	= '../uploads/mapinfo/openData_prepass.csv';
+		_DefPin		= 'icons/red_pin.png';
+		_BigPin		= '';
+
 		_Category 	= '';
+		_1st_id		= 'co_id';
+		_2nd_id		= 'shop_id';
 		_Name 		= 'name';
 		_Address	= 'address';
 		_Tel		= 'phone';
@@ -249,4 +297,208 @@ function mapConvertTable(mapNo){
 	}
 }
 
+function mapMakeInfo(mapNo,data){
+	switch(mapNo){
+
+		//子育て安心
+		case 1 :
+
+	    //備考のまとめ
+	    var head =　_Description;
+	    var opt  = ""; 
+	    for(var i = 1 ; i <= 2 ; i++){
+		if(data[head + i] != ""){
+			opt += data[head + i] + "/";
+		}
+	    }
+	    //***********
+
+
+            var html = "";
+            html +="<div style='width:150px;padding:0px;'>"
+            html += data[_Category];
+
+	    html += "<h5>" + data[_Name] + "</h5>";
+
+            html += "<dl>";
+            html += "<dd>" + data[_Address] + "</dd>";
+            html += "<dd>" + data[_Tel] + "</dd>";
+            html += "<dd>" + opt + "</dd>";
+            html += "</dl>";
+            html += "</div>";
+
+		break;
+
+		//子どもの公園
+		case 2 :
+
+            var html = "";
+            html +="<div style='width:150px;padding:0px;'>"
+            html += data[_Category];
+
+	    html += "<h5>" + data[_Name] + "</h5>";
+
+            html += "<dl>";
+            html += "<dd>" + data[_Address] + "</dd>";
+            html += "<dd>面積：" + data[_Description] + "㎡</dd>";
+            html += "</dl>";
+            html += "</div>";
+
+		break;
+
+		//保育サポート
+		case 3 :
+
+	    //備考のまとめ
+	    var head =　_Description;
+	    var opt  = ""; 
+	    for(var i = 1 ; i <= 2 ; i++){
+		if(data[head + i] != ""){
+			opt += data[head + i] + "/";
+		}
+	    }
+	    //***********
+
+
+            var html = "";
+            html +="<div style='width:150px;padding:0px;'>"
+            html +="保育サポート<br />";
+            html += data[_Category];
+
+	    html += "<h5>" + data[_Name] + "</h5>";
+
+            html += "<dl>";
+            html += "<dd>" + data[_Address] + "</dd>";
+            html += "<dd>" + data[_Tel] + "</dd>";
+            html += "<dd>" + opt + "</dd>";
+            html += "</dl>";
+            html += "</div>";
+
+		break;
+
+		//子育て相談施設
+		case 4 :
+
+	    var image = getSpotImage(data[_1st_id], data[_2nd_id]);
+
+	    //備考のまとめ
+	    var head =　_Description;
+	    var opt  = ""; 
+	    for(var i = 1 ; i <= 2 ; i++){
+		if(data[head + i] != ""){
+			opt += data[head + i] + "/";
+		}
+	    }
+	    //***********
+
+
+            var html = "";
+            html +="<div style='width:150px;padding:0px;'>"
+            html +="子育て相談<br />";
+            html += data[_Category];
+
+	    html += "<h5>" + data[_Name] + "</h5>";
+
+            html += "<dl>";
+            html += "<dd>" + data[_Address] + "</dd>";
+            html += "<dd>" + data[_Tel] + "</dd>";
+            html += "<dd>" + opt + "</dd>";
+            html += "</dl>";
+            html += "</div>";
+
+		break;
+
+		//赤ちゃんの駅
+		case 5 :
+
+	    //var image = getSpotImage(data[_1st_id], data[_2nd_id]);
+
+	    //赤ちゃんサービスのまとめ
+	    var head =　_Description;
+	    var opt  = ""; 
+	    for(var i = 1 ; i <= 13 ; i++){
+		if(data[head + i] != ""){
+			opt += data[head + i] + "/";
+		}
+	    }
+	    //***********
+
+
+            var html = "";
+            html +="<div style='width:150px;padding:0px;'>"
+            html +="赤ちゃんの駅";
+
+            if (data[_Url].length) {
+                html += "<a target='_blank' href='"+ data[_Url] + "'><h5>" + data[_Name] + "</h5></a>";
+            }else{
+		html += "<h5>" + data[_Name] + "</h5>";
+	    }
+
+	    /*
+	    if(image != ""){
+            	html += "<p style='text-align:center'><img src='" + image + "' width='120' ></p>";
+	    }
+	    */
+
+            html += "<dl>";
+            html += "<dd>" + data[_Address] + "</dd>";
+            html += "<dd>" + data[_Tel] + "</dd>";
+            html += "<dd>営業：" + data[_Opentime] + "</dd>";
+            html += "<dd>定休：" + data[_Restdates] + "</dd>";
+            html += "<dd>" + opt + "</dd>";
+            html += "</dl>";
+            html += "</div>";
+
+		break;
+
+		//プレミアムパスポート
+		case 6 :
+
+	    //var image = getSpotImage(data[_1st_id], data[_2nd_id]);
+
+            var html = "";
+            html += "<div style='width:150px;padding:0px;'>"
+            html +="プレミアムパスポート";
+
+            if (data[_Url].length) {
+                html += "<a target='_blank' href='"+ data[_Url] + "'><h5>" + data[_Name] + "</h5></a>";
+            }else{
+		html += "<h5>" + data[_Name] + "</h5>";
+	    }
+
+	    /*
+	    if(image != ""){
+            	html += "<p style='text-align:center'><img src='" + image + "' width='120' ></p>";
+	    }
+	    */
+
+            html += "<dl>";
+            html += "<dd>" + data[_Address] + "</dd>";
+            html += "<dd>" + data[_Tel] + "</dd>";
+            html += "<dd>営業：" + data[_Opentime] + "</dd>";
+            html += "<dd>定休：" + data[_Restdates] + "</dd>";
+            html += "<dd>" + data[_Description] + "</dd>";
+            html += "</dl>";
+            html += "</div>";
+
+		break;
+	
+	}
+
+	return html;
+}
+
+//プレパス、赤ちゃんの駅　画像取得用
+function getSpotImage(coid, ofid)
+{
+	var url = "http://www.i-oyacomi.net/prepass/upimages/" + coid + ofid + "ofPic1_small.jpg";
+	var img = new Image();
+    	img.src = url;
+
+	if(img.height > 0){
+        	return url;
+	}else{
+		return "";
+	}
+}
 </script>
