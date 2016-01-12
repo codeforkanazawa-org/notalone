@@ -27,22 +27,26 @@
 
 <body onload="init()">
 <!-- fix start -->
-<div id="top-menu" onClick="top_index()">能登ノットアローン</div>
+<!--div id="top-menu" onClick="top_index()">能登ノットアローン</div-->
+<div id="top-menu" onClick="top_index()"></div>
 
-<div id="myCalendar">
+<!--div id="myCalendar">
 	<a href="https://www.google.com/calendar/" target="_blank">
 		<img src="images/ico_calendar.png" />
 	</a>
-</div>
+</div-->
 <!-- fix end -->
 
 <!-- fix div 調整用　-->
 <div id="menu-back"></div>
 
+<div id="notalone_image" onClick="privert()">
+	<!--img src="images/notalone_image.png" width="350px"-->
+</div>
+
 <div id="privert">
   <canvas id="myCanvas" onClick="setting()">
   </canvas>	
-
   <div id="info">
 	<div id="myFavFamily">
  	</div>
@@ -93,10 +97,11 @@
 	（注）端末のブラウザに情報を保存しますので、ブラウザ初期化などにより、情報が消える場合があります。
 	</div>
 </div>
-<div class="jobmenu" id="menu1" onClick="snd_index('events')">イベント</div>
-<div class="jobmenu" id="menu2" onClick="snd_index('aidmap')">マップ</div>
-<div class="jobmenu" id="menu3" onClick="snd_index('inquiry')">相談</div>
-<div id="project" onClick="snd_index('about')">能登ノットアローンについて</div>
+
+<div class="jobmenu" id="menu1" onClick="snd_index('events')"></div>
+<div class="jobmenu" id="menu2" onClick="snd_index('aidmap')"></div>
+<div class="jobmenu" id="menu3" onClick="snd_index('inquiry')"></div>
+<div id="project" onClick="snd_index('about')"></div>
 
 
 <!-- Page Checker (style display:none)-->

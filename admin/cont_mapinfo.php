@@ -209,6 +209,52 @@ function mapGetLatLng(){
 
 }
 
+function map_AddrToSearch(){
+	var place = $('#searchAddr').val();
+	if(place == ""){
+		alert("検索する住所を入力してください");
+		return false;
+	}
+
+	// ジオコーダのコンストラクタ
+	var geocoder = new google.maps.Geocoder();
+
+	// geocodeリクエストを実行。
+	// 第１引数はGeocoderRequest。住所⇒緯度経度座標の変換時はaddressプロパティを入れればOK。
+	// 第２引数はコールバック関数。
+	geocoder.geocode({
+		address: place
+	}, function(results, status) {
+		if (status == google.maps.GeocoderStatus.OK) {
+			// 結果の表示範囲。結果が１つとは限らないので、LatLngBoundsで用意。
+			var bounds = new google.maps.LatLngBounds();
+
+			for (var i in results) {
+				if (results[i].geometry) {
+					// 緯度経度を取得
+					var latlng = results[i].geometry.location;
+				        // 住所を取得(日本の場合だけ「日本, 」を削除)
+          				var address = results[i].formatted_address.replace(/^日本, /, '');
+					// 検索結果地が含まれるように範囲を拡大
+					bounds.extend(latlng);
+
+					/*
+          				// あとはご自由に・・・。
+          				new google.maps.InfoWindow({
+            					content: address + "<br>(Lat, Lng) = " + latlng.toString()
+          				}).open(map, new google.maps.Marker({
+            					position: latlng,
+            					map: map
+          				}));
+					*/
+        			}
+      			}
+			// 範囲を移動
+			mapCanvas.fitBounds(bounds);
+		}
+	});
+}
+
 
 //
 function showGoogleMap(initLat, initLng) {
@@ -220,6 +266,8 @@ function showGoogleMap(initLat, initLng) {
         };
         //var map = new google.maps.Map(document.getElementById("map_canvas"), opts);
         mapCanvas = new google.maps.Map(document.getElementById("map_canvas"), opts);
+
+
 
         //現在地のピン
         var now_latlng = new google.maps.LatLng(initLat, initLng);
@@ -233,6 +281,11 @@ function showGoogleMap(initLat, initLng) {
         });
 
 	now_marker.setMap(mapCanvas);
+
+	//クリックした位置に現在ピンが移動する
+	google.maps.event.addListener(mapCanvas, 'click', function(event){
+		now_marker.setPosition(event.latLng);
+	});   
 }
 
 
@@ -250,7 +303,10 @@ function showGoogleMap(initLat, initLng) {
 <div id="map_area">
 	<div id="map_canvas">
 	</div>
-	<input type="button" id="map_getlatlng" onClick="mapGetLatLng()" value="位置座標の取得" />
+	<input type="button" id="map_getlatlng" onClick="mapGetLatLng()" value="位置座標を取得する" />
+	　
+	<input type="text" id="searchAddr" value="" />
+	<input type="button" id="map_hidden" onClick="map_AddrToSearch()" value="住所で検索する" />
 	　
 	<input type="button" id="map_hidden" onClick="map_hidden()" value="マップを閉じる" />
 </div>

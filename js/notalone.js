@@ -13,7 +13,7 @@ $(window).resize(function(){
 var thispage ="";
 
 //デフォルトのメッセージ
-var Def_info ="	<br />みんなで遊そぼ！<br /><br />まずは写真を<br />クリック！！<br />";
+var Def_info ="	誕生日の設定で年齢が表示できます。<br />お気に入りの画像も登録できます。<br />設定する時は画像をクリック！！<br />";
 
 //初期化
 function init(){
@@ -45,6 +45,13 @@ function init(){
 
 		case "inquiry.html" :
 			brows_init();
+
+			//inquiry tableの読み込み
+			var table = "inquiry/inquiry.csv";
+			readInquiry(table);
+
+			//inquiry Dataの整形
+			//inquirySetData();
 
 			break;
 
@@ -95,21 +102,26 @@ function brows_init(){
 		//****************
 		case "index.html" :
 
-	$("#myCalendar").width(BodyWidth);
-	$("#myCalendar").css({"left" : BodyLeftMargin });
+	//$("#myCalendar").width(BodyWidth);
+	//$("#myCalendar").css({"left" : BodyLeftMargin });
 
 
-	//縦幅 0.35
-	var PrivertHeight  = Math.round(DeviceHeight * 0.35);	//個人情報欄の縦幅確保
-	var PhotoPadding = 5;				//個人情報　写真の余白
+
 
 	$("#menu-back").height(TopHeight);
 	$("#menu-back").css({"line-height" : TopHeight + "px"});
 
+	//縦幅 var ritu = 0.5;
+	var ImageHeight  = Math.round(DeviceHeight * 0.5);	//イメージ画像
+	$("#notalone_image").height(ImageHeight);
+
+	//縦幅 var ritu = 0.35;
+	var PrivertHeight  = Math.round(DeviceHeight * 0.5);	//個人情報欄の縦幅確保
+	var PhotoPadding = 5;				//個人情報　写真の余白
 	$("#privert").height(PrivertHeight);
+	$("#privert").css("display" , "none");	//初期非表示
 
-
-	var MenuHeight = ( DeviceHeight - TopHeight - PrivertHeight ) / 3;
+	var MenuHeight = ( DeviceHeight - TopHeight - ImageHeight ) / 3;
 
 	$(".jobmenu").height(MenuHeight);
 	$(".jobmenu").css({"line-height" : MenuHeight + "px"});
@@ -118,10 +130,12 @@ function brows_init(){
 	//$("#photo > img").css({"height" : (PrivertHeight * 0.7 - PhotoPadding * 2) + "px" , "padding" : PhotoPadding + "px"});
 
 	//canvasサイズは縦を基準、横幅は元画像から比率で設定
-	$("#myCanvas").css({"height" : (PrivertHeight - PhotoPadding * 2) + "px" , "padding" : PhotoPadding + "px"});
+	//$("#myCanvas").css({"height" : (PrivertHeight - PhotoPadding * 2) + "px" , "padding" : PhotoPadding + "px"});
+	$("#myCanvas").css({"height" : (PrivertHeight * 0.65 - PhotoPadding * 2) + "px" , "padding" : PhotoPadding + "px"});
 
 	//canvas内に初期画像を表示
-	ImageSet('myCanvas','uploads/images/IMG_0763.jpg');
+	ImageSet('myCanvas','images/notalone_image.png');
+
 
 	//選択画像の表示準備
 	//localImageSet();
@@ -240,6 +254,12 @@ function brows_init(){
 	//イベント欄ダミーの高さ(px)
 	$("#dummy").height(DeviceHeight - $("#top_menu").height());
 
+
+	//map_area の表示位置を動的に調整
+	$("#map_area").css({
+		"left" : BodyLeftMargin
+	});
+
 		break;
 
 		//***************************
@@ -306,14 +326,31 @@ function setMenu(tab){
 	}
 }
 
+//プライベートエリア（画像、成長指標）の表示切り替え
+function privert(){
+	var flg = $("#privert").css("display");
+
+	if(flg == "none"){
+		$("#notalone_image").hide("blind", "", 1000 );
+		$("#privert").show("blind", "", 1000 );
+	}else{
+		$("#privert").hide("blind", "", 1000 );
+		$("#notalone_image").show("blind", "", 1000 );
+	}
+}
+
 //誕生日等の個人情報設定欄の表示切り替え
 function setting(){
+	//var flg = $("#privert").css("display");
 	var flg = $("#setting").css("display");
 
 	if(flg == "none"){
+		//$("#privert").show("blind", "", 1000 );
 		$("#setting").show("blind", "", 1000 );
 	}else{
+		//$("#privert").hide("blind", "", 1000 );
 		$("#setting").hide("bling", "", 1000 );
+		//$("#notalone_image").show("blind", "", 1000 );
 	}
 }
 
@@ -426,8 +463,8 @@ function favInit(type){
 
 			//子育て指標の表示
 			count ++;
-			setdata += fav_name + "<br />";
-			setdata += "・" + calculateAge(fav_bday) + "<br />";
+			setdata += fav_name;
+			setdata += "　：　" + calculateAge(fav_bday) + "<br />";
 		}else{
 			//入力欄クリア
 			$("#name" + i).val('');
@@ -886,8 +923,8 @@ var tar_id    = "target_id";	//
 var tar_color = "color";	//
 var tar_text  = "text_color";	//
 var tar_icon  = "icon";		//
-var default_tar_color = "#4682B4";	//
-var default_tar_text  = "#FFFFFF";	//
+var default_tar_color = "#ffffff";	//
+var default_tar_text  = "#604037";	//
 /*********/
 
 /***  location csv format 変換テーブル  ****/
@@ -1371,6 +1408,8 @@ alert(view);
 
 
 //**** for inquiry.html *******
+var inquiryArray  = new Array();	//相談用配列（２次元：連想配列）
+
 //相談ごとの選択 アコーディオン機能
 var openInq = "";
 function inqScroll(callInq){
@@ -1414,5 +1453,124 @@ function selectInquiry(idno){
 
 		inqScroll(openInq);
 	}
+}
+
+//inquiry（相談）ファイルを読み込みinquiryArrayに保存
+function readInquiry(table){
+	csvToArray( table , function(data) {
+
+		//1行目をフィールド名として扱い連想配列にする
+		for(var i = 1 ; i < data.length ; i++){
+			var rensou = new Object();
+			for(var s = 0; s < data[i].length ; s++){
+				rensou[data[0][s]] = data[i][s]; 
+			}
+			inquiryArray.push(rensou);
+		}
+
+		//そのままデータセット
+		inquirySetData();
+
+		//googlemap の初期設定
+		mapInit();
+	});
+}
+
+//inquiry別のデータ分類
+//inquiry table のデータは、カテゴリ単位に表示順にソートしておくこと
+//***** 変換テーブル *******
+var inq_cat1  = "category1";
+var inq_cat2  = "category2";
+var inq_name  = "name";
+var inq_phone = "phone";
+var inq_addr  = "address";
+var inq_memo  = "memo";
+var inq_lat   = "lat";
+var inq_lng   = "lng";
+
+function inquirySetData(){
+	var ary = inquiryArray;
+	var len = inquiryArray.length;
+
+	if(len > 0){
+		//スタートのカテゴリ
+		var cat1 = ary[0][inq_cat1];
+		var cat2 = ary[0][inq_cat2];
+		var now_id = 1;
+		var buff = "";
+		var cat1_f = 0;
+		var cat2_f = 0;
+	}else{
+		return false;
+	}
+
+	for(var i = 0 ; i < len ; i++){
+
+		if(cat1_f == 0){
+			buff += "<h2>" + ary[i][inq_cat1] + "</h2>";
+			cat1_f = 1;
+		}
+		if(cat2_f == 0){
+			buff += "<h3>" + ary[i][inq_cat2] + "</h3>";
+			cat2_f = 1;
+		}
+
+		//位置情報がある場合　名前をボタンに表示しマップ起動可能とする
+		if(ary[i][inq_lat] != "" && ary[i][inq_lng] != ""){
+			var nlat = ary[i][inq_lat];
+			var nlng = ary[i][inq_lng];
+			buff += "・<input type='button' onClick='inquiryMap_visible(" + nlat + "," + nlng + ")' value='" + ary[i][inq_name] + "' ><br />";
+		}else{
+			//ない場合は、名前のみ表示
+			buff += "・<b>" + ary[i][inq_name] + "</b><br />";
+		}
+
+		if(ary[i][inq_addr] != ""){
+			buff += "　　" + ary[i][inq_addr] + "<br />";
+		}
+		if(ary[i][inq_phone] != ""){
+			buff += "　　" + ary[i][inq_phone] + "<br />";
+		}
+		if(ary[i][inq_memo] != ""){
+			buff += "　　" + ary[i][inq_memo] + "<br />";
+		}
+		//
+
+		if(i < (len -1)){
+
+			if(cat1 == ary[i+1][inq_cat1]){
+				if(cat2 != ary[i+1][inq_cat2]){
+					cat2 = ary[i+1][inq_cat2];
+					cat2_f = 0;
+				}
+			}else{
+				//カテゴリが変わったらデータを書き出し
+				$('#inqid_' + now_id + '_cont').html(buff);
+
+				//各種フラグ更新
+				cat1 = ary[i+1][inq_cat1];
+				cat2 = ary[i+1][inq_cat2];
+				cat1_f = 0;
+				cat2_f = 0;
+				now_id++;
+				buff = "";
+			}
+		}
+	}
+	$('#inqid_' + now_id + '_cont').html(buff);
+}
+
+function inquiryMap_visible(nlat,nlng){
+	//location位置情報
+	var latlng = new google.maps.LatLng(nlat , nlng);
+
+	now_marker.setPosition(latlng);
+	mapCanvas.setCenter(latlng);
+
+	$('#map_area').css('visibility' , 'visible');
+}
+
+function inquiryMap_hidden(){
+	$('#map_area').css('visibility' , 'hidden');
 }
 

@@ -12,7 +12,12 @@ body{
 	width : 100%;
 	text-align : center;
 
-	background-color : yellow;
+	background-color : #ffffff;
+	background-image : url("../images/notalone_header.png");
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center center;
+
 	padding : 0px;
 	margin : 0px;
 
@@ -44,6 +49,15 @@ body{
 }
 
 /**** for index ****/
+
+#notalone_image{
+	/*padding-left:60px;*/
+	background-image : url("../images/notalone_image.png");
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center center;
+}
+
 #privert{
 	position : relative;
 	padding : 0px;
@@ -51,12 +65,12 @@ body{
 }
 #myCanvas{
 	/*width : 50%;*/
-	float : left;
+	/*float : left;*/
 	padding : 0px;
-	margin : 0px;
+	/*margin : 0px;*/
 }
 #info{
-	padding-top  : 10px;
+	padding-top  : 5px;
 	padding-left : 10px;
 	margin : 0px;
 }
@@ -65,8 +79,10 @@ body{
 }
 
 #setting{
+	position : relative;
+
 	display : none;
-	clear : both;
+	/*clear : both;*/
 	font-size : 12px;
 	text-align : left;
 }
@@ -132,18 +148,36 @@ body{
 	margin  : 0px;
 }
 #menu1{
-	background-color : lightgreen;
+	/*background-color : lightgreen;*/
+	background-image : url("../images/notalone_event.png");
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center center;
 }
 #menu2{
-	background-color : #FAFAD2;
+	/*background-color : #FAFAD2;*/
+	background-image : url("../images/notalone_map.png");
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center center;
 }
 #menu3{
-	background-color : #E0FFFF;
+	/*background-color : #E0FFFF;*/
+	background-image : url("../images/notalone_inquiry.png");
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center center;
 }
 #project{
+	height : 30px;
 	background-color : #FFFFFF;
 	text-align : center;
 	border : solid 1px #cccccc;
+
+	background-image : url("../images/notalone_about.png");
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center center;
 }
 
 

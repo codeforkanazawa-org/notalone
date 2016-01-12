@@ -39,7 +39,7 @@
 
         <!-- Make sure all your bars are the first things in your <body> -->
         <header class="bar bar-nav">
-	    <div id="top-menu" onClick="top_index()">能登ノットアローン</div>
+	    <div id="top-menu" onClick="top_index()"></div>
             <!--h1 class="title">子育て応援マップ</h1-->
         </header>
 
@@ -47,25 +47,15 @@
             <div id="loading" style="font-color:#ffffff">Now Loading....</div>
             <div id="map_canvas" style="width:100%; height:480px;"></div>
         </div>
-        <nav class="bar bar-tab" style="display:none;">
-            <a class="tab-item active" href="#">
-                食べる
-            </a>
-            <a class="tab-item" href="#">
-                遊ぶ
-            </a>
-            <a class="tab-item" href="#">
-                買う
-            </a>
-        </nav>
         <nav class="bar bar-tab" style="display:block;">
 	    <select id="mapSelecter">
-		<option value="1">子育て安心マップ</option>
-		<option value="2">子どもの公園</option>
-		<option value="3">保育サポート</option>
-		<option value="4">子育て相談施設</option>
-		<option value="5">赤ちゃんの駅</option>
-		<option value="6">プレミアム・パスポート</option>
+		<option value="1">あそべるところ、公園、図書館</option>
+		<option value="2">なんでも相談できるところ</option>
+		<option value="3">オムツ替えのしやすいところ（赤ちゃんの駅）</option>
+		<option value="4">子連れでお茶やご飯がしやすいところ</option>
+		<option value="5">病院、学校、こども園</option>
+		<option value="6">病後時保育が相談できるところ</option>
+		<option value="7">プレミアム・パスポートの使えるところ</option>
 		<option value="0">---（ピンを消す）---</option>
 	    </select>
 		<input type="button" onClick="clearMapPins()" value="ピンを消す" />
@@ -170,10 +160,10 @@ var _Lng;
 function mapConvertTable(mapNo){ 
 
 	switch(mapNo){
-		//子育て安心マップ
+		//あそべるところ、公園、図書館
 		case 1 :
 	
-		_MapTable	= '../uploads/mapinfo/wajima.csv';
+		_MapTable	= '../uploads/mapinfo/reisiu_wajima_asoberutokoro.csv';
 		_DefPin		= 'icons/pink-pushpin.png';
 		_BigPin		= '';
 
@@ -181,19 +171,19 @@ function mapConvertTable(mapNo){
 		_Name 		= 'name';
 		_Address	= 'address';
 		_Tel		= 'phone1';
-		_Url		= 'url';
-		_Opentime	= 'servicetime';
-		_Restdates	= 'holiday';
+		_Url		= '';
+		_Opentime	= '';
+		_Restdates	= '';
 		_Description	= 'memo';	//1〜2 あるので先頭のみ指定
 		_Lat		= 'lat';
 		_Lng		= 'lng';
 
        		break;
 
-		//子どもの公園
+		//なんでも相談できるところ
 		case 2 :
 	
-		_MapTable	= '../uploads/mapinfo/park.csv';
+		_MapTable	= '../uploads/mapinfo/reisiu_noto_nandemosoudan.csv';
 		_DefPin		= 'icons/ltblu-pushpin.png';
 		_BigPin		= '';
 
@@ -204,54 +194,14 @@ function mapConvertTable(mapNo){
 		_Url		= '';
 		_Opentime	= '';
 		_Restdates	= '';
-		_Description	= 'area';
+		_Description	= 'memo';	//1〜2 あるので先頭のみ指定
 		_Lat		= 'lat';
 		_Lng		= 'lng';
 
        		break;
 
-		//保育サポート
+		//オムツ替えのしやすいところ（赤ちゃんの駅）
 		case 3 :
-	
-		_MapTable	= '../uploads/mapinfo/leave.csv';
-		_DefPin		= 'icons/yellow-pin.png';
-		_BigPin		= '';
-
-		_Category 	= 'category';
-		_Name 		= 'name';
-		_Address	= 'address';
-		_Tel		= 'phone1';
-		_Url		= 'url';
-		_Opentime	= '';
-		_Restdates	= '';
-		_Description	= 'memo';	//1〜2 あるので先頭のみ指定
-		_Lat		= 'lat';
-		_Lng		= 'lng';
-
-       		break;
-
-		//子育て相談施設
-		case 4 :
-	
-		_MapTable	= '../uploads/mapinfo/consultation.csv';
-		_DefPin		= 'icons/blue-pin.png';
-		_BigPin		= '';
-
-		_Category 	= 'category';
-		_Name 		= 'name';
-		_Address	= 'address';
-		_Tel		= 'phone1';
-		_Url		= '';
-		_Opentime	= '';
-		_Restdates	= '';
-		_Description	= 'memo';	//1〜2 あるので先頭のみ指定
-		_Lat		= 'lat';
-		_Lng		= 'lng';
-
-       		break;
-
-		//赤ちゃんの駅
-		case 5 :
 	
 		_MapTable	= '../uploads/mapinfo/openData_baby.csv';
 		_DefPin		= 'icons/green-pin.png';
@@ -272,8 +222,39 @@ function mapConvertTable(mapNo){
 
        		break;
 
-		//プレミアムパスポート
+		//子連れでお茶やご飯がしやすいところ
+		case 4 :
+
+		//病院、学校、こども園
+		case 5 :
+
+		alert("ただいま、準備中です");
+
+		break;
+
+
+		//病後時保育が相談できるところ
 		case 6 :
+	
+		_MapTable	= '../uploads/mapinfo/reisiu_ishikawa_byougojihoiku.csv';
+		_DefPin		= 'icons/yellow-pin.png';
+		_BigPin		= '';
+
+		_Category 	= 'category';
+		_Name 		= 'name';
+		_Address	= 'address';
+		_Tel		= 'phone1';
+		_Url		= '';
+		_Opentime	= '';
+		_Restdates	= '';
+		_Description	= 'memo';	//1〜2 あるので先頭のみ指定
+		_Lat		= 'lat';
+		_Lng		= 'lng';
+
+       		break;
+
+		//プレミアム・パスポートの使えるところ
+		case 7 :
 	
 		_MapTable	= '../uploads/mapinfo/openData_prepass.csv';
 		_DefPin		= 'icons/red_pin.png';
@@ -300,7 +281,7 @@ function mapConvertTable(mapNo){
 function mapMakeInfo(mapNo,data){
 	switch(mapNo){
 
-		//子育て安心
+		//あそべるところ、公園、図書館
 		case 1 :
 
 	    //備考のまとめ
@@ -329,9 +310,19 @@ function mapMakeInfo(mapNo,data){
 
 		break;
 
-		//子どもの公園
+		//なんでも相談できるところ
 		case 2 :
 
+	    //備考のまとめ
+	    var head =　_Description;
+	    var opt  = ""; 
+	    for(var i = 1 ; i <= 2 ; i++){
+		if(data[head + i] != ""){
+			opt += data[head + i] + "/";
+		}
+	    }
+	    //***********
+
             var html = "";
             html +="<div style='width:150px;padding:0px;'>"
             html += data[_Category];
@@ -340,76 +331,15 @@ function mapMakeInfo(mapNo,data){
 
             html += "<dl>";
             html += "<dd>" + data[_Address] + "</dd>";
-            html += "<dd>面積：" + data[_Description] + "㎡</dd>";
+            html += "<dd>" + data[_Description] + "</dd>";
             html += "</dl>";
             html += "</div>";
 
 		break;
 
-		//保育サポート
+
+		//オムツ替えのしやすいところ（赤ちゃんの駅）
 		case 3 :
-
-	    //備考のまとめ
-	    var head =　_Description;
-	    var opt  = ""; 
-	    for(var i = 1 ; i <= 2 ; i++){
-		if(data[head + i] != ""){
-			opt += data[head + i] + "/";
-		}
-	    }
-	    //***********
-
-
-            var html = "";
-            html +="<div style='width:150px;padding:0px;'>"
-            html +="保育サポート<br />";
-            html += data[_Category];
-
-	    html += "<h5>" + data[_Name] + "</h5>";
-
-            html += "<dl>";
-            html += "<dd>" + data[_Address] + "</dd>";
-            html += "<dd>" + data[_Tel] + "</dd>";
-            html += "<dd>" + opt + "</dd>";
-            html += "</dl>";
-            html += "</div>";
-
-		break;
-
-		//子育て相談施設
-		case 4 :
-
-	    var image = getSpotImage(data[_1st_id], data[_2nd_id]);
-
-	    //備考のまとめ
-	    var head =　_Description;
-	    var opt  = ""; 
-	    for(var i = 1 ; i <= 2 ; i++){
-		if(data[head + i] != ""){
-			opt += data[head + i] + "/";
-		}
-	    }
-	    //***********
-
-
-            var html = "";
-            html +="<div style='width:150px;padding:0px;'>"
-            html +="子育て相談<br />";
-            html += data[_Category];
-
-	    html += "<h5>" + data[_Name] + "</h5>";
-
-            html += "<dl>";
-            html += "<dd>" + data[_Address] + "</dd>";
-            html += "<dd>" + data[_Tel] + "</dd>";
-            html += "<dd>" + opt + "</dd>";
-            html += "</dl>";
-            html += "</div>";
-
-		break;
-
-		//赤ちゃんの駅
-		case 5 :
 
 	    //var image = getSpotImage(data[_1st_id], data[_2nd_id]);
 
@@ -451,8 +381,74 @@ function mapMakeInfo(mapNo,data){
 
 		break;
 
-		//プレミアムパスポート
+
+		//病後時保育が相談できるところ
 		case 6 :
+
+	    //備考のまとめ
+	    var head =　_Description;
+	    var opt  = ""; 
+	    for(var i = 1 ; i <= 2 ; i++){
+		if(data[head + i] != ""){
+			opt += data[head + i] + "/";
+		}
+	    }
+	    //***********
+
+
+            var html = "";
+            html +="<div style='width:150px;padding:0px;'>"
+            html +="保育サポート<br />";
+            html += data[_Category];
+
+	    html += "<h5>" + data[_Name] + "</h5>";
+
+            html += "<dl>";
+            html += "<dd>" + data[_Address] + "</dd>";
+            html += "<dd>" + data[_Tel] + "</dd>";
+            html += "<dd>" + opt + "</dd>";
+            html += "</dl>";
+            html += "</div>";
+
+		break;
+
+/*
+		//子育て相談施設
+		case 4 :
+
+	    var image = getSpotImage(data[_1st_id], data[_2nd_id]);
+
+	    //備考のまとめ
+	    var head =　_Description;
+	    var opt  = ""; 
+	    for(var i = 1 ; i <= 2 ; i++){
+		if(data[head + i] != ""){
+			opt += data[head + i] + "/";
+		}
+	    }
+	    //***********
+
+
+            var html = "";
+            html +="<div style='width:150px;padding:0px;'>"
+            html +="子育て相談<br />";
+            html += data[_Category];
+
+	    html += "<h5>" + data[_Name] + "</h5>";
+
+            html += "<dl>";
+            html += "<dd>" + data[_Address] + "</dd>";
+            html += "<dd>" + data[_Tel] + "</dd>";
+            html += "<dd>" + opt + "</dd>";
+            html += "</dl>";
+            html += "</div>";
+
+		break;
+*/
+
+
+		//プレミアム・パスポートの使えるところ
+		case 7 :
 
 	    //var image = getSpotImage(data[_1st_id], data[_2nd_id]);
 

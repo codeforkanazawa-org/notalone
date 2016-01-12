@@ -35,8 +35,18 @@ $DataString = csvDatabaseRead($db_Table,1);
 
 ?>
 
-<html>
+<!DOCTYPE html>
+<html lang="ja">
 <head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<meta name="Robots" content="ALL" />
+
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+
 <title>能登ノットアローン｜オープンデータ</title>
 
 <link rel="stylesheet" href="../css/csvdatabase.css">

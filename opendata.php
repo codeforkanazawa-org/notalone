@@ -75,6 +75,9 @@ if(isset($_GET['multi'])){
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 
 <title>能登ノットアローン｜オープンデータ</title>
+
+<link rel="stylesheet" href="css/notalone.css">
+
 <!--script type="text/javascript" src="js/myScript.js"></script-->
 
 <!-- jquery ライブラリ -->
@@ -210,13 +213,34 @@ function setFile(valNo){
 	}
 }
 
+//** notalone *****
+var TopHeight = 30;				//トップメニューの縦幅
+	$("#top-menu").height(TopHeight);
+	$("#top-menu").css({"line-height" : TopHeight + "px"});
+
+
+	//****for index.html *******
+	$("#menu-back").height(TopHeight);
+	$("#menu-back").css({"line-height" : TopHeight + "px"});
+
+//topメニュー
+function top_index(){
+	location.href = "../index.html";
+}
+
+//******************
+
 </script>
 
 </head>
 
 <body onload="loadxml_init()">
 
-<h3>能登ノットアローン　オープンデータ</h3>
+<div id="top-menu" onClick="top_index()">　</div>
+<div id="menu-back"></div>
+
+<div id="info">
+<h3>オープンデータ</h3>
 <a href="http://creativecommons.jp/licenses/" target="_blank"><img src="/images/by.png"></a>
 
 <hr />
@@ -233,6 +257,7 @@ function setFile(valNo){
 </ul>
 <hr />
 
+</div>
 
 <div id="filelist">
 
