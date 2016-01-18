@@ -27,6 +27,7 @@
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
         <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
         <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js"></script>
+
         <script src="js/main.js"></script>
 
         <!-- Include bookmark_bubble -->
@@ -99,6 +100,9 @@ $(window).resize(function(){
 	map_fit();
 });
 
+//****** システム設定情報 *********
+var settingArray = new Array(); 	//２次元：連想配列
+
 //****** カテゴリアイコン対応 ******
 var iconArray = new Array(); 		//２次元：連想配列
 
@@ -120,17 +124,24 @@ var Zoom_level= "zoom_level";		//
 
 //マップの選択
 var mapNo = 1;
+var initf = 1;
 $('#mapSelecter').change(function(){
 	$('#mapSelecter option:selected').each(function(){
 		mapNo = parseInt($(this).val());
 	});
 	//alert(mapNo);
+
 	if(mapNo == 0){
 		clearMapPins();
+	}else if(initf == 1){
+		//マップ初期起動時はスルーする
+		initf = 0;
 	}else{
 		pushPins(googlemap);
 	}
+
 }).change();
+
 
 //ピン情報保存用の配列
 var markersArray = new google.maps.MVCArray();
@@ -160,10 +171,11 @@ var _Lng;
 function mapConvertTable(mapNo){ 
 
 	switch(mapNo){
+
 		//あそべるところ、公園、図書館
 		case 1 :
 	
-		_MapTable	= '../uploads/mapinfo/reisiu_wajima_asoberutokoro.csv';
+		_MapTable	= '../uploads/mapinfo/wajima_asoberutokoro.csv';
 		_DefPin		= 'icons/pink-pushpin.png';
 		_BigPin		= '';
 
@@ -183,7 +195,7 @@ function mapConvertTable(mapNo){
 		//なんでも相談できるところ
 		case 2 :
 	
-		_MapTable	= '../uploads/mapinfo/reisiu_noto_nandemosoudan.csv';
+		_MapTable	= '../uploads/mapinfo/noto_nandemosoudan.csv';
 		_DefPin		= 'icons/ltblu-pushpin.png';
 		_BigPin		= '';
 
@@ -236,7 +248,7 @@ function mapConvertTable(mapNo){
 		//病後時保育が相談できるところ
 		case 6 :
 	
-		_MapTable	= '../uploads/mapinfo/reisiu_ishikawa_byougojihoiku.csv';
+		_MapTable	= '../uploads/mapinfo/ishikawa_byougojihoiku.csv';
 		_DefPin		= 'icons/yellow-pin.png';
 		_BigPin		= '';
 

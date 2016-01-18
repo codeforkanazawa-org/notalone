@@ -89,9 +89,13 @@ $DataString    = csvDatabaseRead($db_Table,1);
 
 <link rel="stylesheet" href="../css/csvdatabase.css">
 
+<link rel="stylesheet" href="../js/jquery-ui-1.11.4.custom/jquery-ui.min.css">
+
 <script type="text/javascript" src="../js/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="../js/csvdatabase.js"></script>
 <script type="text/javascript" src="../js/sha256.js"></script>
+
+<script type="text/javascript" src="../js/jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
 
 <script type="text/javascript">
 
@@ -125,102 +129,73 @@ print("var DataArray    =" . $DataString  );
 ?>
 
 //**************
-function setOption(){
-	return "";
-}
-
-
-/*  使用例
-var passFieldName = "user_pw";
-var passFieldNo = DataFieldNo(passFieldName);
+var whenFieldName = "when";
+var whenFieldNo   = DataFieldNo(whenFieldName);
+var inputId = "#Mydate";
 
 function setOption(){
-	var option = "<br /><br /><input type='button' onclick='setCode()' value='パスワードの暗号化' />";
-	option += "　";
-	option += "<br /><input type='button' value='パスワードの生成' onclick='makePass()' />";
-	option += "<br /><input type='text'   name='keta' id='keta' size='2' value='8' />桁";
-	option += "<input type='hidden' name='kazu' id='kazu' size='1' value='1' />";
-	option += "<input type='checkbox' name='suuji' id='suuji' checked />数字";
-	option += "<input type='checkbox' name='small' id='small' checked />英語小文字";
-	option += "<input type='checkbox' name='big'   id='big' />英語大文字";
-
-	return option;
+	var buff = '<br /><br /><input type="button" onClick="inputSupportOpen()" value="入力補助を表示する"/>';
+	
+	return buff;
 }
 
-function setCode(){
-	var emt  = $('#Mydata_' + passFieldNo);
-	var pass = emt.val();
-
-	if(pass == ""){
-		alert("パスワードが入力されていません");
-		return;
-	}
-
-	if(confirm(pass + "　パスワードを暗号化します")){
-		emt.val(SHA256(pass));		
+function setData(field){
+	if(field == 'when'){
+		var getdate = $(inputId).val();
+		$('#Mydata_' + whenFieldNo).val(getdate);
 	}
 }
 
-function makePass(){
-  	//エラーフラグ
-  	err = "off";
-
-  	keta = chgMessHalf($('#keta').val());
-  	kazu = chgMessHalf($('#kazu').val());
-
-  	//文字定義
-  	moji = "";
-  	if($('#suuji').prop('checked')){
-    		moji += "0123456789";
-  	}
-  	if($('#small').prop('checked')){
-    		moji += "abcdefghijklmnopqrstuvwxyz";
-  	}
-  	if($('#big').prop('checked')){
-    		moji += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  	}
-  	if(err == "off"){
-    		pass = "";
-    		//パスワード生成
-    		for(i=0; i< kazu; i++){
-      			for(j=0; j< keta; j++){
-        			num = Math.floor(Math.random() * moji.length);
-       				pass += moji.charAt(num);
-      			}
-      			pass += "\n";
-    		}
-		var emt  = $('#Mydata_' + passFieldNo);
-		emt.val(pass);
-
- 	} else {
-    		alert("数字を入力してください。");
-  	}//end makePass
+function inputSupportOpen(){
+	$('#inputSupport').css('visibility' , 'visible');
 }
 
-//make random password
-//半角数字変換用文字定義
-var half = "0123456789";
-var full = "０１２３４５６７８９";
-function chgMessHalf(VAL){
-
-  	messIn = VAL;
-  	messOut = "";
-
-  	for(i=0; i<messIn.length; i++){
-    		oneStr = messIn.charAt(i);
-    		num = full.indexOf(oneStr,0);
-    		oneStr = num >= 0 ? half.charAt(num) : oneStr;
-    		messOut += oneStr;
-  	}
-
-  	//数字か空かチェック
-  	if(isNaN(messOut) || messOut==""){
-    		err = "on";
-  	}
-
-  	return messOut;
+function inputSupportClose(){
+	$('#inputSupport').css('visibility' , 'hidden');
 }
-*/
+
+//カレンダー（detepicker）による誕生日入力
+$(function() {
+	var idname = inputId;
+
+	$(idname).datepicker({
+		//showButtonPanel: true,
+		changeMonth: true,
+		changeYear: true,
+		dateFormat:'yy/MM/dd'
+	});
+
+	$(idname).datepicker("option", "showOn", 'button');
+	$(idname).datepicker("option", "buttonImageOnly", true);
+	$(idname).datepicker("option", "buttonImage", '../images/ico_calendar.png');
+
+	$(idname).datepicker("option", "showButtonPanel", true);
+
+});
+
+//datepicker　日本語化オプション
+$(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['01','02','03','04','05','06',
+        '07','08','09','10','11','12'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy/mm/dd',
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+
 </script>
 
 
@@ -229,8 +204,34 @@ function chgMessHalf(VAL){
 <div id="cont_area">
 </div>
 
+<div id="inputSupport">
+	<input type="text" id="Mydate" size="12" value="" readonly="readonly"><br />
+	<input type="button" id="MydateSet" onClick="setData('when')" value="日付をwhenに設定する" />
+	<br />
+	*where tag1 は検討中<br />
+	<input type="button" onClick="inputSupportClose()" value="閉じる" />
+</div>
+
 <div id="list">
 </div>
 
 </BODY>
 </HTML>
+
+<style>
+#inputSupport{
+	visibility : hidden;
+
+	position : fixed;
+	top  : 400px;
+	left : 350px;
+
+	padding : 5px;
+	border : 3px solid #000000;
+	background : lightgreen;
+
+	z-index : 10;
+}
+
+</style>
+

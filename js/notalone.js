@@ -15,8 +15,29 @@ var thispage ="";
 //デフォルトのメッセージ
 var Def_info ="	誕生日の設定で年齢が表示できます。<br />お気に入りの画像も登録できます。<br />設定する時は画像をクリック！！<br />";
 
+//Setting情報読み込み用　２次元配列
+var settingArray;
+
+//初期位置情報
+var DEFAULT_LAT;
+var DEFAULT_LNG;
+
 //初期化
 function init(){
+
+	//setting データの読み出し
+	var table = "../localhost/setting.csv";
+	readSettingData(table , function(data){
+		DEFAULT_LAT = parseFloat(getSetting("DEFAULT_LAT"));
+		DEFAULT_LNG = parseFloat(getSetting("DEFAULT_LNG"));
+
+		if(parseInt(getSetting("DRAGGABLE")) == 1){
+			DRAGGABLE = true;
+		}else{
+			DRAGGABLE = false;
+		}
+	});
+
 
 	//実行ページのチェック
 	thispage = $("#thispage").html();
@@ -112,11 +133,11 @@ function brows_init(){
 	$("#menu-back").css({"line-height" : TopHeight + "px"});
 
 	//縦幅 var ritu = 0.5;
-	var ImageHeight  = Math.round(DeviceHeight * 0.5);	//イメージ画像
+	var ImageHeight  = Math.round(DeviceHeight * 0.58);	//イメージ画像
 	$("#notalone_image").height(ImageHeight);
 
 	//縦幅 var ritu = 0.35;
-	var PrivertHeight  = Math.round(DeviceHeight * 0.5);	//個人情報欄の縦幅確保
+	var PrivertHeight  = Math.round(DeviceHeight * 0.58);	//個人情報欄の縦幅確保
 	var PhotoPadding = 5;				//個人情報　写真の余白
 	$("#privert").height(PrivertHeight);
 	$("#privert").css("display" , "none");	//初期非表示
@@ -260,9 +281,43 @@ function brows_init(){
 		"left" : BodyLeftMargin
 	});
 
+	//本体を表示
+	$('#inquiry_contener').css({
+		"display" : "block"
+	});
+		break;
+
+
+		//***************************
+
+		case "about.html" :
+
+	$("#menu-back").height(TopHeight);
+	$("#menu-back").css({"line-height" : TopHeight + "px"});
+
+	//var MenuHeight = ( DeviceHeight - TopHeight - PrivertHeight ) / 3;
+	var MenuHeight = ( DeviceHeight - TopHeight ) / 5;
+
+	$(".jobmenu").height(MenuHeight);
+	$(".jobmenu").css({"line-height" : MenuHeight + "px"});
+
+	//イベント欄ダミーの高さ(px)
+	$("#dummy").height(DeviceHeight - $("#top_menu").height());
+
+
+	//map_area の表示位置を動的に調整
+	$("#map_area").css({
+		"left" : BodyLeftMargin
+	});
+
+	//本体を表示
+	$('#inquiry_contener').css({
+		"display" : "block"
+	});
 		break;
 
 		//***************************
+
 	}
 
 
@@ -852,8 +907,8 @@ var now_marker;		//位置表示用マーカー
 function mapInit(){
 	//sub/js/main/js　で定義
 	//どこかで設定ファイルの作成が必要
-	var DEFAULT_LAT = 37.390556;
-    	var DEFAULT_LNG = 136.899167;
+	//var DEFAULT_LAT = 37.390556;
+    	//var DEFAULT_LNG = 136.899167;
 
 	showGoogleMap(DEFAULT_LAT,DEFAULT_LNG);
 }
@@ -1120,33 +1175,6 @@ function selectEvent(idno){
 
 		evtScroll(openEvt);
 	}
-}
-
-//CSVファイルの読み込み
-function csvToArray(filename, cb) {
-	//キャッシュしない
-	$.ajaxSetup({
-		cache: false
-	});
-
-	$.get(filename, function(csvdata) {
-		//CSVのパース作業
-		//CRの解析ミスがあった箇所を修正しました。
-		//以前のコードだとCRが残ったままになります。
-		// var csvdata = csvdata.replace("\r/gm", ""),
-		csvdata = csvdata.replace(/\r/gm, "");
-
-		var line = csvdata.split("\n"),
-		ret = [];
-		for (var i in line) {
-        		//空行はスルーする。
-        		if (line[i].length == 0) continue;
-
-        		var row = line[i].split(",");
-        		ret.push(row);
-      		}
-      		cb(ret);
-	});
 }
 
 
@@ -1572,5 +1600,68 @@ function inquiryMap_visible(nlat,nlng){
 
 function inquiryMap_hidden(){
 	$('#map_area').css('visibility' , 'hidden');
+}
+
+
+
+//*********** common ****************
+
+//CSVファイルの読み込み
+function csvToArray(filename, cb) {
+	//キャッシュしない
+	$.ajaxSetup({
+		cache: false
+	});
+
+	$.get(filename, function(csvdata) {
+		//CSVのパース作業
+		//CRの解析ミスがあった箇所を修正しました。
+		//以前のコードだとCRが残ったままになります。
+		// var csvdata = csvdata.replace("\r/gm", ""),
+		csvdata = csvdata.replace(/\r/gm, "");
+
+		var line = csvdata.split("\n"),
+		ret = [];
+		for (var i in line) {
+        		//空行はスルーする。
+        		if (line[i].length == 0) continue;
+
+        		var row = line[i].split(",");
+        		ret.push(row);
+      		}
+      		cb(ret);
+	});
+}
+
+
+//setting ファイルを読み込み settingArrayに保存
+function readSettingData(table , callback){
+	csvToArray( table , function(data) {
+
+		settingArray = new Array();
+
+		//1行目をフィールド名として扱い連想配列にする
+		for(var i = 1 ; i < data.length ; i++){
+			var rensou = new Object();
+			for(var s = 0; s < data[i].length ; s++){
+				rensou[data[0][s]] = data[i][s]; 
+			}
+			settingArray.push(rensou);
+		}
+		callback(settingArray);
+	});
+}
+
+//settingArrayから、フィールド名のデータを読み出す
+function getSetting(fieldname){
+	var data = settingArray;
+ 
+	for(var i = 0 ; i < data.length ; i++){
+		if(data[i]['define'] == fieldname){
+			return data[i]['data'];
+			break;
+		}
+	}
+	return false;
 }
 

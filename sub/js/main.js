@@ -2,22 +2,44 @@
 //    initlaize();
 
     var googlemap;
+    var now_marker;
+    var now_infowindow;
 
     //var KANAZAWA_STATION_LAT = 36.578273;
     //var KANAZAWA_STATION_LNG = 136.647763;
     //輪島市役所
-    var DEFAULT_LAT = 37.390556;
-    var DEFAULT_LNG = 136.899167;
-    var FARAWAY_DISTANCE     = 0.8;
+    //var DEFAULT_LAT = 37.390556;
+    //var DEFAULT_LNG = 136.899167;
+    //var FARAWAY_DISTANCE     = 0.8;
+
+    var DEFAULT_LAT;
+    var DEFAULT_LNG;
+    var DRAGGABLE;
 
     function initlaize() {
-	//カテゴリアイコンの読み出し
-	var table = "../localhost/categoryicon.csv";
-	readCategoryIcon(table , function(data){
-		//alert(data.length);
-	});
 
-        getLocation();
+	//setting データの読み出し
+	var table = "../localhost/setting.csv";
+	readSettingData(table , function(data){
+		DEFAULT_LAT = parseFloat(getSetting("DEFAULT_LAT"));
+		DEFAULT_LNG = parseFloat(getSetting("DEFAULT_LNG"));
+
+		if(parseInt(getSetting("DRAGGABLE")) == 1){
+			DRAGGABLE = true;
+		}else{
+			DRAGGABLE = false;
+		}
+
+
+		//setting を完全に読みだしてから、後処理を実施
+		//カテゴリアイコンの読み出し
+		var table = "../localhost/categoryicon.csv";
+		readCategoryIcon(table , function(data){
+			//alert(data.length);
+		});
+
+        	getLocation();
+	});
     }
 
     function showGoogleMap(initLat, initLng) {
@@ -34,17 +56,37 @@
 
         //現在地のピン
         var now_latlng = new google.maps.LatLng(initLat, initLng);
-        var now_marker = new google.maps.Marker({
+        now_marker = new google.maps.Marker({
             position:now_latlng,
             title: 'ドラッグで移動',
 	    icon : "icons/blue-dot.png",
 	    draggable : true,
             map: googlemap,
         });
-       
 
+	//現在地ピンのinfoWindowとイベント
+	var html = "このピンは目印です。<br />ドラッグで移動できます<br />";
+	html += "<input type='button' onClick='now_markerHidden()' value='このピンを消す'>";
+
+        now_infowindow = new google.maps.InfoWindow();
+        now_infowindow.setContent(html);
+
+        google.maps.event.addListener(now_marker, 'click', function() {
+            now_infowindow.open(googlemap, now_marker);
+        });
+
+
+	//各種マップを表示する
         pushPins(googlemap);
+
     }
+
+    //現在地ピンを消す
+    function now_markerHidden(){
+	now_infowindow.close();
+	now_marker.setVisible( false ) ;
+    }
+
 
     function getLocation() {
         if (navigator.geolocation) {
@@ -57,7 +99,6 @@
     function successCallback(pos) {
         var lat = pos.coords.latitude;
         var lng = pos.coords.longitude;
-
 	/* FARAWAY? 
         //石川から大きく離れた場所の場合、現在地情報を金沢駅に設定
         if (getDistanceFromKanazawaStation(lat, lng) > FARAWAY_DISTANCE) {
@@ -95,6 +136,7 @@
     //var mapNo = 1;
     function pushPins(map)
     {
+
 	//select テーブルで切り替え
 	mapConvertTable(mapNo);
 
@@ -123,8 +165,9 @@
 	
 	//category icon のチェック ******
 	if(_Category != ""){
-		var level  = googlemap.getZoom();
-	
+
+		var level  = map.getZoom();
+
 		var cat    = data[_Category].trim();
 
 		var to_dir = "../";	//subからの相対ディレクトリ
@@ -146,7 +189,7 @@
             position:latlng,
 	    title : data[_Name],
 	    icon  : icon,
-	    draggable : true,
+	    draggable : DRAGGABLE,
 
             map: map
         });
@@ -224,6 +267,37 @@
 		}
 		callback(iconArray);
 	});
+    }
+
+    //setting ファイルを読み込み settingArrayに保存
+    function readSettingData(table , callback){
+	csvToArray( table , function(data) {
+
+		settingArray = new Array();
+
+		//1行目をフィールド名として扱い連想配列にする
+		for(var i = 1 ; i < data.length ; i++){
+			var rensou = new Object();
+			for(var s = 0; s < data[i].length ; s++){
+				rensou[data[0][s]] = data[i][s]; 
+			}
+			settingArray.push(rensou);
+		}
+		callback(settingArray);
+	});
+    }
+
+    //settingArrayから、フィールド名のデータを読み出す
+    function getSetting(fieldname){
+	var data = settingArray;
+ 
+	for(var i = 0 ; i < data.length ; i++){
+		if(data[i]['define'] == fieldname){
+			return data[i]['data'];
+			break;
+		}
+	}
+	return false;
     }
 
 //});

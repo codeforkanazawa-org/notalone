@@ -151,7 +151,7 @@ function show_flist(){
 		buff += '<a href="' + dname + '/' + fname + '" target="_blank">' + fname + '</a>';
 		buff += '</td><td>';
 
-		buff += ' <input type="button" onClick="setFile(' + i + ');" value="データ内容を確認する" />';
+		buff += ' <input type="button" onClick="setFile(' + i + ');" value="内容の確認" />';
 
 		buff += '</td></tr>';
 	}
