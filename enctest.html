@@ -1,0 +1,38 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta http-equiv="content-script-type" content="text/javascript">
+<script src="js/jquery-1.11.3.min.js"></script>
+<script src="js/encoding.min.js"></script>
+<script>
+$(function(){
+	//2ちゃんねるの板一覧でテスト
+	var url_2ch="http://menu.2ch.sc/bbsmenu.html";
+
+	//ajaxで外部読み込み
+	var bbsmenu=$.ajax({
+		url: url_2ch,
+		async: false
+	}).responseText;
+
+	//変換処理
+	var str_array=bbsmenu.split('');//1文字ずつ配列に入れる
+	var utf8Array=Encoding.convert(str_array, 'UTF8', 'AUTO');//UTF-8に変換
+	var convert=utf8Array.join('');//配列を文字列に戻す
+
+	//コンソールで確認
+	console.log(convert);
+
+	//HTMLに表示
+	$("#results").html(convert);
+});
+</script>
+<title>文字コード変換のてすと</title>
+</head>
+<body>
+
+<div id="results"></div>
+
+</body>
+</html>

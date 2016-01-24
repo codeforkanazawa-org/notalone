@@ -37,7 +37,7 @@ if (!function_exists('json_encode')) {
 	// JSON形式データをPHPの配列型に変換
 	$eventdata = json_decode($json,true);
 
-	print_r($data);
+	//print_r($data);
 
 	//**********************
 	//イベント集計ファイルの雛形を読み出す
@@ -113,6 +113,7 @@ if (!function_exists('json_encode')) {
 	sortArrayByKey( $eventArray , 'when', SORT_ASC );
 
 	print_r($eventArray);
+	print("<br />");
 
 
 	//出力ディレクトリ
@@ -136,7 +137,8 @@ if (!function_exists('json_encode')) {
 		}
  	}
 
-	print_r($nowMonth);	
+	print_r($nowMonth);
+	print("nowMonth=<br />");	
 
 	//最大月数分配列をループ
 	for($i = 0 ; $i < count($nowMonth) ; $i++){
@@ -144,6 +146,9 @@ if (!function_exists('json_encode')) {
 		$bcnt = 0; 
 		for($s = 0 ; $s < count($eventArray) ; $s++){
 			$thisMonth = substr($eventArray[$s]['when'],0,7);
+
+print("thisMonth=" . $thisMonth . "<br />");
+
 			if($thisMonth == $nowMonth[$i]){
 
 				//eventData抽出

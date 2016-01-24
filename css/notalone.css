@@ -65,6 +65,9 @@ body{
 	padding : 0px;
 	margin : 0px;
 }
+#canvas-div{
+	text-align : center;
+}
 #myCanvas{
 	/*width : 50%;*/
 	/*float : left;*/
@@ -74,8 +77,10 @@ body{
 #info{
 	padding-top  : 5px;
 	padding-left : 10px;
+	line-height : 120%;
 	margin : 0px;
 }
+
 #info img,input{
 	vertical-align : top;
 }
@@ -140,8 +145,11 @@ body{
 	/*clear : both;*/
 }
 
+#myFavFamily td{
+	border-collapse: collapse;
+	border : none;
+}
 
-/*** index / inquiry common */
 .jobmenu{
 	clear : both;
 	position : relative;
@@ -149,10 +157,12 @@ body{
 	padding : 0px;
 	margin  : 0px;
 }
+
 #menu1{
 	/*background-color : lightgreen;*/
 	background-image : url("../images/notalone_event.png");
-	background-size: contain;
+	/*background-size: contain;*/
+	background-size: 100% 90%;
 	background-repeat: no-repeat;
 	background-position: center center;
 	margin  : 0px 5px 0px 5px;
@@ -160,7 +170,8 @@ body{
 #menu2{
 	/*background-color : #FAFAD2;*/
 	background-image : url("../images/notalone_map.png");
-	background-size: contain;
+	/*background-size: contain;*/
+	background-size: 100% 90%;
 	background-repeat: no-repeat;
 	background-position: center center;
 	margin  : 0px 5px 0px 5px;
@@ -168,7 +179,8 @@ body{
 #menu3{
 	/*background-color : #E0FFFF;*/
 	background-image : url("../images/notalone_inquiry.png");
-	background-size: contain;
+	/*background-size: contain;*/
+	background-size: 100% 90%;
 	background-repeat: no-repeat;
 	background-position: center center;
 	margin  : 0px 5px 0px 5px;
@@ -185,31 +197,6 @@ body{
 	background-position: center center;
 
 }
-
-
-#menu4,#inqid_1_title{
-	background-color : lightgreen;
-}
-#menu5,#inqid_2_title{
-	background-color : #FFDEAD;
-}
-#menu6,#inqid_3_title{
-	background-color : #FAFAD2;
-}
-#menu7,#inqid_4_title{
-	background-color : #E0FFFF;
-}
-#menu8,#inqid_5_title{
-	background-color : #FFE4E1;
-}
-
-#inqid_close{
-	text-align : center;
-	background-color : lightgray;
-	/* border : solid 1px; */
-}
-
-
 
 
 /**** for events.html ****/
@@ -293,4 +280,96 @@ body{
 }
 #inquiry_contener{
 	display:none;
+}
+
+.inquiry_title{
+	height : 15px;
+}
+
+#inqid_1_title{
+	/*background-color : lightgreen;*/
+	background-image : url("../images/inquiry_menu1.png");
+	background-size: 100% 95%;
+	background-repeat: no-repeat;
+	background-position: center center;
+	margin  : 0px 5px 0px 5px;
+	opacity: 0.8;
+}
+#inqid_2_title{
+	/*background-color : #FFDEAD;*/
+	background-image : url("../images/inquiry_menu2.png");
+	background-size: 100% 95%;
+	background-repeat: no-repeat;
+	background-position: center center;
+	margin  : 0px 5px 0px 5px;
+	opacity: 0.8;
+}
+#inqid_3_title{
+	/*background-color : #FAFAD2;*/
+	background-image : url("../images/inquiry_menu3.png");
+	background-size: 100% 95%;
+	background-repeat: no-repeat;
+	background-position: center center;
+	margin  : 0px 5px 0px 5px;
+	opacity: 0.8;
+}
+#inqid_4_title{
+	/*background-color : #E0FFFF;*/
+	background-image : url("../images/inquiry_menu4.png");
+	background-size: 100% 95%;
+	background-repeat: no-repeat;
+	background-position: center center;
+	margin  : 0px 5px 0px 5px;
+	opacity: 0.8;
+}
+#inqid_5_title{
+	/*background-color : #FFE4E1;*/
+	background-image : url("../images/inquiry_menu5.png");
+	background-size: 100% 95%;
+	background-repeat: no-repeat;
+	background-position: center center;
+	margin  : 0px 5px 0px 5px;
+	opacity: 0.8;
+}
+
+#inqid_close{
+	text-align : center;
+	background-color : lightgray;
+	/* border : solid 1px; */
+}
+
+
+/***** about.html *****/
+.about-cont {
+	padding-left : 10px;
+	display:none;
+}
+#about_contener{
+	display:none;
+}
+
+.about_title{
+	height : 15px;
+}
+
+#aboutid_1_title{
+	background-color : lightgreen;
+}
+#aboutid_2_title{
+	background-color : #FFDEAD;
+}
+#aboutid_3_title{
+	background-color : #FAFAD2;
+}
+#aboutid_4_title{
+	background-color : #E0FFFF;
+}
+#aboutid_5_title{
+	background-color : #FFE4E1;
+}
+
+#about_close{
+	text-align : center;
+	background-color : lightgray;
+	/* border : solid 1px; */
 }

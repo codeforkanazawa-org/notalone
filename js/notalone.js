@@ -45,7 +45,7 @@ function init(){
 	switch(thispage){
 		case "index.html"  :
 			brows_init();
-			//index_init();
+			index_init();
 
 			break;
 
@@ -147,15 +147,20 @@ function brows_init(){
 	$(".jobmenu").height(MenuHeight);
 	$(".jobmenu").css({"line-height" : MenuHeight + "px"});
 
+
+	//イベント欄ダミーの高さ(px)
+	$("#dummy").height(TopHeight);	//メニューの高さ分の余裕
+
+
 	//$("#photo > img").css({"height" : (PrivertHeight - PhotoPadding * 2) + "px" , "padding" : PhotoPadding + "px"});
 	//$("#photo > img").css({"height" : (PrivertHeight * 0.7 - PhotoPadding * 2) + "px" , "padding" : PhotoPadding + "px"});
 
 	//canvasサイズは縦を基準、横幅は元画像から比率で設定
 	//$("#myCanvas").css({"height" : (PrivertHeight - PhotoPadding * 2) + "px" , "padding" : PhotoPadding + "px"});
-	$("#myCanvas").css({"height" : (PrivertHeight * 0.65 - PhotoPadding * 2) + "px" , "padding" : PhotoPadding + "px"});
+	$("#myCanvas").css({"height" : (PrivertHeight * 0.7 - PhotoPadding * 2) + "px" , "padding" : PhotoPadding + "px"});
 
 	//canvas内に初期画像を表示
-	ImageSet('myCanvas','images/notalone_image.png');
+	ImageSet('myCanvas','images/notalone_icon.png');
 
 
 	//選択画像の表示準備
@@ -163,7 +168,6 @@ function brows_init(){
 
 	//個人情報の読み出し　指標を表示
 	favInit(0);
-
 
 		break;
 
@@ -311,7 +315,7 @@ function brows_init(){
 	});
 
 	//本体を表示
-	$('#inquiry_contener').css({
+	$('#about_contener').css({
 		"display" : "block"
 	});
 		break;
@@ -334,7 +338,13 @@ function top_index(){
 //****for index.html ********
 //index.html　初期化
 function index_init(){
+	//ローカルストレージに目的のデータがあるか確認 
+	var key = "MyFavPicture";
 
+	if (window.localStorage[key]) { 
+		//存在すればそれを使用 
+		ImageSet('myCanvas',window.localStorage[key]);
+	} 
 }
 
 //2nd(next) menu link
@@ -503,7 +513,7 @@ function favInit(type){
 	var fav_bday;
 
 	var count = 0;
-	var setdata = "";
+	var setdata = "<table>";
 
 	for(i=1 ; i<=MyFav_count ;i++){
 		fav_name = MyFavFamily[i]['name'];
@@ -518,14 +528,18 @@ function favInit(type){
 
 			//子育て指標の表示
 			count ++;
-			setdata += fav_name;
-			setdata += "　：　" + calculateAge(fav_bday) + "<br />";
+			setdata += "<tr><td>";
+			setdata += "・" + fav_name;
+			setdata += "</td><td>";
+			setdata += "：" + calculateAge(fav_bday);
+			setdata += "</td></tr>";
 		}else{
 			//入力欄クリア
 			$("#name" + i).val('');
 			$("#bday" + i).val('');		
 		}
 	}
+	setdata += "</table>";
 
 	if(count>0){
 		$("#myFavFamily").html(setdata);
@@ -677,38 +691,42 @@ function myfavDel_all(){
 }
 
 
+//******** 
+var IMAGES = [];
+var imageType;
+//********
 //ローカル画像ファイルの表示
 //function localImageSet(){
 $(function(){
 $("#uploadFile").change(function() {
-    var canvas = $("#myCanvas");
-    var ctx = canvas[0].getContext("2d");
+    //canvas　の設定は　jqueryではうまくいかない
+    //var canvas = $("#myCanvas");
+    //var ctx = canvas[0].getContext("2d");
+
+    var canvas = document.getElementById('myCanvas');
+    var ctx = canvas.getContext("2d");
 
     // 選択されたファイルを取得
     var file = this.files[0];
 
     // 画像ファイル以外は処理中止
-    if (!file.type.match(/^image\/(png|jpeg|gif)$/)) return;
+    if (!file.type.match(/^image\/(png|jpeg|gif)$/)){
+	return;
+    }else{
+	imageType = file.type;
+    }
 
-    var image = new Image();
     var reader = new FileReader();
 
     // File APIを使用し、ローカルファイルを読み込む
     reader.onload = function(evt) {
 
-      // 画像がloadされた後に、canvasに描画する
-      image.onload = function() {
-        //ctx.drawImage(image, 0, 0);
-      }
+      // 画像の情報（base64）を配列に設定
+      IMAGES.push(evt.target.result);
 
-      // 画像のURLをソースに設定
-      image.src = evt.target.result;
 
-      ImageSet('myCanvas' , image.src);
-
-      //
-      //$('#urldata').val(image.src);
-      //alert(image.src);
+      //配列情報からcanvasに描画
+      ImageSet('myCanvas' , IMAGES);
 
     }
 
@@ -722,8 +740,11 @@ $("#uploadFile").change(function() {
 
 //canvasに指定の画像を表示する
 function ImageSet(canvasname,imagename){
-    var canvas  = $('#' + canvasname);
-    var context = canvas[0].getContext('2d');
+    //var canvas  = $('#' + canvasname);
+    //var context = canvas[0].getContext('2d');
+
+    var canvas  = document.getElementById(canvasname);
+    var context = canvas.getContext('2d');
 
     var image = new Image();
     image.src = imagename;
@@ -733,19 +754,23 @@ function ImageSet(canvasname,imagename){
 	var sheight = image.height;
 	var sexp    = swidth / sheight;
 
-        var iheight = canvas.height();
+        //var iheight = canvas.height();
+        var iheight = canvas.height;
         var iwidth  = parseInt(iheight * sexp);
- 
+
 	//canvasのサイズ変更は　css は NG（縦長） --> attr　で設定
-	$(canvas).attr('width'  , iwidth);
-	$(canvas).attr('height' , iheight);
+	//$(canvas).attr('width'  , iwidth);
+	//$(canvas).attr('height' , iheight);
+	canvas.width  = iwidth;
+	canvas.height = iheight;
 
         //context.drawImage(image, 100, 100);
+        //context.drawImage(image, 0 , 0 , iwidth , iheight);
         context.drawImage(image, 0 , 0 , iwidth , iheight);
     }, false);
 }
 
-
+/*  画像の保存方法　その１
 //画像ファイルのアップロード
 $(function(){
     $('#imgupload').submit(function(){
@@ -766,6 +791,33 @@ $(function(){
 
     });
 });
+*/
+
+//canvasに読み込んだ画像をローカルストレージに保存
+function imgStorageSet(){
+	//var canvas = $("#myCanvas");
+	//var ctx = canvas[0].getContext("2d");
+	var canvas = document.getElementById("myCanvas");
+	var ctx = canvas.getContext("2d");
+
+	//alert("画像の保存方法は検討中です");
+	//return false;
+
+
+	//ローカルストレージに保存 
+	//toDataURL は、ローカルのイメージをクロスドメインと判断する
+	//window.localStorage["MyFavPicture"] = canvas.toDataURL('image/jpeg'); 
+	window.localStorage["MyFavPicture"] = canvas.toDataURL(imageType); 
+
+	alert("選択した画像情報を保存しました");
+}
+
+//ローカルストレージのキャッシュをクリアする
+function imgStorageClear(){
+	//キャッシュをクリアする場合 
+	window.localStorage.clear();
+	alert("登録していた画像情報を消去しました");
+}
 //****************************
 
 
@@ -1602,6 +1654,37 @@ function inquiryMap_hidden(){
 	$('#map_area').css('visibility' , 'hidden');
 }
 
+
+//******* about.html *****
+function selectAbout(idno){
+	var callInq = '#aboutid_' + idno;
+
+	if(openInq != ""){
+		//イベント詳細が開いている場合は、閉じてから次のオープンに進む
+		$(openInq).hide("blind" , "" , 200 ).promise().done(function(){
+
+			if(openInq == callInq || idno == 0){
+				openInq = "";
+
+				//topに戻る
+				var targetY = 0;
+				$("html,body").animate({scrollTop:targetY},{duration: 1000});
+			}else{
+				$(callInq).show("blind", "", 500 );
+				openInq = '#aboutid_' + idno;
+
+				inqScroll(openInq);
+			}
+
+		});	
+	}else{
+		//イベント詳細が開いていない場合
+		$(callInq).show("blind", "", 1000 );
+		openInq = '#aboutid_' + idno;
+
+		inqScroll(openInq);
+	}
+}
 
 
 //*********** common ****************

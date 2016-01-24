@@ -80,6 +80,9 @@ if(isset($_GET['multi'])){
 <!-- jquery ライブラリ -->
 <script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
 
+<!-- 文字encoding -->
+<script type="text/javascript" src="js/encoding.min.js"></script>
+
 <script type="text/javascript">
 
 <?php	
@@ -213,14 +216,6 @@ function show_flist(jkn){
 
 		buff += '<a href="' + dname + '/' + fname + '" target="_blank">' + fname + '</a>';
 
-		//downloadボタンの追加　******
-		buff += '</td><td>';
-		
-		buff += '<input type="button" onClick="download(' + i + ');" value="ダウンロード">';
-
-		//*************************
-
-
 		//画像の場合　座標の有無表示
 		if(ftype == 'image' && ( lat != 0 || lng != 0) ){
 			buff += ' *';
@@ -263,23 +258,6 @@ function show_flist(jkn){
 
 	//ログイン状態が変化した場合callBackを実行する
 	onChangeValue(window, 'inputName', callBack , 1000);
-}
-
-//csvファイルのダウンロード
-function download(valNo){
-	var dir   = flist[valNo]['dir'];
-	var fname = flist[valNo]['file'];
-	var path  = dir + "/" + fname;
-
-	var link = "download.php?dir=" + dir + "&file=" + fname;
-
-	if($('input[name=fencode]:checked').val() === 'siftjis'){
-  		link += "&enc=sjis";
-	}
-	//default : utf8
-	
-	location.href = link;
-	//alert(link);
 }
 
 //シングルファイルの選択
@@ -552,7 +530,6 @@ function flist_reflesh(){
 	show_flist(jkn);
 }
 
-
 function LocalFileLoad(){
 
 	if ( ftype.indexOf("text") != -1) {
@@ -598,19 +575,27 @@ function LocalFileLoad(){
 
   		//FileReaderの作成
   		var reader = new FileReader();
-
   		//テキスト形式で読み込む
-		//readAsText 文字エンコード機能あり　デフォルトはUTF8
-		if($('input[name=fencode]:checked').val() === 'siftjis'){
-  			reader.readAsText(file[0],"Shift-JIS");
-		}else{
-  			reader.readAsText(file[0]);
-		}
+  		reader.readAsText(file[0]);
   
   		//読込終了後の処理
   		reader.onload = function(ev){
     			//テキストエリアに表示する
     			document.test.txt.value = reader.result;
+
+/*			//********************
+			//文字エンコード
+			//1文字ずつ配列に入れる
+			var str_array = Encoding.stringToCode(reader.result);
+			//UTF-8に変換
+			var utf8Array=Encoding.convert(str_array, 'UTF8', 'SJIS');
+			//配列を文字列に戻す
+			//var convert=utf8Array.join('');
+			var convert = Encoding.codeToString(utf8Array);
+    			//テキストエリアに表示する
+    			document.test.txt.value = convert;
+			//*********************
+*/
   		}
 	},false);
 
@@ -893,12 +878,7 @@ function saveFile( outdir , fhead , fext , indata){
 <input type="button" id="logout_bt" onClick="user_logout();" value="ログアウト" style="visibility:hidden" />
 <!--input type="button" id="close_bt"  onClick="window.close();" value="閉じる" /-->
 <input type="button" id="close_bt"  onClick="location.href='admin/index.php'" value="indexに戻る" />
-<hr />
-<h5>
-<input type="radio" id="fencode" name="fencode" value="utf8" >utf-8 
-<input type="radio" id="fencode" name="fencode" value="siftjis" checked>sift_jis 
-：アップロード、ダウンロードの文字エンコード
-</h5>
+<br />
 
 <div id="LocalRead" style="display:none">
 	<hr />
@@ -914,14 +894,10 @@ function saveFile( outdir , fhead , fext , indata){
 	<div id="textform" style="display:none">
 	<!-- テキストファイル-->
 	<form name="test">
-
-		<input type="file" id="selfile"><br />
-		<input type="reset" value="クリア"><br />
+		<input type="file" id="selfile"><br>
 		
 
 		<textarea name="txt" id="txt" rows="10" cols="100" readonly></textarea>
-
-
 	</form>
 	<input type="button" id="Lexcec_bt" onClick="LocalExcec()" value="アップロード実行" /><br />
 	</div>
@@ -945,10 +921,9 @@ function saveFile( outdir , fhead , fext , indata){
 </div> 
 
 <hr />
-<h5>
+
 　ファイルを選択してください<br />
 （アップロード、削除、名前変更は、ログインが必要です）<br />
-</h5>
 
 <input type="text" size="30" id="keyword" value="" />
 <input type="button" id="key_bt" onClick="flist_reflesh()" value="and検索" /> 

@@ -7,7 +7,7 @@ $ThisFile   = "cont_location.php";
 //$Case1File  = "common_user_append.php";  	//ユーザ登録なしの場合のアクセスファイル名
 
 //=============================
-$acc_level  = 2;			//アクセスレベル
+$acc_level  = 1;			//アクセスレベル
 
 $ReturnFile = $ThisFile;		//戻り先のファイル名
 $_SESSION['CallJob'] = $ThisFile;	//log_in.php　からの戻り用
@@ -38,7 +38,7 @@ echo '
 <ul>
 <li>,（カンマ）"（ダブルクオーテーション）\'（シングルクオーテーション）は使用できません</li>
 <li>データを更新する場合は、必ずファイルに保存してください</li>
-<li>lat（緯度）、lng（経度）がない場合は、デフォルト座標が認識されます</li>
+<li>lat（緯度）、lng（経度）がない場合は、地図は表示しません</li>
 </ul>
 ';
 

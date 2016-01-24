@@ -35,6 +35,10 @@ ini_set( 'display_startup_errors', "1" );
 	// ファイル保存のおまじない
 	file_put_contents($file_name , $data);
 
+	//文字エンコードをUTF-8に調整　元の文字コードをうまく検出できない
+	//file_put_contents($file_name , mb_convert_encoding($data, "UTF-8", "auto"));
+
+
 	//echo $file_name;
 	echo $save_fname;
 

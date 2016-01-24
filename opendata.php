@@ -151,6 +151,14 @@ function show_flist(){
 		buff += '<a href="' + dname + '/' + fname + '" target="_blank">' + fname + '</a>';
 		buff += '</td><td>';
 
+		//downloadボタンの追加　******
+
+		buff += '<input type="button" onClick="download(' + i + ');" value="ダウンロード">';
+
+		buff += '</td><td>';
+
+		//*************************
+
 		buff += ' <input type="button" onClick="setFile(' + i + ');" value="内容の確認" />';
 
 		buff += '</td></tr>';
@@ -159,6 +167,23 @@ function show_flist(){
 	buff += '</table>';
 
 	document.getElementById("filelist").innerHTML = buff;
+}
+
+//csvファイルのダウンロード
+function download(valNo){
+	var dir   = flist[valNo]['dir'];
+	var fname = flist[valNo]['file'];
+	var path  = dir + "/" + fname;
+
+	var link = "download.php?dir=" + dir + "&file=" + fname;
+
+	if($('input[name=fencode]:checked').val() === 'siftjis'){
+  		link += "&enc=sjis";
+	}
+	//default : utf8
+	
+	location.href = link;
+	//alert(link);
 }
 
 //シングルファイルの選択
@@ -246,6 +271,7 @@ function top_index(){
 <hr />
 ・<a href="sub/map.html" target="_blank">マップ用</a>データファイル
 <hr />
+<h5>
 <ul>
 <li>子育て支援関係の施設、機関等の位置情報を中心にしたデータセットです。</li>
 <li>能登地域のデータは、プロジェクトNNA（能登ノットアローン）が独自に収集したものです。</li>
@@ -253,11 +279,17 @@ function top_index(){
 <li>また、<a href="http://www.city.suzu.ishikawa.jp/soumu/opendata_index.html" target="_blank">珠洲市のオープンデータ</a>も一部取り込んでいます。</li>
 <li>石川県内のデータは、<a href="http://www.i-oyacomi.net/prepass/page/opendata.php" target="_blank">（公財）いしかわ子育て支援財団のオープンデータ</a>を流用しています。</li>
 <li>下記のファイルは、マップ用ファイルを直接公開していますので、ファイル名、ファイル構造など、逐次変更される場合があります。</li>
-<li>このデータを活用される方は、ファイル名のリンクからダウンロードしてください。</li>
+<li>文字エンコードを行っていますので、一部変換できない文字が含まれている可能性があります。</li>
 </ul>
+</h5>
 <hr />
-
 </div>
+
+<h5>
+<input type="radio" id="fencode" name="fencode" value="utf8" >utf-8 
+<input type="radio" id="fencode" name="fencode" value="siftjis" checked>sift_jis 
+：ダウンロードの文字エンコード
+</h5>
 
 <div id="filelist">
 

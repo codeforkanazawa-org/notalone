@@ -52,8 +52,10 @@
 </div>
 
 <div id="privert">
-  <canvas id="myCanvas" onClick="setting()">
-  </canvas>	
+  <div id="canvas-div">
+  	<canvas id="myCanvas" onClick="setting()">
+  	</canvas>
+  </div>	
   <div id="info">
 	<div id="myFavFamily">
  	</div>
@@ -77,8 +79,9 @@
 
 		<br />
 		<br />
-		<input type="submit" value="登録" />
-		<input type="reset"  value="クリア"/>
+		<!--input type="submit" onClick="imgStorageSet()" value="登録" /-->
+			<input type="button" onClick="imgStorageSet()" value="登録" />
+		<input type="reset"  onClick="imgStorageClear()" value="クリア"/>
 		</form>
 		<br />
 	</div>
@@ -110,6 +113,7 @@
 <div class="jobmenu" id="menu3" onClick="snd_index('inquiry')"></div>
 <div id="project" onClick="snd_index('about')"></div>
 
+<div id="dummy"></div>
 
 <!-- Page Checker (style display:none)-->
 <div id="thispage">index.html</div>

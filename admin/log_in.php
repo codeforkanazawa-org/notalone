@@ -181,7 +181,7 @@ if($_POST["log_in_flg"]==""){
 			<input type="submit" value="確認">
 			</form>
 			';
-	print("戻りファイル：" . $ReturnFile);
+	//print("戻りファイル：" . $ReturnFile);
 
 
 		}else{
