@@ -50,7 +50,7 @@
         </div>
         <nav class="bar bar-tab" style="display:block;">
 	    <select id="mapSelecter">
-		<option value="1">あそべるところ、公園、図書館</option>
+		<option value="1">あそべるところ（公園、図書館、公民館）</option>
 		<option value="2">なんでも相談できるところ</option>
 		<option value="3">オムツ替えのしやすいところ（赤ちゃんの駅）</option>
 		<option value="4">子連れでお茶やご飯がしやすいところ</option>
@@ -172,7 +172,7 @@ function mapConvertTable(mapNo){
 
 	switch(mapNo){
 
-		//あそべるところ、公園、図書館
+		//あそべるところ（公園、図書館、公民館）
 		case 1 :
 	
 		_MapTable	= '../uploads/mapinfo/wajima_asoberutokoro.csv';
@@ -236,11 +236,25 @@ function mapConvertTable(mapNo){
 
 		//子連れでお茶やご飯がしやすいところ
 		case 4 :
+		break;
 
 		//病院、学校、こども園
 		case 5 :
 
-		alert("ただいま、準備中です");
+		_MapTable	= '../uploads/mapinfo/noto_nusryschool.csv';
+		_DefPin		= 'icons/blue-pin.png';
+		_BigPin		= '';
+
+		_Category 	= 'category';
+		_Name 		= 'name';
+		_Address	= 'address';
+		_Tel		= '';
+		_Url		= '';
+		_Opentime	= '';
+		_Restdates	= '';
+		_Description	= 'memo';	//1〜2 あるので先頭のみ指定
+		_Lat		= 'lat';
+		_Lng		= 'lng';
 
 		break;
 
@@ -330,7 +344,7 @@ function mapMakeInfo(mapNo,data){
 	    var opt  = ""; 
 	    for(var i = 1 ; i <= 2 ; i++){
 		if(data[head + i] != ""){
-			opt += data[head + i] + "/";
+			opt += data[head + i] + "<br />";
 		}
 	    }
 	    //***********
@@ -343,7 +357,8 @@ function mapMakeInfo(mapNo,data){
 
             html += "<dl>";
             html += "<dd>" + data[_Address] + "</dd>";
-            html += "<dd>" + data[_Description] + "</dd>";
+            //html += "<dd>" + data[_Description] + "</dd>";
+            html += "<dd>" + opt + "</dd>";
             html += "</dl>";
             html += "</div>";
 
@@ -393,6 +408,34 @@ function mapMakeInfo(mapNo,data){
 
 		break;
 
+
+		case 5 :
+		//病院、学校、こども園
+
+	    //備考のまとめ
+	    var head =　_Description;
+	    var opt  = ""; 
+	    for(var i = 1 ; i <= 2 ; i++){
+		if(data[head + i] != ""){
+			opt += data[head + i] + "<br />";
+		}
+	    }
+	    //***********
+
+            var html = "";
+            html +="<div style='width:150px;padding:0px;'>"
+            html += data[_Category];
+
+	    html += "<h5>" + data[_Name] + "</h5>";
+
+            html += "<dl>";
+            html += "<dd>" + data[_Address] + "</dd>";
+            //html += "<dd>" + data[_Description] + "</dd>";
+            html += "<dd>" + opt + "</dd>";
+            html += "</dl>";
+            html += "</div>";
+
+		break;
 
 		//病後時保育が相談できるところ
 		case 6 :

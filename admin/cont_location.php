@@ -56,6 +56,8 @@ $DataString = csvDatabaseRead($db_Table,1);
 <script type="text/javascript" src="../js/csvdatabase.js"></script>
 <script type="text/javascript" src="../js/sha256.js"></script>
 
+<script type="text/javascript" src="../js/setting.js"></script>
+
 <!--googlemaps api-->
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script src="http://maps.googleapis.com/maps/api/js?libraries=geometry,drawing&sensor=false"></script> 
@@ -83,9 +85,7 @@ print("var DataTable ='" . $db_Table . "';" );
 print("var DataArray =" . $DataString  );
 ?>
 
-
 //**************
-
 var latFieldName = "lat";
 var lngFieldName = "lng";
 var addressFieldName = "address";
@@ -97,6 +97,7 @@ var mapCanvas;		//マップ
 var now_marker;		//位置取得用マーカー
 
 function locationInit(){
+
 	ShowData();		//データの読み込みと表示
 	locationGetLatLng();	//マップの初期設定
 }
@@ -108,10 +109,9 @@ function setOption(){
 }
 
 function locationGetLatLng(){
-	//sub/js/main/js　で定義
-	//どこかで設定ファイルの作成が必要
-	var DEFAULT_LAT = 37.390556;
-    	var DEFAULT_LNG = 136.899167;
+	//setting.js　で定義
+	//var DEFAULT_LAT = 37.390556;
+    	//var DEFAULT_LNG = 136.899167;
 
 	showGoogleMap(DEFAULT_LAT,DEFAULT_LNG);
 }

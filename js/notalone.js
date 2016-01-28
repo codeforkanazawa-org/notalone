@@ -160,7 +160,8 @@ function brows_init(){
 	$("#myCanvas").css({"height" : (PrivertHeight * 0.7 - PhotoPadding * 2) + "px" , "padding" : PhotoPadding + "px"});
 
 	//canvas内に初期画像を表示
-	ImageSet('myCanvas','images/notalone_icon.png');
+	//index_init()へ内包
+	//ImageSet('myCanvas','images/notalone_icon.png');
 
 
 	//選択画像の表示準備
@@ -344,6 +345,8 @@ function index_init(){
 	if (window.localStorage[key]) { 
 		//存在すればそれを使用 
 		ImageSet('myCanvas',window.localStorage[key]);
+	}else{
+		ImageSet('myCanvas','images/notalone_icon.png');
 	} 
 }
 
@@ -956,6 +959,7 @@ function getLocationLatLng(where){
 }
 
 var now_marker;		//位置表示用マーカー
+var now_infowindow;	//インフォウインドウ
 function mapInit(){
 	//sub/js/main/js　で定義
 	//どこかで設定ファイルの作成が必要
@@ -986,12 +990,35 @@ function showGoogleMap(initLat, initLng) {
             map: mapCanvas,
         });
 
+	//***********
+        now_infowindow = new google.maps.InfoWindow();
+	var html = "test info";
+        now_infowindow.setContent(html);
+
+        google.maps.event.addListener(now_marker, 'click', function() {
+            now_infowindow.open(mapCanvas , now_marker);
+        });
+	//***********
+
 	now_marker.setMap(mapCanvas);
 }
 
-function eventMap_visible(nlat,nlng){
+//function eventMap_visible(nlat,nlng){
+function eventMap_visible(locationNo){
 	//location位置情報
+	var nlat = locationArray[locationNo][loc_lat];
+	var nlng = locationArray[locationNo][loc_lng];
+
 	var latlng = new google.maps.LatLng(nlat , nlng);
+
+	//******
+	var html = "<h5>";
+	html += locationArray[locationNo][loc_name] + "<br />";
+	html += locationArray[locationNo][loc_memo];
+	html += "</h5>";
+
+        now_infowindow.setContent(html);
+	//******
 
 	now_marker.setPosition(latlng);
 	mapCanvas.setCenter(latlng);
@@ -1000,6 +1027,9 @@ function eventMap_visible(nlat,nlng){
 }
 
 function eventMap_hidden(){
+	//openInfoWindow close
+        now_infowindow.close();
+
 	$('#map_area').css('visibility' , 'hidden');
 }
 
@@ -1039,6 +1069,8 @@ var loc_name = "location_name";	//
 var loc_id   = "location_idt";	//
 var loc_lat  = "lat";		//
 var loc_lng  = "lng";		//
+var loc_address = "address";	//
+var loc_memo = "memo";		//
 /*********/
 
 //eventArrayのデータをFullCalendarに設定する（月単位）
@@ -1154,27 +1186,42 @@ function eventSetCalendar(){
 		evtcont += tg1 + "時間"  + tg2 + ev[ev_open].substr(0,5) + "〜" + ev[ev_close].substr(0,5) + tg3;
 		evtcont += tg1 + "内容"  + tg2 + ev[ev_what] + tg3;
 
+		evtcont += tg1 + "対象者" + tg2 + ev[ev_whom] + tg3;
+		//evtcont += tg1 + "(tag1)"   + tg2 + ev[ev_cat] + tg3;
+
+		if(ev[ev_fee] == 0 || ev[ev_fee] ==""){
+			evtcont += tg1 + "参加費" + tg2 + "無料" + tg3;
+		}else{
+			evtcont += tg1 + "参加費" + tg2 + ev[ev_fee] + "円" + tg3;
+		}
+
 		//location位置情報の確認
 		var loc = getLocationLatLng(ev[ev_where]);
 		if(loc == -1){
 			evtcont += tg1 + "場所"  + tg2 + ev[ev_where] + tg3;
 		}else{
 			evtcont += tg1 + "場所"  + tg2;
+			/*
 			var nlat = locationArray[loc][loc_lat];
 			var nlng = locationArray[loc][loc_lng];
 			evtcont += "<input type='button' value='" + ev[ev_where] + "' onClick='eventMap_visible(" + nlat + "," + nlng + ")' >";
+			*/
+
+			evtcont += "<input type='button' value='" + ev[ev_where] + "' onClick='eventMap_visible(" + loc + ")' >";
+
+			//イベント開催場所のメモを表示
+			var nmemo = locationArray[loc][loc_memo];
+			if(nmemo !=""){
+				evtcont += "<br />";
+				evtcont += nmemo;
+			}
+
 			evtcont += tg3;
 		}
 
-		evtcont += tg1 + "対象者" + tg2 + ev[ev_whom] + tg3;
-		evtcont += tg1 + "(tag1)"   + tg2 + ev[ev_cat] + tg3;
-		evtcont += tg1 + "主催者" + tg2 + ev[ev_who] + tg3;
-		if(ev[ev_fee] == 0 || ev[ev_fee] ==""){
-			evtcont += tg1 + "参加費" + tg2 + "無料" + tg3;
-		}else{
-			evtcont += tg1 + "参加費" + tg2 + ev[ev_fee] + "円" + tg3;
-		}
 		evtcont += tg1 + "連絡先" + tg2 + ev[ev_cont] + tg3;
+
+		evtcont += tg1 + "主催者" + tg2 + ev[ev_who] + tg3;
 
 		evtcont +="</table>";
 
@@ -1597,9 +1644,10 @@ function inquirySetData(){
 
 		//位置情報がある場合　名前をボタンに表示しマップ起動可能とする
 		if(ary[i][inq_lat] != "" && ary[i][inq_lng] != ""){
-			var nlat = ary[i][inq_lat];
-			var nlng = ary[i][inq_lng];
-			buff += "・<input type='button' onClick='inquiryMap_visible(" + nlat + "," + nlng + ")' value='" + ary[i][inq_name] + "' ><br />";
+			//var nlat = ary[i][inq_lat];
+			//var nlng = ary[i][inq_lng];
+			//buff += "・<input type='button' onClick='inquiryMap_visible(" + nlat + "," + nlng + ")' value='" + ary[i][inq_name] + "' ><br />";
+			buff += "・<input type='button' onClick='inquiryMap_visible(" + i + ")' value='" + ary[i][inq_name] + "' ><br />";
 		}else{
 			//ない場合は、名前のみ表示
 			buff += "・<b>" + ary[i][inq_name] + "</b><br />";
@@ -1640,9 +1688,22 @@ function inquirySetData(){
 	$('#inqid_' + now_id + '_cont').html(buff);
 }
 
-function inquiryMap_visible(nlat,nlng){
+//function inquiryMap_visible(nlat,nlng){
+function inquiryMap_visible(locationNo){
 	//location位置情報
+	var nlat = inquiryArray[locationNo][inq_lat];
+	var nlng = inquiryArray[locationNo][inq_lng];
 	var latlng = new google.maps.LatLng(nlat , nlng);
+
+	//******
+	var html = "<h5>";
+	html += inquiryArray[locationNo][inq_name];
+	//html += "<br />";
+	//html += locationArray[locationNo][inq_memo];
+	html += "</h5>";
+
+        now_infowindow.setContent(html);
+	//******
 
 	now_marker.setPosition(latlng);
 	mapCanvas.setCenter(latlng);
@@ -1651,6 +1712,9 @@ function inquiryMap_visible(nlat,nlng){
 }
 
 function inquiryMap_hidden(){
+	//openInfoWindow close
+        now_infowindow.close();
+
 	$('#map_area').css('visibility' , 'hidden');
 }
 
