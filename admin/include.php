@@ -25,8 +25,8 @@ $PAGESTART_session = "NOTALONE_PAGESTART";	//表示開始のページ番号
 //$PAGE_start = 0;
 
 
-ini_set( 'display_errors', "1" ); 
-ini_set( 'display_startup_errors', "1" ); 
+//ini_set( 'display_errors', "1" ); 
+//ini_set( 'display_startup_errors', "1" ); 
 
 
 //このサイトのディレクトリ
@@ -54,6 +54,12 @@ $USERlevel_cookie = "notalonelevel";
 
 //仮登録承認URL
 //$USER_url = "http://apli.nono1.jp/nightview/admin/user_comp.php"; 
+
+
+//session のチェック
+if(!isset($_SESSION[$USER_session])){
+	$_SESSION[$USER_session] = "";
+}
 
 
 //*************************//
@@ -188,7 +194,6 @@ function common_header($title){
        	print("</table>");
        	print("</center>");
        	print("<hr>"); 
-
 
 	if($_SESSION[$USER_session] == ""){
 		print("ログインしていません<br>");

@@ -50,9 +50,6 @@ function init(){
 			break;
 
 		case "events.html" :
-			//FullCalendarの初期化を先に実行
-			events_init();
-			brows_init();
 
 			//target tableの読み込み
 			var table = "localhost/target.csv";
@@ -61,6 +58,10 @@ function init(){
 			//location tableの読み込み
 			var table = "localhost/location.csv";
 			readLocation(table);
+
+			//FullCalendarの初期化を先に実行
+			events_init();
+			brows_init();
 
 			break;
 
@@ -844,7 +845,8 @@ var JpWeekday = ['日','月','火','水','木','金','土'];	//日本語曜日
 
 
 //基準月に応じたファイルを読み込みeventArrayに保存
-function readEvents(target){
+//function readEvents(target){
+function readEvents(target , cb){
 	//配列初期化
 	eventArray = new Array();
 
@@ -900,6 +902,10 @@ function readEvents(target){
 			if(a[ev_open] > b[ev_open]) return 1;
 			return 0;
 		});
+
+		//callback化
+		cb();
+		//*********
 	});
 }
 
@@ -1284,7 +1290,7 @@ function events_init(){
 
 		//eventデータの読み込み
 		//readEvents();
-		readEvents(0);
+		//readEvents(0);
 
 		//******************
 
@@ -1300,8 +1306,11 @@ function events_init(){
 						$('#calendar').fullCalendar('changeView','month');
 						$('#calendar').fullCalendar('today');
 
-						readEvents(0);
-						setTimeout("eventSetCalendar()" , 1000);
+						//readEvents(0);
+						//setTimeout("eventSetCalendar()" , 1000);
+						readEvents(0 , function(){
+							eventSetCalendar();
+						});
             				}
 	        		},
         			myCustomMonth: {
@@ -1318,8 +1327,12 @@ function events_init(){
 						$('#calendar').fullCalendar('changeView','month');
 						$('#calendar').fullCalendar('prev');
 
-						readEvents(-1);
-						setTimeout("eventSetCalendar()" , 1000);
+						//readEvents(-1);
+						//setTimeout("eventSetCalendar()" , 1000);
+						readEvents(-1 , function(){
+							eventSetCalendar();
+						});
+
             				}
 	        		},
         			myCustomNext: {
@@ -1329,8 +1342,12 @@ function events_init(){
 						$('#calendar').fullCalendar('changeView','month');
 						$('#calendar').fullCalendar('next');
 
-						readEvents(1);
-						setTimeout("eventSetCalendar()" , 1000);
+						//readEvents(1);
+						//setTimeout("eventSetCalendar()" , 1000);
+						readEvents(1 , function(){
+							eventSetCalendar();
+						});
+
            				}
 	        		},
 			},
@@ -1529,7 +1546,13 @@ alert(view);
 		});
 
 		//イベント情報の設定（eventArrayへのデータ設定完了までの十分な時間を確保する）
-		setTimeout("eventSetCalendar()" , 1000);
+		//setTimeout("eventSetCalendar()" , 2000);
+
+		//callback化
+		readEvents(0 , function(){
+			eventSetCalendar();
+		});
+
 	});
 }
 
@@ -1619,6 +1642,10 @@ function inquirySetData(){
 	var ary = inquiryArray;
 	var len = inquiryArray.length;
 
+	//category 1 は、５つが前提（settingでの決めが必要）
+	var max_cat1 = 5;
+	//*****************
+
 	if(len > 0){
 		//スタートのカテゴリ
 		var cat1 = ary[0][inq_cat1];
@@ -1633,6 +1660,13 @@ function inquirySetData(){
 
 	for(var i = 0 ; i < len ; i++){
 
+		/*//********
+		if(now_id > max_cat1){
+			//return false;
+		}
+		//********
+		*/
+
 		if(cat1_f == 0){
 			buff += "<h2>" + ary[i][inq_cat1] + "</h2>";
 			cat1_f = 1;
@@ -1641,6 +1675,11 @@ function inquirySetData(){
 			buff += "<h3>" + ary[i][inq_cat2] + "</h3>";
 			cat2_f = 1;
 		}
+
+		//max_cat1 を超えた場合はスルー
+
+
+		//
 
 		//位置情報がある場合　名前をボタンに表示しマップ起動可能とする
 		if(ary[i][inq_lat] != "" && ary[i][inq_lng] != ""){
@@ -1686,6 +1725,14 @@ function inquirySetData(){
 		}
 	}
 	$('#inqid_' + now_id + '_cont').html(buff);
+
+/*
+	//****試験運用中*****
+	for(var s = 2 ; s <= 5 ; s++){
+		$('#inqid_' + s + '_cont').html("<center><img src='images/notalone_symbol.png'>ただいま準備中です。<br />しばらくお待ち下さい。</center>");
+	}
+	//*****************
+*/
 }
 
 //function inquiryMap_visible(nlat,nlng){

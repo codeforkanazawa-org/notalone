@@ -54,7 +54,7 @@ body{
 
 #notalone_image{
 	/*padding-left:60px;*/
-	background-image : url("../images/notalone_image.png");
+	background-image : url("../images/notalone_pre_image.png");
 	background-size: contain;
 	background-repeat: no-repeat;
 	background-position: center center;

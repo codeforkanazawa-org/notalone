@@ -14,6 +14,7 @@
 
     var DEFAULT_LAT;
     var DEFAULT_LNG;
+    var DEFAULT_ZOOM;
     var DRAGGABLE;
 
     function initlaize() {
@@ -23,6 +24,7 @@
 	readSettingData(table , function(data){
 		DEFAULT_LAT = parseFloat(getSetting("DEFAULT_LAT"));
 		DEFAULT_LNG = parseFloat(getSetting("DEFAULT_LNG"));
+		DEFAULT_ZOOM = parseInt(getSetting("DEFAULT_ZOOM"));
 
 		if(parseInt(getSetting("DRAGGABLE")) == 1){
 			DRAGGABLE = true;
@@ -46,7 +48,8 @@
         var latlng = new google.maps.LatLng(initLat, initLng);
         var opts = {
             //zoom: 16,
-            zoom: 14,
+            //zoom: 14,
+	    zoom : DEFAULT_ZOOM,
 	    center: latlng,
 	    mapTypeId: google.maps.MapTypeId.ROADMAP,
 	    mapTypeControl: true

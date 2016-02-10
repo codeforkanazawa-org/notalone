@@ -11,21 +11,27 @@ user_header("能登ノットアローン index");
 
 ?>
 <br />
-<a href="http://kosodate.df-c.net/loadfiles.php?dir=uploads/events&ftype=text/csv&key=&next=cont_event.php">イベントファイル</a><br>
-　　<a href="http://kosodate.df-c.net/event_total.php">イベントファイルの集計処理</a><br>
+<!--a href="http://kosodate.df-c.net/loadfiles.php?dir=uploads/events&ftype=text/csv&key=&next=cont_event.php">イベントファイル</a><br-->
+<a href="../loadfiles.php?dir=uploads/events&ftype=text/csv&key=&next=cont_event.php">イベントファイル</a><br>
+　　<!--a href="http://kosodate.df-c.net/event_total.php">イベントファイルの集計処理</a><br-->
+　　<a href="../event_total.php">イベントファイルの集計処理</a><br>
 <br />
-<a href="http://kosodate.df-c.net/loadfiles.php?dir=events&ftype=text/csv&key=&next=cont_events_admin.php">イベント集計ファイル</a><br>
+<!--a href="http://kosodate.df-c.net/loadfiles.php?dir=events&ftype=text/csv&key=&next=cont_events_admin.php">イベント集計ファイル</a><br-->
+<a href="../loadfiles.php?dir=events&ftype=text/csv&key=&next=cont_events_admin.php">イベント集計ファイル</a><br>
 <br />
 <a href="cont_location.php">イベント開催場所</a><br>
 <br />
 <a href="cont_target.php">イベント対象者</a><br>
 <br />
 <hr />
-<a href="http://kosodate.df-c.net/loadfiles.php?dir=uploads/mapinfo&ftype=text/csv&key=&next=cont_mapinfo.php">マップファイル</a><br>
+<!--a href="http://kosodate.df-c.net/loadfiles.php?dir=uploads/mapinfo&ftype=text/csv&key=&next=cont_mapinfo.php">マップファイル</a><br-->
+<a href="../loadfiles.php?dir=uploads/mapinfo&ftype=text/csv&key=&next=cont_mapinfo.php">マップファイル</a><br>
 <br />
-<a href="http://kosodate.df-c.net/opendata.php?dir=uploads/mapinfo&ftype=text/csv&key=&next=open_mapinfo.php">マップファイル（オープンデータ）</a><br>
+<!--a href="http://kosodate.df-c.net/opendata.php?dir=uploads/mapinfo&ftype=text/csv&key=&next=open_mapinfo.php">マップファイル（オープンデータ）</a><br-->
+<a href="../opendata.php?dir=uploads/mapinfo&ftype=text/csv&key=&next=open_mapinfo.php">マップファイル（オープンデータ）</a><br>
 <br />
-<a href="http://kosodate.df-c.net/loadfiles.php?dir=uploads/mapinfo&ftype=text/csv&key=&next=cont_csvdatacoordinator.php">マップファイルの調整</a><br>
+<!--a href="http://kosodate.df-c.net/loadfiles.php?dir=uploads/mapinfo&ftype=text/csv&key=&next=cont_csvdatacoordinator.php">マップファイルの調整</a><br-->
+<a href="../loadfiles.php?dir=uploads/mapinfo&ftype=text/csv&key=&next=cont_csvdatacoordinator.php">マップファイルの調整</a><br>
 <br />
 <a href="cont_categoryicon.php">カテゴリ別アイコン</a><br>
 <hr />
