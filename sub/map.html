@@ -131,6 +131,14 @@ $('#mapSelecter').change(function(){
 	});
 	//alert(mapNo);
 
+
+	//*************
+	if(mapNo == 4){
+		alert("ただいま準備中です");
+		return false;
+	}
+	//*************
+
 	if(mapNo == 0){
 		clearMapPins();
 	}else if(initf == 1){
@@ -406,6 +414,11 @@ function mapMakeInfo(mapNo,data){
             html += "</dl>";
             html += "</div>";
 
+		break;
+
+		//子連れでお茶やご飯がしやすいところ
+		case 4 :
+		
 		break;
 
 
