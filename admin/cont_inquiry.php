@@ -289,4 +289,7 @@ function showGoogleMap(initLat, initLng) {
 	height: 400px;
 }
 
+table{
+	width : 200%;
+}
 </style>

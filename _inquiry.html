@@ -1,0 +1,111 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+<!-- キャッシュしない -->
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="cache-control" content="no-cache" />
+<meta http-equiv="expires" content="0" />
+<!--               -->
+
+<title>のとノットアローン｜相談</title>
+
+<link rel="stylesheet" href="css/notalone.css">
+
+<link rel="stylesheet" href="js/jquery-ui-1.11.4.custom/jquery-ui.min.css">
+
+<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
+
+<script src="http://maps.googleapis.com/maps/api/js?libraries=geometry,drawing"></script> 
+
+<script type="text/javascript" src="js/notalone.js"></script>
+
+</head>
+
+<body onload="init()">
+
+
+<!-- fix start -->
+<div id="top-menu" onClick="top_index()"></div>
+
+<!--div id="myCalendar">
+	<a href="https://www.google.com/calendar/" target="_blank">
+		<img src="images/ico_calendar.png" />
+	</a>
+</div-->
+<!-- fix end -->
+
+<!-- fix div 調整用　-->
+<div id="menu-back"></div>
+
+
+<div id="setting">
+</div>
+
+<div id="inquiry_contener">
+
+<div class="jobmenu" id="inqid_1_title" onClick="selectInquiry(1)"><img class="inquiry_title" src="images/inquiry_title1.png"></div>
+	<div id="inqid_1" class="inquiry-cont">
+
+		<div id="inqid_1_cont">
+		</div>
+
+	</div>
+
+<div class="jobmenu" id="inqid_2_title" onClick="selectInquiry(2)"><img class="inquiry_title" src="images/inquiry_title2.png"></div>
+	<div id="inqid_2" class="inquiry-cont">
+
+
+		<div id="inqid_2_cont">
+		</div>
+
+	</div>
+
+<div class="jobmenu" id="inqid_3_title" onClick="selectInquiry(3)"><img class="inquiry_title" src="images/inquiry_title3.png"></div>
+	<div id="inqid_3" class="inquiry-cont">
+
+
+		<div id="inqid_3_cont">
+		</div>
+
+	</div>
+
+<div class="jobmenu" id="inqid_4_title" onClick="selectInquiry(4)"><img class="inquiry_title" src="images/inquiry_title4.png"></div>
+	<div id="inqid_4" class="inquiry-cont">
+
+		<div id="inqid_4_cont">
+		</div>
+
+	</div>
+
+<div class="jobmenu" id="inqid_5_title" onClick="selectInquiry(5)"><img class="inquiry_title" src="images/inquiry_title5.png"></div>
+	<div id="inqid_5" class="inquiry-cont">
+
+		<div id="inqid_5_cont">
+		</div>
+
+	</div>
+
+<div id="inqid_close" onClick="selectInquiry(0)">⇧</div>
+
+</div>
+
+<div id="dummy">
+</div>
+
+
+<div id="map_area">
+	<div id="map_canvas">
+	</div>　
+	<input type="button" id="map_hidden" onClick="eventMap_hidden()" value="マップを閉じる" />
+</div>
+
+<!-- Page Checker (style display:none)-->
+<div id="thispage">inquiry.html</div>
+
+</body>
+</html>

@@ -6,14 +6,14 @@ ini_set( 'display_startup_errors', "1" );
 include_once( "include.php");
 
 
-user_header("能登ノットアローン index");
+user_header("のとノットアローン index");
 
 
 ?>
 <br />
 <!--a href="http://kosodate.df-c.net/loadfiles.php?dir=uploads/events&ftype=text/csv&key=&next=cont_event.php">イベントファイル</a><br-->
 <a href="../loadfiles.php?dir=uploads/events&ftype=text/csv&key=&next=cont_event.php">イベントファイル</a><br>
-　　<!--a href="http://kosodate.df-c.net/event_total.php">イベントファイルの集計処理</a><br-->
+<a href="../loadfiles.php?dir=uploads/events&ftype=text/csv&key=&next=cont_csvdatacoordinator.php">イベントファイルの調整</a><br>
 　　<a href="../event_total.php">イベントファイルの集計処理</a><br>
 <br />
 <!--a href="http://kosodate.df-c.net/loadfiles.php?dir=events&ftype=text/csv&key=&next=cont_events_admin.php">イベント集計ファイル</a><br-->
@@ -21,16 +21,16 @@ user_header("能登ノットアローン index");
 <br />
 <a href="cont_location.php">イベント開催場所</a><br>
 <br />
-<a href="cont_target.php">イベント対象者</a><br>
+タイトル色別用<br />
+　　<a href="cont_area.php">地域ファイル</a>（通常）<br>
+　　<a href="cont_target.php">任意ファイル</a>（優先）<br>
 <br />
 <hr />
 <!--a href="http://kosodate.df-c.net/loadfiles.php?dir=uploads/mapinfo&ftype=text/csv&key=&next=cont_mapinfo.php">マップファイル</a><br-->
 <a href="../loadfiles.php?dir=uploads/mapinfo&ftype=text/csv&key=&next=cont_mapinfo.php">マップファイル</a><br>
 <br />
-<!--a href="http://kosodate.df-c.net/opendata.php?dir=uploads/mapinfo&ftype=text/csv&key=&next=open_mapinfo.php">マップファイル（オープンデータ）</a><br-->
-<a href="../opendata.php?dir=uploads/mapinfo&ftype=text/csv&key=&next=open_mapinfo.php">マップファイル（オープンデータ）</a><br>
+<!--a href="../opendata.php?dir=uploads/mapinfo&ftype=text/csv&key=&next=open_mapinfo.php">マップファイル（オープンデータ）</a><br-->
 <br />
-<!--a href="http://kosodate.df-c.net/loadfiles.php?dir=uploads/mapinfo&ftype=text/csv&key=&next=cont_csvdatacoordinator.php">マップファイルの調整</a><br-->
 <a href="../loadfiles.php?dir=uploads/mapinfo&ftype=text/csv&key=&next=cont_csvdatacoordinator.php">マップファイルの調整</a><br>
 <br />
 <a href="cont_categoryicon.php">カテゴリ別アイコン</a><br>
