@@ -1153,6 +1153,9 @@ function eventSetCalendar(cb){
 	var bcolor = default_tar_color;
 	var tcolor = default_tar_text;
 
+	//地図リンク用画像
+	var maplink   = "<img src='images/maplink.png' height='20px' ";
+
 	for(var i =0 ; i < eventArray.length ; i++){
 
 		var ev = eventArray[i];
@@ -1320,7 +1323,10 @@ function eventSetCalendar(cb){
 			evtcont += "<input type='button' value='" + ev[ev_where] + "' onClick='eventMap_visible(" + nlat + "," + nlng + ")' >";
 			*/
 
-			evtcont += "<input type='button' value='" + ev[ev_where] + "' onClick='eventMap_visible(" + loc + ")' >";
+			//evtcont += "<input type='button' value='" + ev[ev_where] + "' onClick='eventMap_visible(" + loc + ")' >";
+			evtcont += ev[ev_where] + " ";
+			evtcont += maplink + " onClick='eventMap_visible(" + loc + ")' />";
+
 
 			//イベント開催場所のメモを表示
 			var nmemo = locationArray[loc][loc_memo];
@@ -1331,10 +1337,6 @@ function eventSetCalendar(cb){
 
 			evtcont += tg3;
 		}
-
-		//色別検証用
-		evtcont += tg1 + "(tag1)"   + tg2 + ev[ev_cat]  + tg3;
-		evtcont += tg1 + "(area)"   + tg2 + ev[ev_area] + tg3;
 
 		//電話発信機能 電話番号のチェック
 		var teldata = telNumber(ev[ev_cont]);
@@ -1356,6 +1358,11 @@ function eventSetCalendar(cb){
 				evtcont += ev[ev_url] + "</p>" + tg3;
 			}
 		}
+
+		//色別検証用
+		evtcont += tg1 + "(color)" + tg2;
+		evtcont += "tag1:" + ev[ev_cat]  + "　";
+		evtcont += "area:" + ev[ev_area] + tg3;
 
 
 		evtcont +="</table>";
@@ -1945,7 +1952,7 @@ function inquirySetData(){
 		//位置情報がある場合　名前をボタンに表示しマップ起動可能とする
 		if(ary[i][inq_lat] != "" && ary[i][inq_lng] != ""){
 			//buff += "<input class='inq_map' type='button' onClick='inquiryMap_visible(" + i + ")' value='地図' ><br />";
-			buff += maplink + " onClick='inquiryMap_visible(" + i + ")' /><br />";
+			buff += "　" + maplink + " onClick='inquiryMap_visible(" + i + ")' /><br />";
 
 		}else{
 			buff += "<br />";

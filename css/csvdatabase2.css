@@ -1,0 +1,56 @@
+#cont_area{
+	display : none;
+	position : fixed;
+	top  : 30px;
+	left : 50px;
+	height : 500px;
+	overflow: scroll;
+
+	background : lightyellow;
+	padding : 10px;
+	border : 2px solid #000000;
+}
+#list{
+
+}
+.nofield{
+	text-align : center;
+}
+.Mydata{
+	width  : 400px;
+}
+
+
+/********* フィールドの幅確保、データ選択、ソート*/
+#DbTable{
+	/*width : 1500px;*/
+	table-layout : fixed;
+	word-break: break-all;
+	border-collapse: collapse; /* 枠線の表示方法 */ 
+	border: 1px solid #CCCCCC;
+}
+#DbTable th,#DbTable td{
+	border: 1px solid #CCCCCC;
+}
+
+.btn_arrow{
+	background : #EEE;
+	border-top    : 1px solid #DDDDDD;
+	border-left   : 1px solid #DDDDDD;
+	border-right  : 1px solid #BBBBBB;
+	border-bottom : 1px solid #BBBBBB;
+	color : #111;
+	width  : 20px;
+	height : 20px;
+	padding : 3px 0;
+}
+.btn_ecd{
+	background : #EEE;
+	border-top    : 1px #DDD solid;
+	border-left   : 1px #DDD solid;
+	border-right  : 1px #BBB solid;
+	border-bottom : 1px #BBB solid;
+	color : #111;
+	width : 40px;
+	padding : 3px 0;
+}
