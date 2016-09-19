@@ -44,7 +44,7 @@ if(isset($_GET['next'])){
 }
 //$next = "" . $next;
 
-$next = "admin/cont_event.php";
+$next = "admin/cont_event2.php";
 
 
 //log_in.php からの戻り場所指定
@@ -88,7 +88,11 @@ $id = $_SESSION[$USER_session];
 		$fname = basename($flist[$i]);
 		$dname = dirname($flist[$i]);
 
-		$buff .= '{ dir : "' . $dname . '", file : "' . $fname . '", select : ' . $default . ' , user : "' . $id . '" }';
+		//ファイルの更新日時
+		$timestamp = date("Y/m/d H:m:s",filemtime($flist[$i]));
+
+		//$buff .= '{ dir : "' . $dname . '", file : "' . $fname . '", select : ' . $default . ' , user : "' . $id . '" }';
+		$buff .= '{ dir : "' . $dname . '", file : "' . $fname . '", timestamp : "' . $timestamp . '", select : "' . $default . '", user : "' . $id . '" }';
 
 		if($i < ($flength - 1)){
 			$buff .= ',';
@@ -153,6 +157,7 @@ function show_flist(jkn){
 		fname  = flist[i]['file'];
 		dname  = flist[i]['dir'];
 		select = flist[i]['select'];
+		timestamp = flist[i]['timestamp'];
 
 		//and検索	
 		fjkn_flg = 1;
@@ -186,6 +191,9 @@ function show_flist(jkn){
 		buff += '</td><td>';
 
 		buff += '<a href="' + dname + '/' + fname + '" target="_blank">' + fname + '</a>';
+
+		buff += '</td><td>';
+		buff += timestamp;
 
 		buff += '</td><td>';
 

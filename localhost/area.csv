@@ -1,6 +1,11 @@
-no,area_name,color,text_color,icon,memo
-1,輪島,#FF0000,#FFFFFF,,
-2,珠洲,#FFCC33,#000000,,
-3,能登,#CCFF00,#000000,,
-4,門前,#99FFFF,#000000,,
-5,穴水,#CCCCCC,#000000,,
+no,area_name,color,text_color,icon,memo,visible
+1,輪島市,#87BCE1,#603B32,,,
+2,珠洲市,#E99B9D,#603B32,,,
+3,能登町,#ECDE6C,#603B32,,,
+4,穴水町,#D2DF95,#603B32,,,
+5,七尾市,#dbd0e6,#603B32,,,
+6,志賀町,#dbd0e6,#603B32,,,
+7,中能登町,#dbd0e6,#603B32,,,
+8,羽咋市,#dbd0e6,#603B32,,,
+9,宝達志水町,#dbd0e6,#603B32,,,
+10,かほく市,#dbd0e6,#603B32,,,

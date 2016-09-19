@@ -79,8 +79,8 @@ if($ReadOnly == 'true'){
 	//***** Data Check ******
 	echo '
 	<input type="button" onClick="DataCheck()" value="イベントデータの簡易チェック">
-	<div id="errorArea">
-		<textarea id="errorResult" rows="10" cols="100">
+	<div id="errorArea" style="position:fixed; top:180px; left:10px;">
+		<textarea id="errorResult" rows="10" cols="100" style="background:lightyellow;">
 		</textarea>
 		<input type="button" onClick="errorAreaClose()" value="閉じる">
 	</div>
@@ -264,6 +264,8 @@ $(function($){
 
 //イベントデータの簡易チェック
 //check field ***************
+var titleField = "eventtitle";
+
 var whereField = "where";
 var whenField  = "when";
 var openField  = "openTime";
@@ -281,6 +283,8 @@ function DataCheck(){
 
 	var buff ="";
 	var fieldNo;
+	var eventdate;
+	var mdata;
 	var data;
 	var msg;
 
@@ -291,62 +295,68 @@ function DataCheck(){
 
 		//*****
 		fieldNo = DataFieldNo(whenField);
+		mdata = DataArray[i][fieldNo];
+		eventdate = mdata;
 		data = DataArray[i][fieldNo].split("/");
 		if(data.length != 3){
-			msg += whenField + "のデータエラー　/　";
+			msg += whenField + "(" + mdata + ")のデータエラー　/　";
 		}else{
 			if(data[0].length != 4){
-				msg += whenField + "年の桁数エラー /　";
+				msg += whenField + "(" + data[0] + ")年の桁数エラー /　";
 			}
 			if(data[1].length != 2){
-				msg += whenField + "月の桁数エラー /　";
+				msg += whenField + "(" + data[1] + ")月の桁数エラー /　";
 			}
 			if(data[2].length != 2){
-				msg += whenField + "日の桁数エラー /　";
+				msg += whenField + "(" + data[2] + ")日の桁数エラー /　";
 			}
 		}
 
 
 		//*****
 		fieldNo = DataFieldNo(openField);
+		mdata = DataArray[i][fieldNo];
 		data = DataArray[i][fieldNo].split(":");
 		if(data.length < 3 ){
-			msg += openField + "のデータエラー　/　";
+			msg += openField + "(" + mdata + ")のデータエラー　/　";
 		}else{
 			if(data[0].length != 2){
-				msg += openField + "時の桁数エラー /　";
+				msg += openField + "(" + data[0] + ")時の桁数エラー /　";
 			}
 			if(data[1].length != 2){
-				msg += openField + "分の桁数エラー /　";
+				msg += openField + "(" + data[1] + ")分の桁数エラー /　";
 			}
 		}
 
 		//*****
 		fieldNo = DataFieldNo(closeField);
+		mdata = DataArray[i][fieldNo];
 		data = DataArray[i][fieldNo].split(":");
 		if(data.length < 3 ){
-			msg += closeField + "のデータエラー　/　";
+			msg += closeField + "(" + mdata + ")のデータエラー　/　";
 		}else{
 			if(data[0].length != 2){
-				msg += closeField + "時の桁数エラー /　";
+				msg += closeField + "(" + data[0] + ")時の桁数エラー /　";
 			}
 			if(data[1].length != 2){
-				msg += closeField + "分の桁数エラー /　";
+				msg += closeField + "(" + data[1] + ")分の桁数エラー /　";
 			}
 		}
 
 		//******
 		fieldNo = DataFieldNo(tagField);
 		data = DataArray[i][fieldNo];
-		var find = 0;
-		for(var s = 0 ; s < targetArray.length ; s++){
-			if(targetArray[s][tagId] == data){
-				find = 1;
-				break;
+		if(data != ""){
+			var find = 0;
+			for(var s = 0 ; s < targetArray.length ; s++){
+				if(targetArray[s][tagId] == data){
+					find = 1;
+					break;
+				}
 			}
-		}
-		if(find == 0){
-			msg += tagField + "と一致するラベルがありません / ";
+			if(find == 0){
+				msg += tagField + "(" + data + ")と一致するラベルがありません / ";
+			}
 		}
 
 		//******
@@ -360,15 +370,17 @@ function DataCheck(){
 			}
 		}
 		if(find == 0){
-			msg += whereField + "と一致する名前がありません / ";
+			msg += whereField + "(" + data + ")と一致する名前がありません / ";
 		}
 
 
 		//*****************
 		if(msg != ""){
-			fieldNo = DataFieldNo("no");
+			//fieldNo = DataFieldNo("no");
+			//buff += i + "行目 no:" + DataArray[i][fieldNo] + "　=　";
 
-			buff += i + "行目 no:" + DataArray[i][fieldNo] + "　=　";
+			fieldNo = DataFieldNo(titleField);
+			buff += i + "行目 :" + DataArray[i][fieldNo] + "[" + eventdate + "]　=　";
 
 			buff += msg; 
 

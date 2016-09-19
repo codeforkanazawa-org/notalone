@@ -36,7 +36,8 @@ var settingArray;
 function csvToArray(filename, cb) {
 	//キャッシュしない
 	$.ajaxSetup({
-		cache: false
+		cache: false,
+		async:false
 	});
 
 	$.get(filename, function(csvdata) {

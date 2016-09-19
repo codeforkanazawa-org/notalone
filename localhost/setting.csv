@@ -1,3 +1,11 @@
 no,name,define,data,memo
-1,初期のマップ緯度,DEFAULT_LAT,37.390556,輪島市役所
-2,初期のマップ経度,DEFAULT_LNG,136.899167,輪島市役所
+1,初期のマップ緯度,_DEFAULT_LAT,37.288661,もんぜん児童館
+2,初期のマップ経度,_DEFAULT_LNG,136.765627,もんぜん児童館
+3,初期のマップ緯度,DEFAULT_LAT,37.390556,輪島市役所
+4,初期のマップ経度,DEFAULT_LNG,136.899167,輪島市役所
+5,マップのマーカードラッグ,DRAGGABLE,0,ドラッグでの移動可否(1:true　0:false)
+6,マップの初期ズームレベル,DEFAULT_ZOOM,14,
+7,マップの中心マーカー表示,DEFAULT_CENTERVIEW,0,(1:true  0:false)
+8,マップのアイコン移動,DEFAULT_ICONMOVE,0,(1:true  0:false)
+9,マップのラベル表示,DEFAULT_LABELVIEW,0,(1:true  0:false)
+10,マップのラベル移動,DEFAULT_LABELMOVE,0,(1:true  0:false)

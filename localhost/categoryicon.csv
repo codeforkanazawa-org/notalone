@@ -1,7 +1,18 @@
 no,category,default_directory,default_icon,big_directory,big_icon,zoom_level,memo
-1,図書館,,,uploads/images,tosyokan.gif,15,
-2,公園,,,uploads/images,kouen.gif,15,
-3,公民館,,,uploads/images,kouminkan.gif,15,
-4,学校,,,uploads/images,gakkou.gif,15,
-5,保育園,,,uploads/images,hoikusyo.gif,15,
-6,児童館,,,uploads/images,jidoukan.gif,15,
+1,図書館,uploads/images,tosyokan20.gif,uploads/images,tosyokan.gif,15,
+2,公園,uploads/images,kouen3_20.gif,uploads/images,kouen3_40.gif,15,
+3,公民館,uploads/images,kouminkan2_20.gif,uploads/images,kouminkan2_40.gif,15,
+4,学校,uploads/images,gakkou20.gif,uploads/images,gakkou40.gif,15,gakkou.gifだとFile Not Foundエラーになる（原因不明）
+5,保育園,uploads/images,hoikuen2_20.gif,uploads/images,hoikuen2_40.gif,15,
+6,児童館,uploads/images,jidoukan2_20.gif,uploads/images,jidoukan2_40.gif,15,
+7,子どもの公園,uploads/images,kouen20.gif,uploads/images	,kouen40.gif,15,
+8,小学校,uploads/images,eschool2_20.gif,uploads/images,eschool2_40.gif,15,
+9,中学校,uploads/images,jhschool2_20.gif,uploads/images,jhschool2_40.gif,15,
+10,高校,uploads/images,gakkou20.gif,uploads/images,gakkou40.gif,15,gakkou.gifだとFile Not Foundエラーになる（原因不明）
+11,飲食店,uploads/images,cafe20.gif,uploads/images,cafe40.gif,15,
+12,児童クラブ,uploads/images,jidoukan2_20.gif,uploads/images,jidoukan2_40.gif,15,
+13,幼稚園,uploads/images,youtien2_20.gif,uploads/images,youtien2_40.gif,15,
+14,こども園,uploads/images,youtien2_20.gif,uploads/images,youtien2_40.gif,15,
+15,病院,uploads/images,byouin2_20.gif,uploads/images,byouin2_40.gif,15,
+16,赤ちゃんの駅,uploads/images,baby20.gif,uploads/images,baby40.gif,15,
+17,道の駅,uploads/images,toilet_20.gif,uploads/images,toilet_40.gif,15,toilet50.gifだとFileNotFoundエラー

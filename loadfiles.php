@@ -92,6 +92,9 @@ if(isset($_GET['multi'])){
 		$fname = basename($flist[$i]);
 		$dname = dirname($flist[$i]);
 
+		//ファイルの更新日時
+		$timestamp = date("Y/m/d H:m:s",filemtime($flist[$i]));
+
 		if($ftype == "image"){
 			//exifから　lat lng 付加
 			$filename = $dname . "/" . $fname;
@@ -104,7 +107,8 @@ if(isset($_GET['multi'])){
 		}
 		//////////////////////
 
-		$buff .= '{ dir : "' . $dname . '", file : "' . $fname . '", lat : "' . $lat . '", lng : "' . $lng . '" }';
+		//$buff .= '{ dir : "' . $dname . '", file : "' . $fname . '", lat : "' . $lat . '", lng : "' . $lng . '" }';
+		$buff .= '{ dir : "' . $dname . '", file : "' . $fname . '", timestamp : "' . $timestamp . '", lat : "' . $lat . '", lng : "' . $lng . '" }';
 
 		if($i < ($flength - 1)){
 			$buff .= ',';
@@ -181,6 +185,7 @@ function show_flist(jkn){
 		dname = flist[i]['dir'];
 		lat   = flist[i]['lat'];
 		lng   = flist[i]['lng'];
+		timestamp = flist[i]['timestamp'];
 
 		/*
 		if(fname.indexOf(jkn) != -1) {
@@ -212,6 +217,8 @@ function show_flist(jkn){
 		}
 
 		buff += '<a href="' + dname + '/' + fname + '" target="_blank">' + fname + '</a>';
+		buff += '</td><td>';
+		buff += timestamp;
 
 		//downloadボタンの追加　******
 		buff += '</td><td>';

@@ -261,12 +261,13 @@ body{
 
 #map_area{
 	visibility : hidden;
+	display : block;
 
 	position : fixed;
-	top  : 50px;
+	top  : 30;
 
 	/* left は初期値 */
-	left : 10px;
+	/*left : 10px; */
 
 	padding : 5px;
 	border : 3px solid #000000;
@@ -277,13 +278,37 @@ body{
 
 #map_canvas{
 	width : 250px;
-	height: 300px;
+	/*width : 100%;*/
+	height: 500px;
+	/*height : 90%;*/
+	z-index : 11;
 }
+
+/*
+#map_canvas label { width: auto; display: inline; }
+#map_canvas img { max-width: none; max-height: none; }
+*/
 
 #showBlock{
 	display : none;
 }
 
+#set_area{
+	visibility : hidden;
+
+	/*position : fixed;*/
+	position : absolute;
+	top  : 30px;
+
+	/* left は初期値 */
+	left : 0px;
+
+	padding : 5px;
+	border : 3px solid #000000;
+	background : lightyellow;
+
+	z-index : 20;
+}
 
 /**** for inquiry.html ****/
 .inquiry-cont {
@@ -305,10 +330,10 @@ body{
 }
 .inq_name{
 	background-image : url("../images/inquiry_menu1.png");
-	//background-size: 100% 95%;
+	/*background-size: 100% 95%;*/
 	background-repeat: no-repeat;
 	background-position: center center;
-	//margin  : 0px 5px 0px 5px;
+	/*margin  : 0px 5px 0px 5px;*/
 	opacity: 0.8;
 
 	padding-left : 10px;

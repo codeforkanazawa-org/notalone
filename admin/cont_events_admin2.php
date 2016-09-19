@@ -53,6 +53,18 @@ echo '
 </ul>
 ';
 
+	//***** Data Check ******
+	echo '
+	<input type="button" onClick="DataCheck()" value="イベントデータの簡易チェック">
+	<div id="errorArea" style="position:fixed; top:180px; left:10px;">
+		<textarea id="errorResult" rows="10" cols="100" style="background:lightyellow;">
+		</textarea>
+		<input type="button" onClick="errorAreaClose()" value="閉じる">
+	</div>
+	';	
+	//***********************
+
+
 //*************
 print("<h3>【ファイル名：" . $db_Table . "】</h3>");
 
@@ -183,6 +195,220 @@ $(function($){
     $.datepicker.setDefaults($.datepicker.regional['ja']);
 });
 
+
+
+//イベントデータの簡易チェック
+//check field ***************
+var souceField = "soucefile";
+var titleField = "eventtitle";
+
+var whereField = "where";
+var whenField  = "when";
+var openField  = "openTime";
+var closeField = "closeTime";
+var tagField   = "tag1";
+
+var tagId   = "target_id";
+var tagName = "target_label";
+var locId   = "location_name";
+
+var CR = "\n"; 
+//***************************
+
+function DataCheck(){
+
+	var buff ="";
+	var fieldNo;
+	var eventdate;
+	var mdata;
+	var data;
+	var msg;
+
+	//配列情報の設定（イベントファイル）
+	//0 はフィールド名、1 からスタート
+	for(var i = 1; i < DataArray.length ; i++){
+		msg = "";
+
+		//*****
+		fieldNo = DataFieldNo(whenField);
+		mdata = DataArray[i][fieldNo];
+		eventdate = mdata;
+		data = DataArray[i][fieldNo].split("/");
+		if(data.length != 3){
+			msg += whenField + "(" + mdata + ")のデータエラー　/　";
+		}else{
+			if(data[0].length != 4){
+				msg += whenField + "(" + data[0] + ")年の桁数エラー /　";
+			}
+			if(data[1].length != 2){
+				msg += whenField + "(" + data[1] + ")月の桁数エラー /　";
+			}
+			if(data[2].length != 2){
+				msg += whenField + "(" + data[2] + ")日の桁数エラー /　";
+			}
+		}
+
+
+		//*****
+		fieldNo = DataFieldNo(openField);
+		mdata = DataArray[i][fieldNo];
+		data = DataArray[i][fieldNo].split(":");
+		if(data.length < 3 ){
+			msg += openField + "(" + mdata + ")のデータエラー　/　";
+		}else{
+			if(data[0].length != 2){
+				msg += openField + "(" + data[0] + ")時の桁数エラー /　";
+			}
+			if(data[1].length != 2){
+				msg += openField + "(" + data[1] + ")分の桁数エラー /　";
+			}
+		}
+
+		//*****
+		fieldNo = DataFieldNo(closeField);
+		mdata = DataArray[i][fieldNo];
+		data = DataArray[i][fieldNo].split(":");
+		if(data.length < 3 ){
+			msg += closeField + "(" + mdata + ")のデータエラー　/　";
+		}else{
+			if(data[0].length != 2){
+				msg += closeField + "(" + data[0] + ")時の桁数エラー /　";
+			}
+			if(data[1].length != 2){
+				msg += closeField + "(" + data[1] + ")分の桁数エラー /　";
+			}
+		}
+
+		//******
+		fieldNo = DataFieldNo(tagField);
+		data = DataArray[i][fieldNo];
+		if(data != ""){
+			var find = 0;
+			for(var s = 0 ; s < targetArray.length ; s++){
+				if(targetArray[s][tagId] == data){
+					find = 1;
+					break;
+				}
+			}
+			if(find == 0){
+				msg += tagField + "(" + data + ")と一致するラベルがありません / ";
+			}
+		}
+
+		//******
+		fieldNo = DataFieldNo(whereField);
+		data = DataArray[i][fieldNo];
+		var find = 0;
+		for(var s = 0 ; s < locationArray.length ; s++){
+			if(locationArray[s][locId] == data){
+				find = 1;
+				break;
+			}
+		}
+		if(find == 0){
+			msg += whereField + "(" + data + ")と一致する名前がありません / ";
+		}
+
+
+		//*****************
+		if(msg != ""){
+			//fieldNo = DataFieldNo("no");
+			//buff += i + "行目 no:" + DataArray[i][fieldNo] + "　=　";
+
+			fieldNo = DataFieldNo(titleField);
+			buff += i + "行目 :" + DataArray[i][fieldNo] + "[" + eventdate + "]　=　";
+
+			buff += msg; 
+
+			//提供元ファイル名を追加
+			fieldNo = DataFieldNo(souceField);
+			buff += "【データ元：" + DataArray[i][fieldNo] + "】";
+
+			buff += CR;
+		}
+	}
+
+	$("#errorArea").css("display" , "block");
+	$("#errorResult").html(buff);
+}
+
+function errorAreaClose(){
+	$("#errorArea").css("display" , "none");
+}
+
+
+//*****************
+var targetTable   = "../localhost/target.csv";
+var locationTable = "../localhost/location.csv";
+
+var targetArray   = new Array();
+var locationArray = new Array();
+
+$(function() {
+	//連想配列の設定
+	setRensouArray(targetTable , targetArray , function(){
+		//入力補助機能
+		var ren = targetArray;
+		for(var i = 0 ; i < ren.length ; i++){
+			$("#taglist").append($("<option>").val(ren[i][tagId]).html(ren[i][tagName] + "(" + ren[i][tagId] + ")" ));
+		}
+	});
+
+	setRensouArray(locationTable , locationArray , function(){
+		//入力補助機能
+		var ren = locationArray;
+		for(var i = 0 ; i < ren.length ; i++){
+			$("#wherelist").append($("<option>").val(ren[i][locId]).html(ren[i][locId]));
+		}
+	});
+
+
+});
+
+//csvデータを読み込み、連想配列に設定する
+function setRensouArray(table , rensouArray , cr){
+	csvToArray( table , function(data) {
+
+		//1行目をフィールド名として扱い連想配列にする
+		for(var i = 1 ; i < data.length ; i++){
+			var rensou = new Object();
+			for(var s = 0; s < data[i].length ; s++){
+				rensou[data[0][s]] = data[i][s]; 
+			}
+			rensouArray.push(rensou);
+		}
+		cr();
+	});	
+}
+
+//CSVファイルの読み込み
+function csvToArray(filename, cb) {
+	//キャッシュしない
+	$.ajaxSetup({
+		cache: false
+	});
+
+	$.get(filename, function(csvdata) {
+		//CSVのパース作業
+		//CRの解析ミスがあった箇所を修正しました。
+		//以前のコードだとCRが残ったままになります。
+		// var csvdata = csvdata.replace("\r/gm", ""),
+		csvdata = csvdata.replace(/\r/gm, "");
+
+		var line = csvdata.split("\n"),
+		ret = [];
+		for (var i in line) {
+        		//空行はスルーする。
+        		if (line[i].length == 0) continue;
+
+        		var row = line[i].split(",");
+        		ret.push(row);
+      		}
+      		cb(ret);
+	});
+}
+
+
 </script>
 
 
@@ -218,6 +444,10 @@ $(function($){
 	background : lightgreen;
 
 	z-index : 10;
+}
+
+#errorArea{
+	display : none;
 }
 
 </style>

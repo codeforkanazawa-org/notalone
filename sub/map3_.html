@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>のとノットアローン｜マップ</title>
+	<link rel="stylesheet" href="../css/notalone.css">
+
+
+        <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+        <!-- Sets initial viewport load and disables zooming  -->
+        <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+
+        <!-- Makes your prototype chrome-less once bookmarked to your phone's home screen -->
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+        <link rel="apple-touch-icon-precomposed" href="img/icon.png" />
+
+        <!-- Include the compiled Ratchet CSS -->
+        <link href="css/ratchet.css" rel="stylesheet">
+
+        <!-- Include the compiled Ratchet JS -->
+        <script src="js/ratchet.js"></script>
+
+        <!-- Include fork origin -->
+        <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/main.css" rel="stylesheet">
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js"></script>
+
+        <script src="js/main.js"></script>
+
+        <!-- Include bookmark_bubble -->
+        <!--script src="js/mobile-bookmark-bubble/bookmark_bubble.js"></script-->
+        <!--script src="js/mobile-bookmark-bubble/example/example.js"></script-->
+
+    </head>
+
+    <body onload="initlaize(); map_fit();">
+
+        <!-- Make sure all your bars are the first things in your <body> -->
+        <header class="bar bar-nav">
+	    <div id="top-menu" onClick="top_index()"></div>
+            <!--h1 class="title">子育て応援マップ</h1-->
+        </header>
+
+        <div class="content">
+            <div id="loading" style="font-color:#ffffff">Now Loading....</div>
+            <div id="map_canvas" style="width:100%; height:480px;"></div>
+        </div>
+        <nav class="bar bar-tab" style="display:block;">
+	    <select id="mapSelecter">
+		<option value="1">児童館、図書館、公民館、他（屋内で遊べるところ）</option>
+		<option value="2">公園、他（屋外で遊べるところ）</option>
+		<option value="3">お茶やご飯がしやすいところ（飲食店・お弁当スポット）</option>
+		<option value="4">病院・学校・保育所、幼稚園、他</option>
+		<option value="5">病児・病後児保育・一時預かり</option>
+		<option value="6">トイレ休憩なら（道の駅、赤ちゃんの駅、他）</option>
+		<option value="7">プレミアム・パスポートの使えるところ</option>
+		<option value="0">---（ピンを消す）---</option>
+	    </select>
+		<input type="button" onClick="clearMapPins()" value="ピンを消す" />
+	</nav>
+    </body>
+</html>
+
+<script type="text/javascript">
+
+//** notalone *****
+var TopHeight = 30;				//トップメニューの縦幅
+	$("#top-menu").height(TopHeight);
+	$("#top-menu").css({"line-height" : TopHeight + "px"});
+
+
+	//****for index.html *******
+	$("#menu-back").height(TopHeight);
+	$("#menu-back").css({"line-height" : TopHeight + "px"});
+
+//topメニュー
+function top_index(){
+	location.href = "../index.html";
+}
+
+//******************
+
+function map_fit(){
+	//ブラウザの縦サイズにフィットさせる
+	//上下に設置するdiv縦幅
+	var ajust = 81;
+	//var ajust = 50;
+	$('#map_canvas').css({
+		'height' : (window.innerHeight - ajust) + "px",
+		'width'  : window.innerWidth + "px"
+	});
+
+}
+
+//window risize 時の処理
+$(window).resize(function(){
+	map_fit();
+});
+
+//****** システム設定情報 *********
+var settingArray = new Array(); 	//２次元：連想配列
+
+//****** カテゴリアイコン対応 ******
+var iconArray = new Array(); 		//２次元：連想配列
+
+/***  categoryicon csv format 変換テーブル  ****/
+var Cat_name  = "category";	  	//
+var Def_dir   = "default_directory";	//
+var Def_icon  = "default_icon";		//
+var Big_dir   = "big_directory";	//
+var Big_icon  = "big_icon";		//
+var Zoom_level= "zoom_level";		//
+/*********/
+
+//CategoryIcon tableの読み込み
+//var table = "../localhost/categoryicon.csv";
+//readCategoryIcon(table);
+
+
+//****** 複数マップの対応機能 ******
+
+//マップの選択
+var mapNo = 1;
+var initf = 1;
+$('#mapSelecter').change(function(){
+	$('#mapSelecter option:selected').each(function(){
+		mapNo = parseInt($(this).val());
+	});
+	//alert(mapNo);
+
+
+	//*************
+	/*if(mapNo == 6){
+		alert("ただいま準備中です");
+		return false;
+	}*/
+	//*************
+
+	if(mapNo == 0){
+		clearMapPins();
+	}else if(initf == 1){
+		//マップ初期起動時はスルーする
+		initf = 0;
+	}else{
+		pushPins(googlemap);
+	}
+
+}).change();
+
+
+//ピン情報保存用の配列
+//var markersArray = new google.maps.MVCArray();
+var markersArray = new Array();
+function clearMapPins(){
+	//markersArray.forEach(function (marker, idx) { marker.setMap(null); });
+	var len = markersArray.length;
+	for(var i=0  ; i < len ; i++){
+		markersArray[i].setMap(null);
+	}
+	markersArray = new Array();
+
+	mapPinsArray = new Array();
+
+	clearStrings();
+
+	clearCategorys();
+}
+
+//ピン情報補助（カテゴリーアイコン）用の配列
+var categorysArray = new Array();
+function clearCategorys(){
+	categorysArray = new Array();
+}
+
+
+//個別マップ対応テーブル
+var _MapTable;
+var _DefPin;
+var _BigPin;
+
+var _Category;
+var _1st_id;
+var _2nd_id;
+var _Name;
+var _Address;
+var _Tel1;
+var _Tel2;
+var _Url;
+var _Opentime;
+var _Restdates;
+var _Description1;
+var _Description2;
+var _Lat;
+var _Lng;
+
+var _Diaper;
+var _Zasiki;
+var _Parking;
+
+var _Area;
+var _Display;
+
+var _Opentime_name;
+var _Restdates_name;
+var _Diaper_name;
+var _Zasiki_name;
+var _Parking_name;
+
+function mapConvertTable(mapNo){ 
+
+	switch(mapNo){
+
+		//児童館、図書館、公民館、他（屋内で遊べるところ）
+		case 1 :
+	
+		_MapTable	= '../uploads/mapinfo/asoberu_in.csv';
+		_DefPin		= 'icons/pink-pushpin.png';
+		_BigPin		= '';
+
+		_Category 	= 'category';
+		_Name 		= 'name';
+		_Address	= 'address';
+		_Tel1		= 'phone1';
+		_Tel2		= 'phone2';
+		_Url		= 'URL';
+
+		_Opentime	= 'hours';
+		_Opentime_name =  '開館';
+		_Restdates	= 'closing';
+		_Restdates_name = '休館';
+		_Description1	= 'memo1';
+		_Description2	= 'memo2';
+		_Diaper		= 'diaper';
+		_Diaper_name   = 'オムツ交換台';
+
+		_Zasiki	        = '';
+		_Zasiki_name    = '';
+		_Parking        = '';
+		_Parking_name   = '';
+
+		_Lat		= 'lat';
+		_Lng		= 'lng';
+
+		_Area		= 'area';
+		_Display	= 'display';
+
+       		break;
+
+		//公園、他（屋外で遊べるところ）
+		case 2 :
+	
+		_MapTable	= '../uploads/mapinfo/asoberu_out.csv';
+		_DefPin		= 'icons/ltblu-pushpin.png';
+		_BigPin		= '';
+
+		_Category 	= 'category';
+		_Name 		= 'name';
+		_Address	= 'address';
+		_Tel1		= 'phone1';
+		_Tel2		= 'phone2';
+		_Url		= 'URL';
+
+		_Opentime	= 'hours';
+		_Opentime_name  = '';
+		_Restdates	= 'closing';
+		_Restdates_name = '';
+		_Description1	= 'memo1';
+		_Description2	= 'memo2';
+		_Diaper		= 'diaper';
+		_Diaper_name    = 'オムツ交換台';
+
+		_Zasiki	        = '';
+		_Zasiki_name    = '';
+		_Parking        = '';
+		_Parking_name   = '';
+
+		_Lat		= 'lat';
+		_Lng		= 'lng';
+
+		_Area		= 'area';
+		_Display	= 'display';
+
+       		break;
+
+		//お茶やご飯がしやすいところ（飲食店・お弁当スポット）
+		case 3 :
+	
+		_MapTable	= '../uploads/mapinfo/cafe.csv';
+		_DefPin		= 'icons/green-pin.png';
+		_BigPin		= '';
+
+		_Category 	= 'category';
+		_Name 		= 'name';
+		_Address	= 'address';
+		_Tel1		= 'phone1';
+		_Tel2		= 'phone2';
+		_Url		= 'URL';
+		_Opentime	= 'hours';
+		_Opentime_name  = '営業'; 
+		_Restdates	= 'closing';
+		_Restdates_name = '定休';
+		_Description1	= 'memo1';
+		_Description2	= 'memo2';
+		_Diaper		= 'diaper';
+		_Diaper_name   = 'オムツ交換台';
+
+		_Zasiki	        = 'zasiki';
+		_Zasiki_name    = '座敷';
+		_Parking        = 'parking';
+		_Parking_name   = '駐車場';
+
+		_Lat		= 'lat';
+		_Lng		= 'lng';
+
+		_Area		= 'area';
+		_Display	= 'display';
+
+       		break;
+
+		//病院・学校・保育所、幼稚園、他
+		case 4 :
+
+		_MapTable	= '../uploads/mapinfo/school_hospital.csv';
+		_DefPin		= 'icons/yellow-pin.png';
+		_BigPin		= '';
+
+		_Category 	= 'category';
+		_Name 		= 'name';
+		_Address	= 'address';
+		_Tel1		= 'phone1';
+		_Tel2		= 'phone2';
+		_Url		= 'URL';
+		_Opentime	= 'hours';
+		_Opentime_name  = '開館';
+		_Restdates	= 'closing';
+		_Restdates_name = '休館';
+		_Description1	= 'memo1';
+		_Description2	= 'memo2';
+		_Diaper		= 'diaper';
+		_Diaper_name   = 'オムツ交換台';
+
+		_Zasiki	        = '';
+		_Zasiki_name    = '';
+		_Parking        = '';
+		_Parking_name   = '';
+
+		_Lat		= 'lat';
+		_Lng		= 'lng';
+
+		_Area		= 'area';
+		_Display	= 'display';
+
+		break;
+
+		//病児・病後児保育・一時預かり
+		case 5 :
+
+		_MapTable	= '../uploads/mapinfo/kidscare.csv';
+		_DefPin		= 'icons/blue-pin.png';
+		_BigPin		= '';
+
+		_Category 	= 'category';
+		_Name 		= 'name';
+		_Address	= 'address';
+		_Tel1		= 'phone1';
+		_Tel2		= 'phone2';
+		_Url		= 'URL';
+		_Opentime	= 'hours';
+		_Opentime_name  = '開館';
+		_Restdates	= 'closing';
+		_Restdates_name = '休館';
+		_Description1	= 'memo1';
+		_Description2	= 'memo2';
+		_Diaper		= 'diaper';
+		_Diaper_name   = 'オムツ交換台';
+
+		_Zasiki	        = '';
+		_Zasiki_name    = '';
+		_Parking        = '';
+		_Parking_name   = '';
+
+		_Lat		= 'lat';
+		_Lng		= 'lng';
+
+		_Area		= 'area';
+		_Display	= 'display';
+
+		break;
+
+
+		//トイレ休憩なら（道の駅、赤ちゃんの駅、他）
+		case 6 :
+	
+		_MapTable	= '../uploads/mapinfo/toilet.csv';
+		_DefPin		= 'icons/yellow-pin.png';
+		_BigPin		= '';
+
+		_Category 	= 'category';
+		_Name 		= 'name';
+		_Address	= 'address';
+		_Tel1		= 'phone1';
+		_Tel2		= 'phone2';
+		_Url		= 'URL';
+		_Opentime	= 'hours';
+		_Opentime_name  = '';
+		_Restdates	= 'closing';
+		_Restdates_name = '';
+		_Description1	= 'memo1';
+		_Description2	= 'memo2';
+		_Lat		= 'lat';
+		_Lng		= 'lng';
+
+		_Diaper		= 'diaper';
+		_Diaper_name    = 'オムツ交換台';
+
+		_Zasiki	        = '';
+		_Zasiki_name    = '';
+		_Parking        = '';
+		_Parking_name   = '';
+
+		_Area		= 'area';
+		_Display	= 'display';
+
+       		break;
+
+		//プレミアム・パスポートの使えるところ
+		case 7 :
+	
+		_MapTable	= '../uploads/mapinfo/openData_prepass.csv';
+		_DefPin		= 'icons/red_pin.png';
+		_BigPin		= '';
+
+		_Category 	= '';
+		_1st_id		= 'co_id';
+		_2nd_id		= 'shop_id';
+		_Name 		= 'name';
+		_Address	= 'address';
+		_Tel		= 'phone';
+		_Url		= 'url';
+		_Opentime	= 'servicetime';
+		_Restdates	= 'holiday';
+		_Description	= 'prepass';
+		_Lat		= 'lat';
+		_Lng		= 'lng';
+
+       		break;
+
+	}
+}
+
+function mapMakeInfo(mapNo,data){
+	switch(mapNo){
+
+		//あそべるところ、公園、図書館
+		case 1 :
+
+		//なんでも相談できるところ
+		case 2 :
+
+		//オムツ替えのしやすいところ（赤ちゃんの駅）
+		case 3 :
+
+		//子連れでお茶やご飯がしやすいところ
+		case 4 :
+
+		case 5 :
+		//病院、学校、こども園
+
+            var html = "";
+            html +="<div style='width:150px;padding:0px;'>"
+            html += data[_Category];
+
+	    if(data[_Url] !=""){
+		//html += "<dd>" + data[_Url] + "</dd>"};
+		html += "<a href='" + data[_Url] + "' target='_blank'>";
+		html += "<h5>" + data[_Name] + "</h5></a>";
+	    }else{
+	    	html += "<h5>" + data[_Name] + "</h5>";
+	    }
+
+            html += "<dl>";
+	    if(data[_Address] != ""){
+		html += "<dd>" + data[_Address] + "</dd>"};
+            if(data[_Tel1] != ""){
+		html += "<dd>" + data[_Tel1] + "</dd>"};
+	    if(data[_Tel2] != ""){
+		html += "<dd>" + data[_Tel2] + "</dd>"};
+
+	    if(data[_Opentime] != ""){
+		html += "<dd>【" + _Opentime_name + "】" + data[_Opentime] + "</dd>"};
+	    if(data[_Restdates] != ""){
+		html += "<dd>【" + _Restdates_name + "】" + data[_Restdates] + "</dd>"};
+	    if(data[_Diaper] != ""){
+		html += "<dd>【" + _Diaper_name + "】" + data[_Diaper] + "</dd>"};
+
+	    if(_Zasiki != "" && data[_Zasiki] != ""){
+		html += "<dd>【" + _Zasiki_name + "】" + data[_Zasiki] + "</dd>"};
+	    if(_Parking != "" && data[_Parking] != ""){
+		html += "<dd>【" + _Parking_name + "】" + data[_Parking] + "</dd>"};
+
+	    if(data[_Description1] != ""){
+		html += "<dd>" + data[_Description1] + "</dd>"};
+	    if(data[_Description2] != ""){
+		html += "<dd>" + data[_Description2] + "</dd>"};
+	    if(data[_Area] != ""){
+		html += "<dd>" + data[_Area] + "㎡</dd>"};
+
+            html += "</dl>";
+            html += "</div>";
+
+	    //***********
+
+		break;
+
+		//トイレ休憩なら（道の駅、赤ちゃんの駅、他）
+		case 6 :
+
+
+            var html = "";
+            html +="<div style='width:150px;padding:0px;'>"
+            html += data[_Category];
+
+	    html += "<h5>" + data[_Name] + "</h5>";
+
+            html += "<dl>";
+	    if(data[_Address] != ""){
+		html += "<dd>" + data[_Address] + "</dd>"};
+            if(data[_Tel1] != ""){
+		html += "<dd>" + data[_Tel1] + "</dd>"};
+	    if(data[_Tel2] != ""){
+		html += "<dd>" + data[_Tel2] + "</dd>"};
+	    if(data[_Url] !=""){
+		html += "<dd>" + data[_Url] + "</dd>"};
+	    if(data[_Opentime] != ""){
+		html += "<dd>" + data[_Opentime] + "</dd>"};
+	    if(data[_Restdates] != ""){
+		html += "<dd>" + data[_Restdates] + "</dd>"};
+	    if(data[_Description1] != ""){
+		html += "<dd>" + data[_Description1] + "</dd>"};
+	    if(data[_Description2] != ""){
+		html += "<dd>" + data[_Description2] + "</dd>"};
+	    if(data[_Area] != ""){
+		html += "<dd>" + data[_Area] + "㎡</dd>"};
+
+            html += "</dl>";
+            html += "</div>";
+
+		break;
+
+
+		//プレミアム・パスポートの使えるところ
+		case 7 :
+
+	    //var image = getSpotImage(data[_1st_id], data[_2nd_id]);
+
+            var html = "";
+            html += "<div style='width:150px;padding:0px;'>"
+            html +="プレミアムパスポート";
+
+            if (data[_Url].length) {
+                html += "<a target='_blank' href='"+ data[_Url] + "'><h5>" + data[_Name] + "</h5></a>";
+            }else{
+		html += "<h5>" + data[_Name] + "</h5>";
+	    }
+
+	    /*
+	    if(image != ""){
+            	html += "<p style='text-align:center'><img src='" + image + "' width='120' ></p>";
+	    }
+	    */
+
+            html += "<dl>";
+            html += "<dd>" + data[_Address] + "</dd>";
+            html += "<dd>" + data[_Tel] + "</dd>";
+            html += "<dd>営業：" + data[_Opentime] + "</dd>";
+            html += "<dd>定休：" + data[_Restdates] + "</dd>";
+            html += "<dd>" + data[_Description] + "</dd>";
+            html += "</dl>";
+            html += "</div>";
+
+		break;
+	
+	}
+
+	return html;
+}
+
+//プレパス、赤ちゃんの駅　画像取得用
+function getSpotImage(coid, ofid)
+{
+	var url = "http://www.i-oyacomi.net/prepass/upimages/" + coid + ofid + "ofPic1_small.jpg";
+	var img = new Image();
+    	img.src = url;
+
+	if(img.height > 0){
+        	return url;
+	}else{
+		return "";
+	}
+}
+</script>
