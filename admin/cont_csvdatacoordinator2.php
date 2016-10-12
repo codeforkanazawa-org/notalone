@@ -311,7 +311,11 @@ function csvDataSouceRead($filename,$type){
 
 <!--googlemaps api-->
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-<script src="http://maps.googleapis.com/maps/api/js?libraries=geometry,drawing&sensor=false"></script> 
+
+<!-- Include googlemaps api -->
+<script type="text/javascript" src="../js/googlemap_api.js"></script>
+
+
 <script type="text/javascript">
 
 //DataShow Mode Check
@@ -368,9 +372,10 @@ function locationInit(){
 	locationGetLatLng();	//マップの初期設定
 }
 
-function setOption(){
-	var option  = "<br /><br /><input type='button' onclick='map_visible()' value='マップの表示' />　";
 
+function setOption(){
+	//var option  = "<br /><br /><input type='button' onclick='map_visible()' value='マップの表示' />　";
+	var option = ""; 
 	return option;
 }
 

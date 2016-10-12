@@ -55,9 +55,7 @@ $DataString = csvDatabaseRead($db_Table,1);
 <script type="text/javascript" src="../js/csvdatabase2.js"></script>
 <script type="text/javascript" src="../js/sha256.js"></script>
 
-<!--googlemaps api-->
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-<script src="http://maps.googleapis.com/maps/api/js?libraries=geometry,drawing&sensor=false"></script> 
+
 <script type="text/javascript">
 
 //DataBase 宣言 ***** php側でデータ読み込み

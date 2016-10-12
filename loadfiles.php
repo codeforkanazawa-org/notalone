@@ -991,7 +991,7 @@ function getFileList($dir) {
 
 
 
-//exif情報から、座標を取得する
+//exif情報から、座標を取得する（未使用）
 function getExifLatLng($filename){
 
 	$latlng = array();

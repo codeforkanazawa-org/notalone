@@ -250,7 +250,7 @@ var TopHeight = 30;				//トップメニューの縦幅
 
 //topメニュー
 function top_index(){
-	location.href = "../index.html";
+	location.href = "index.html";
 }
 
 //******************
@@ -266,7 +266,7 @@ function top_index(){
 
 <div id="info">
 <h3>オープンデータ</h3>
-<a href="http://creativecommons.jp/licenses/" target="_blank"><img src="/images/by.png"></a>
+<a href="http://creativecommons.jp/licenses/" target="_blank"><img src="images/by.png"></a>
 
 <hr />
 ・<a href="sub/map.html" target="_blank">マップ用</a>データファイル

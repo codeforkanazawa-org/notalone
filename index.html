@@ -51,100 +51,78 @@ ga('send', 'pageview');
 </head>
 
 <body onload="init()">
-<!-- fix start -->
-<!--div id="top-menu" onClick="top_index()">能登ノットアローン</div-->
+
 <div id="top-menu" onClick="top_index()"></div>
-
-<!--div id="myCalendar">
-	<a href="https://www.google.com/calendar/" target="_blank">
-		<img src="images/ico_calendar.png" />
-	</a>
-</div-->
-<!-- fix end -->
-
-<!-- fix div 調整用　-->
 <div id="menu-back"></div>
 
-
-<div id="notalone_image" onClick="privert()">
-	<!--img src="images/notalone_image.png" width="350px"-->
-</div>
-
+<div id="notalone_image" onClick="privert()"></div>
 
 <!-- start index_conntiner -->
 <div id="index_contener">
 
-
-<div id="privert">
-  <div id="canvas-div">
-  	<canvas id="myCanvas" onClick="setting()">
-  	</canvas>
-  </div>	
-  <div id="info">
-	<div id="myFavFamily">
- 	</div>
-  </div>
-</div>
-
-<div id="setting">
-	<div id="settingMenu">
-		<li id="settingMenu1" onClick="setMenu(1)">名前・誕生日の設定</li>
-		<li id="settingMenu2" onClick="setMenu(2)">写真の登録</li>
+	<!-- secret menu -->
+	<div id="privert">
+  	<div id="canvas-div">
+  		<canvas id="myCanvas" onClick="setting()">
+  		</canvas>
+  	</div>	
+  	<div id="info">
+		<div id="myFavFamily">
+ 		</div>
+  	</div>
 	</div>
 
-	<div id="imageSetting">
-		<form id="imgupload">
-		お気に入り写真の登録<br />
-		<br />
-		<!--input type="button" onClick="localImageSet()" value="画像選択" /-->
-		<input id="uploadFile" name="image" type="file" />
+	<div id="setting">
+		<div id="settingMenu">
+			<li id="settingMenu1" onClick="setMenu(1)">名前・誕生日の設定</li>
+			<li id="settingMenu2" onClick="setMenu(2)">写真の登録</li>
+		</div>
 
-		<!--input type="file" id="bphoto" ><br /-->
-
-		<br />
-		<br />
-		<!--input type="submit" onClick="imgStorageSet()" value="登録" /-->
+		<div id="imageSetting">
+			<form id="imgupload">
+			お気に入り写真の登録<br />
+			<br />
+			<input id="uploadFile" name="image" type="file" />
+			<br />
+			<br />
 			<input type="button" onClick="imgStorageSet()" value="登録" />
-		<input type="reset"  onClick="imgStorageClear()" value="クリア"/>
-		</form>
-		<br />
+			<input type="reset"  onClick="imgStorageClear()" value="クリア"/>
+			</form>
+			<br />
+		</div>
+
+		<div id="favSetting">
+			<form>
+			家族の名前、誕生日の設定<br />
+			<input type="text" id="name1" size="12" value="">
+			<input type="text" id="bday1" size="12" value="" readonly="readonly"><br />
+			<input type="text" id="name2" size="12" value="">
+			<input type="text" id="bday2" size="12" value="" readonly="readonly"><br />
+			<input type="text" id="name3" size="12" value="">
+			<input type="text" id="bday3" size="12" value="" readonly="readonly"><br />
+
+			<input type="button" onClick="favInit(1)" value="表示" />
+			<input type="reset"  value="非表示"/>
+			｜<input type="button" onClick="myfavSet()" value="保存" />
+			<input type="button" onClick="myfavDel_all()" value="消去" />
+			</form>
+		</div>
+
+		<div id="settingInfo">
+		（注）端末のブラウザに情報を保存しますので、ブラウザ初期化などにより、情報が消える場合があります。
+		</div>
 	</div>
+	<!-- secret menu end -->
 
-	<div id="favSetting">
-		<form>
-		家族の名前、誕生日の設定<br />
-		<input type="text" id="name1" size="12" value="">
-		<input type="text" id="bday1" size="12" value="" readonly="readonly"><br />
-		<input type="text" id="name2" size="12" value="">
-		<input type="text" id="bday2" size="12" value="" readonly="readonly"><br />
-		<input type="text" id="name3" size="12" value="">
-		<input type="text" id="bday3" size="12" value="" readonly="readonly"><br />
+	<!-- main menu -->
+	<div class="jobmenu" id="menu1" onClick="snd_index('events')"><img class="index_title" src="images/notalone_event_st.png" /></div>
+	<div class="jobmenu" id="menu2" onClick="snd_index('map')"><img class="index_title" src="images/notalone_map_st.png" /></div>
+	<div class="jobmenu" id="menu3" onClick="snd_index('inquiry')"><img class="index_title" src="images/notalone_inquiry_st.png" /></div>
 
-		<input type="button" onClick="favInit(1)" value="表示" />
-		<input type="reset"  value="非表示"/>
-		｜<input type="button" onClick="myfavSet()" value="保存" />
-		<input type="button" onClick="myfavDel_all()" value="消去" />
-		</form>
-	</div>
+	<div id="project" onClick="snd_index('about')"></div>
 
-	<div id="settingInfo">
-	（注）端末のブラウザに情報を保存しますので、ブラウザ初期化などにより、情報が消える場合があります。
-	</div>
-</div>
-
-<div class="jobmenu" id="menu1" onClick="snd_index('events')"><img class="index_title" src="images/notalone_event_st.png" /></div>
-<div class="jobmenu" id="menu2" onClick="snd_index('aidmap')"><img class="index_title" src="images/notalone_map_st.png" /></div>
-<div class="jobmenu" id="menu3" onClick="snd_index('inquiry')"><img class="index_title" src="images/notalone_inquiry_st.png" /></div>
-
-<div id="project" onClick="snd_index('about')"></div>
-
-<div id="dummy"></div>
-
-<div style="text-align:center">
-<!-- Facebook Badge START -->
-<!--a href="https://www.facebook.com/sknono1" title="&#x5e02;&#x6c11;&#x5354;&#x50cd;&#x306e;&#x307e;&#x3061;&#x3065;&#x304f;&#x308a;&#x5e02;&#x6c11;&#x4f1a;&#x8b70;" target="_TOP"><img class="img" src="https://badge.facebook.com/badge/1686844091540821.11364.1037834140.png" style="border: 0px;" alt="" /></a><br /-->
-<!-- Facebook Badge END -->
-</div>
+	<div id="dummy"></div>
+	<!-- main menu end -->
 
 </div>
 <!-- end index_conntiner -->
@@ -152,8 +130,7 @@ ga('send', 'pageview');
 
 <!-- Page Checker (style display:none)-->
 <div id="thispage">index.html</div>
-
-<!--textarea id="result"></textarea-->
+<!-- Page Checker end -->
 
 </body>
 </html>

@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>のとノットアローン｜マップ</title>
+	<link rel="stylesheet" href="../css/notalone.css">
+
+
+        <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+        <!-- Sets initial viewport load and disables zooming  -->
+        <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+
+        <!-- Include the compiled Ratchet CSS -->
+        <link href="css/ratchet.css" rel="stylesheet">
+        <!-- Include the compiled Ratchet JS -->
+        <script src="js/ratchet.js"></script>
+
+        <link href="css/main.css" rel="stylesheet">
+
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <!-- Include googlemaps api -->
+	<script type="text/javascript" src="../js/googlemap_api.js"></script>
+
+        <script src="js/main.js"></script>
+    </head>
+
+    <body onload="initlaize(); map_fit();">
+
+        <!-- Make sure all your bars are the first things in your <body> -->
+        <header class="bar bar-nav">
+	    <div id="top-menu" onClick="top_index()"></div>
+        </header>
+
+        <div class="content">
+            <div id="loading" style="font-color:#ffffff">Now Loading....</div>
+            <div id="map_canvas" style="width:100%; height:480px;"></div>
+        </div>
+
+	<div id="displayArea1">
+	    <div class="areaMenu">
+		<li class="tabmap" id="map_tab1" onClick="mapNameClear()">クリア</li>
+		<li class="tabmap" id="map_tab2" onClick="showMapPins(); saveSetMap();">選択</li>
+		<li class="tabmap" id="map_tab4" onClick="mapMenu(0)">閉じる</li>
+	    </div>
+
+	    <div id="mapSelecter">
+		【マップの選択】<br />
+		*屋内で遊べるところ<br />
+		<label><input type="checkbox" id="mapName1" value="1">児童館、図書館、公民館、他</label>(<label><input type="checkbox" id="mapName1_label" value="1">ラベル無</label>)<br />
+		*屋外で遊べるところ<br />
+		<label><input type="checkbox" id="mapName2" value="2">公園、他</label>(<label><input type="checkbox" id="mapName2_label" value="2">ラベル無</label>)<br />
+		*飲食店・お弁当スポット<br />
+		<label><input type="checkbox" id="mapName3" value="3">お茶やご飯がしやすいところ</label>(<label><input type="checkbox" id="mapName3_label" value="3">ラベル無</label>)<br />
+		<label><input type="checkbox" id="mapName4" value="4">病院・学校・保育所、幼稚園、他</label>(<label><input type="checkbox" id="mapName4_label" value="4">ラベル無</label>)<br />
+		<label><input type="checkbox" id="mapName5" value="5">病児・病後児保育・一時預かり</label>(<label><input type="checkbox" id="mapName5_label" value="5">ラベル無</label>)<br />
+		*道の駅、赤ちゃんの駅、他<br />
+		<label><input type="checkbox" id="mapName6" value="6">トイレ休憩なら</label>(<label><input type="checkbox" id="mapName6_label" value="6">ラベル無</label>)<br />
+		<label><input type="checkbox" id="mapName7" value="7">プレミアム・パスポートの使えるところ</label>(<label><input type="checkbox" id="mapName7_label" value="7">ラベル無</label>)<br />
+
+	    </div>
+	</div>
+
+	<div id="displayArea2">
+
+	    <div class="areaMenu">
+		<li class="tabfav" id="set_tab2" onClick="selectPosition(); mapMenu(0);">中央変更</li>
+		<li class="tabfav" id="set_tab12" onClick="preSetSave()">お好み登録</li>
+		<li class="tabfav" id="set_tab11" onClick="preSetClear()">お好み削除</li>
+		<li class="tabfav" id="set_tab10" onClick="mapMenu(0)">閉じる</li>
+	    </div>
+
+	    <div id="mapPosition">
+		【中央位置の変更】<br />
+		　<label><input type="radio" name="center" id="default" value="default">初期位置</label><br />
+		　<label><input type="radio" name="center" id="pre1set" value="pre1set">お好み１：<span id="pre1setlabel"></span></label><br />
+		　<label><input type="radio" name="center" id="pre2set" value="pre2set">お好み２：<span id="pre2setlabel"></span></label><br />
+		　<label><input type="radio" name="center" id="gpsset" value="gpsset">現在位置</label><br />
+	    </div>
+
+
+	    <div id="favoSetting">
+		<hr class="optHr" />
+		【お好み位置の登録・削除】<br />
+		<label><input type="radio" name="favo" id="favo1" value="pre1set">お好み１：
+			名前<input type="text" class="prelabel" id="pre1setinput" value="">
+		</label><br />
+		<label><input type="radio" name="favo" id="favo2" value="pre2set">お好み２：
+			名前<input type="text" class="prelabel" id="pre2setinput" value="">
+		</label><br />
+	    </div>
+
+	    <div>
+		<b>◻︎登録の手順</b><br />
+		①お好みの位置をダブルクリックする<br />
+		　（お好みの位置がマップの中央に移動する）<br />
+		②お好み１、または２をチェックする<br />
+		③名前を入力する<br />
+		④「お好み登録」ボタンをクリックする<br />
+		<b>◻︎削除の手順</b><br />
+		①お好み１、または２をチェックする<br />
+		②「お好み削除」ボタンをクリックする<br />
+	    </div>
+
+	</div>
+
+	<div id="displayArea3">
+	</div>
+
+	<div id="displayArea4">
+
+	    <div class="areaMenu">
+		<li class="tabopt" id="set_tab1" onClick="defaultSet()">初期状態</li>
+		<li class="tabopt" id="set_tab2" onClick="selectPosition(); mapMenu(0);">設定変更</li>
+		<li class="tabopt" id="set_tab12" onClick="pcWindowOpen()">PC表示</li>
+		<li class="tabopt" id="set_tab3" onClick="mapMenu(0)">閉じる</li>
+	    </div>
+
+	    <div id="setSetting">
+		【中央位置マーカー】<br />
+		　<label><input type="checkbox" id="cMarkerView" value="1">中央位置マーカーを表示する</label><br />
+		【アイコンのドラッグ機能】<br />
+		　<label><input type="checkbox" id ="mapIconDrag" value="1">ドラッグ機能を有効にする</label><br />
+		　＋<label><input type="checkbox" id="mapIconMove"  value="1">アイコンの位置を移動する</label><br />
+		　＋<label><input type="checkbox" id="labelMove"   value="1">ラベルの位置を移動する</label><br />
+		【ラベル】<br />
+		　<label><input type="checkbox" id="labelView"   value="1">ラベルを表示する</label>
+	    </div>
+
+	    <div id="option">
+		<hr class="optHr" />
+		【PC表示】<br />
+		・現在表示しているマップをPC（パソコン）画面のサイズで表示します。<br />
+		・ただし、表示されるマーカーや情報などは一部異なります。<br />
+		・PC画面用のマップは、別ウィンドウに表示されます。<br />
+		・スマートフォン等のモバイル端末でPC表示を行う場合、エラーとなる可能性があります。<br />
+	    </div>
+	</div>
+
+	<div id="selectArea">
+		<li class="tabmenu" id="tab2" onClick="mapMenu(2)">位置設定</li>
+		<li class="tabmenu" id="tab1" onClick="mapMenu(1)">マップ選択</li>
+		<!--li class="tabmenu" id="tab3" onClick="mapMenu(3)">登録</li-->
+		<li class="tabmenu" id="tab4" onClick="mapMenu(4)">Option</li>
+	</div>
+
+    </body>
+</html>
+
+
+<script type="text/javascript">
+//** for ver.up ***
+function mapMenu(job){
+
+	var tabname  = "#tab";
+	var areaname = "#displayArea";
+	for(var i = 1 ; i <= 4 ; i++){
+		$(tabname + i).css({
+			"background" : "white",
+			"border-top" : "solid 1px #DCDCDC"
+		});
+		$(areaname + i).hide("blind", "", 1000 );
+	}
+
+	if(job == 0){
+		return;
+	}else if(job == 3 && CENTERVIEW == false){
+		//お好みの登録の場合、センターに中心マーカーを強制的に表示する
+		if(confirm("中心マーカーを表示します")){
+			now_markerVisible();
+		}else{
+			return;
+		}	
+	}
+
+	$(tabname + job).css({
+		"background" : "lightyellow",
+		"border-top" : "dashed 1px #DCDCDC"
+	});
+	$(areaname + job).show("blind", "", 1000 );
+}
+
+
+var mapCount = 　7;	//マップの数
+function mapNameClear(){
+	//var idn = "#mapName";
+	var idn = mapSelectId;
+
+	for(var i = 1 ; i <= mapCount ; i++){
+		$(idn + i).prop("checked",false);
+		$(idn + i + "_label").prop("checked",false);
+	}
+
+	clearMapPins();	
+
+	localStorage.setItem("SetMapNo", "");
+}
+
+
+//var mapNo;		//外部名
+//var googlemap;	//外部名
+var mapSelectId = "#mapName";
+function showMapPins(){
+
+	var mapSelect = 0;
+
+	clearMapPins();
+
+	//var checkid = "#mapName";
+	var checkid = mapSelectId;
+
+	for(var i = 1 ; i <= mapCount ; i++){
+		if($(checkid + i).prop("checked")){
+			mapNo = i;
+			pushPins(googlemap);
+			mapSelect ++;
+		}
+ 	}
+
+	if(mapSelect == 0){
+		alert("マップが選択されていません");
+	}else{
+		mapMenu(0);
+	}
+}
+
+
+//保存したマップ番号を読み出し、マップ選択に設定。初期マップを表示する
+function loadSetMap(cb){
+	//**************
+	var mapflg = localStorage.getItem("SetMapNo");
+
+	if(mapflg==null){
+		return;
+	}
+
+	var maplist = mapflg.split(",");
+	var labelflg;
+	for(var i = 0 ; i < maplist.length ; i++){
+
+		//不要なデータを無視
+		if(maplist[i] == ""){
+			continue;
+		}
+
+		//mapNo = maplist[i];
+		labelflg = maplist[i].split(":");
+		mapNo = labelflg[0];	//マップの番号
+		//マップ選択にチェックを入れる
+		$(mapSelectId + mapNo).prop("checked",true);
+
+		//ラベルの表示状態にチェックを入れる
+		if(labelflg[1] && labelflg[1] == "true"){
+			//非表示
+			$(mapSelectId + mapNo + "_label").prop("checked",true);
+		}else{
+			//表示
+			$(mapSelectId + mapNo + "_label").prop("checked",false);
+		}
+	}
+
+	//マップを表示する
+	showMapPins()
+
+	return cb();
+}
+
+//選択したマップ番号とラベルの表示非表示を保存する
+function saveSetMap(){
+	var mapflg = "";
+
+	for(var i = 1 ; i <= mapCount ; i++){
+		if($(mapSelectId + i).prop("checked")){
+			//mapflg += i + ",";
+			mapflg += i + ":";
+			if($(mapSelectId + i + "_label").prop("checked")){
+				mapflg += "true,";	//非表示
+			}else{
+				mapflg += "false,";	//表示
+			}
+		}
+	}
+
+	localStorage.setItem("SetMapNo", mapflg);
+}
+
+//お好み１、２の登録
+function preSetSave(){
+	var set = $("input[name=favo]:checked").val();
+
+	if(set != "pre1set" && set != "pre2set"){
+		alert("お好み１、または２が選択されていません");
+		return;
+	}
+
+	var olabel = (set == "pre1set") ? "お好み１" : "お好み２"; 
+	var center = (set == "pre1set") ? "#pre1set" : "#pre2set";
+	var label = $("#" + set + "input").val();
+
+	if(label == ""){
+		alert("名前を入力してください");
+		return;
+	}
+
+	//*******
+	var itemLat = set + "Lat";
+	var itemLng = set + "Lng";
+	var itemLabel = set + "Label";
+
+	//現在情報の確認
+	var nlat = localStorage.getItem(itemLat);
+	var nlng = localStorage.getItem(itemLng);
+	var nlabel = localStorage.getItem(itemLabel);
+
+	//if(nlabel == null) nlabel = "未登録";
+
+	if(nlat != "" || nlng != "" || nlabel != ""){
+		if(confirm(olabel + "を「" + label + "」に更新します")){
+		}else{
+			$("#" + set + "input").val(nlabel);
+			return;
+		} 
+	}
+	
+	//var pos = now_marker.getPosition();	//中央マーカーの位置を登録する
+	var pos = googlemap.getCenter();	//マップの中心を登録する
+	var lat = pos.lat();
+	var lng = pos.lng();
+	//var label = $("#" + set + "label").val();
+
+	localStorage.setItem(itemLat ,lat);
+	localStorage.setItem(itemLng ,lng);
+	localStorage.setItem(itemLabel , label);
+
+	localStorage.setItem("MapPosition", set);
+
+	setPosition(lat,lng);
+
+
+	$(center).prop("checked",true);
+	$("#" + set + "label").html(label);
+
+	//alert("お好みの場所「" + label +"」を登録しました");
+}
+
+//お好み１、２のクリア
+function preSetClear(){
+	var set = $("input[name=favo]:checked").val();
+
+	if(set != "pre1set" && set != "pre2set"){
+		alert("お好み１、または２が選択されていません");
+		return;
+	}
+
+	var olabel = (set == "pre1set") ? "お好み１" : "お好み２"; 
+
+	//*******
+	var itemLat = set + "Lat";
+	var itemLng = set + "Lng";
+	var itemLabel = set + "Label";
+
+	//現在情報の確認
+	var nlat = localStorage.getItem(itemLat);
+	var nlng = localStorage.getItem(itemLng);
+	var nlabel = localStorage.getItem(itemLabel);
+
+	if(nlat == null || nlng == null || nlabel == null){
+		alert(olabel + "の登録がありません");
+		return;
+	}
+	
+
+	if(confirm(olabel + "の登録情報をクリア（削除）します")){
+	}else{
+		return;
+	} 
+
+	//現在キーの削除
+	localStorage.removeItem(itemLat);
+	localStorage.removeItem(itemLng);
+	localStorage.removeItem(itemLabel);
+
+	//setPosition(lat,lng);
+
+	$("#" + set + "input").val("");
+	$("#" + set + "label").html("");
+
+	//default
+	$("#default").prop("checked",true);
+	selectPosition();
+}
+
+//初期設定値に戻す
+function defaultSet(){
+	locflg = "default";
+	CENTERVIEW = DEFAULT_CENTERVIEW;
+	DRAGGABLE  = DEFAULT_DRAGGABLE;
+	ICONMOVE   = DEFAULT_ICONMOVE;
+	LABELVIEW  = DEFAULT_LABELVIEW;
+	LABELMOVE  = DEFAULT_LABELMOVE;
+
+	//マップの中心初期状態
+	$("#default").prop("checked" , true);
+
+
+	//中央マーカーの初期状態
+	if(CENTERVIEW == true){
+		$("#cMarkerView").prop("checked",true);
+		now_markerVisible();
+	}else{
+		$("#cMarkerView").prop("checked",false);
+		now_markerHidden();
+	}
+
+	//アイコンのドラッグの初期状態
+	if(DRAGGABLE == true){
+		$("#mapIconDrag").prop("checked",true);
+		iconDragTrue();
+	}else{
+		$("#mapIconDrag").prop("checked",false);
+		iconDragFalse();
+	}
+
+	//アイコン移動の初期状態
+	if(ICONMOVE == true){
+		$("#mapIconMove").prop("checked",true);
+		iconMoveTrue();
+	}else{
+		$("#mapIconMove").prop("checked",false);
+		iconMoveFalse();
+	}
+
+	//ラベル表示の初期状態
+	if(LABELVIEW == true){
+		$("#labelView").prop("checked",true);
+		labelViewTrue();
+	}else{
+		$("#labelView").prop("checked",false);
+		labelViewFalse();
+	}
+
+	//ラベル移動の初期状態
+	if(LABELMOVE == true){
+		$("#labelMove").prop("checked",true);
+		labelMoveTrue();
+	}else{
+		$("#labelMove").prop("checked",false);
+		labelMoveFalse();
+	}
+
+	selectPosition();
+}
+
+var win;
+function pcWindowOpen(){
+	if(!win || win.closed){
+	}else{
+		win.close();
+	}
+
+	var features = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes";
+	win = window.open("pcwindow.html", "pcWindow", features);
+
+}
+
+
+//** notalone *****
+var TopHeight = 30;				//トップメニューの縦幅
+	$("#top-menu").height(TopHeight);
+	$("#top-menu").css({"line-height" : TopHeight + "px"});
+
+
+	//****for index.html *******
+	$("#menu-back").height(TopHeight);
+	$("#menu-back").css({"line-height" : TopHeight + "px"});
+
+//topメニュー
+function top_index(){
+	location.href = "../index.html";
+}
+
+//******************
+
+function map_fit(){
+	//ブラウザの縦サイズにフィットさせる
+	//上下に設置するdiv縦幅
+	var ajust = 66;
+	//var ajust = 50;
+	$('#map_canvas').css({
+		'height' : (window.innerHeight - ajust) + "px",
+		'width'  : window.innerWidth + "px"
+	});
+
+}
+
+//window risize 時の処理
+$(window).resize(function(){
+	map_fit();
+});
+
+//****** システム設定情報 *********
+var settingArray = new Array(); 	//２次元：連想配列
+
+//****** カテゴリアイコン対応 ******
+var iconArray = new Array(); 		//２次元：連想配列
+
+/***  categoryicon csv format 変換テーブル  ****/
+var Cat_name  = "category";	  	//
+var Def_dir   = "default_directory";	//
+var Def_icon  = "default_icon";		//
+var Big_dir   = "big_directory";	//
+var Big_icon  = "big_icon";		//
+var Zoom_level= "zoom_level";		//
+/*********/
+
+//CategoryIcon tableの読み込み
+//var table = "../localhost/categoryicon.csv";
+//readCategoryIcon(table);
+
+
+//****** 複数マップの対応機能 ******
+
+var mapNo;
+
+/*
+//マップの選択
+var mapNo = 1;
+var initf = 1;
+$('#mapSelecter').change(function(){
+	$('#mapSelecter option:selected').each(function(){
+		mapNo = parseInt($(this).val());
+	});
+	//alert(mapNo);
+
+
+	//*************
+	//if(mapNo == 6){
+	//	alert("ただいま準備中です");
+	//	return false;
+	//}
+	//*************
+
+	if(mapNo == 0){
+		clearMapPins();
+	}else if(initf == 1){
+		//マップ初期起動時はスルーする
+		initf = 0;
+	}else{
+		pushPins(googlemap);
+	}
+
+}).change();
+*/
+
+//マーカー情報保存用の配列
+//var markersArray = new google.maps.MVCArray();
+var markersArray = new Array();
+function clearMapPins(){
+	//markersArray.forEach(function (marker, idx) { marker.setMap(null); });
+	var len = markersArray.length;
+	for(var i=0  ; i < len ; i++){
+		markersArray[i].setMap(null);
+	}
+	markersArray = new Array();
+
+	mapPinsArray = new Array();
+
+	clearStrings();
+
+	clearCategorys();
+}
+
+//ピン情報補助（カテゴリーアイコン）用の配列
+var categorysArray = new Array();
+
+function clearCategorys(){
+	categorysArray = new Array();
+}
+
+
+//個別マップ対応テーブル
+var _MapTable;
+var _DefPin;
+var _BigPin;
+
+var _Category;
+var _1st_id;
+var _2nd_id;
+var _Name;
+var _Address;
+var _Tel1;
+var _Tel2;
+var _Url;
+var _Opentime;
+var _Restdates;
+var _Description1;
+var _Description2;
+var _Lat;
+var _Lng;
+
+var _Diaper;
+var _Zasiki;
+var _Parking;
+
+var _Area;
+var _Display;
+
+var _Opentime_name;
+var _Restdates_name;
+var _Diaper_name;
+var _Zasiki_name;
+var _Parking_name;
+
+function mapConvertTable(mapNo){ 
+
+	switch(mapNo){
+
+		//児童館、図書館、公民館、他（屋内で遊べるところ）
+		case 1 :
+	
+		_MapTable	= '../uploads/mapinfo/asoberu_in.csv';
+		_DefPin		= 'icons/pink-pushpin.png';
+		_BigPin		= '';
+
+		_Category 	= 'category';
+		_Name 		= 'name';
+		_Address	= 'address';
+		_Tel1		= 'phone1';
+		_Tel2		= 'phone2';
+		_Url		= 'URL';
+
+		_Opentime	= 'hours';
+		_Opentime_name =  '開館';
+		_Restdates	= 'closing';
+		_Restdates_name = '休館';
+		_Description1	= 'memo1';
+		_Description2	= 'memo2';
+		_Diaper		= 'diaper';
+		_Diaper_name   = 'オムツ交換台';
+
+		_Zasiki	        = '';
+		_Zasiki_name    = '';
+		_Parking        = '';
+		_Parking_name   = '';
+
+		_Lat		= 'lat';
+		_Lng		= 'lng';
+
+		_Area		= 'area';
+		_Display	= 'display';
+
+       		break;
+
+		//公園、他（屋外で遊べるところ）
+		case 2 :
+	
+		_MapTable	= '../uploads/mapinfo/asoberu_out.csv';
+		_DefPin		= 'icons/ltblu-pushpin.png';
+		_BigPin		= '';
+
+		_Category 	= 'category';
+		_Name 		= 'name';
+		_Address	= 'address';	//address 必須固定名
+		_Tel1		= 'phone1';
+		_Tel2		= 'phone2';
+		_Url		= 'URL';
+
+		_Opentime	= 'hours';
+		_Opentime_name  = '';
+		_Restdates	= 'closing';
+		_Restdates_name = '';
+		_Description1	= 'memo1';
+		_Description2	= 'memo2';
+		_Diaper		= 'diaper';
+		_Diaper_name    = 'オムツ交換台';
+
+		_Zasiki	        = '';
+		_Zasiki_name    = '';
+		_Parking        = '';
+		_Parking_name   = '';
+
+		_Lat		= 'lat';	//lat 必須固定名
+		_Lng		= 'lng';	//lng 必須固定名
+
+		_Area		= 'area';
+		_Display	= 'display';
+
+       		break;
+
+		//お茶やご飯がしやすいところ（飲食店・お弁当スポット）
+		case 3 :
+	
+		_MapTable	= '../uploads/mapinfo/cafe.csv';
+		_DefPin		= 'icons/green-pin.png';
+		_BigPin		= '';
+
+		_Category 	= 'category';
+		_Name 		= 'name';
+		_Address	= 'address';
+		_Tel1		= 'phone1';
+		_Tel2		= 'phone2';
+		_Url		= 'URL';
+		_Opentime	= 'hours';
+		_Opentime_name  = '営業'; 
+		_Restdates	= 'closing';
+		_Restdates_name = '定休';
+		_Description1	= 'memo1';
+		_Description2	= 'memo2';
+		_Diaper		= 'diaper';
+		_Diaper_name   = 'オムツ交換台';
+
+		_Zasiki	        = 'zasiki';
+		_Zasiki_name    = '座敷';
+		_Parking        = 'parking';
+		_Parking_name   = '駐車場';
+
+		_Lat		= 'lat';
+		_Lng		= 'lng';
+
+		_Area		= 'area';
+		_Display	= 'display';
+
+       		break;
+
+		//病院・学校・保育所、幼稚園、他
+		case 4 :
+
+		_MapTable	= '../uploads/mapinfo/school_hospital.csv';
+		_DefPin		= 'icons/yellow-pin.png';
+		_BigPin		= '';
+
+		_Category 	= 'category';
+		_Name 		= 'name';
+		_Address	= 'address';
+		_Tel1		= 'phone1';
+		_Tel2		= 'phone2';
+		_Url		= 'URL';
+		_Opentime	= 'hours';
+		_Opentime_name  = '開館';
+		_Restdates	= 'closing';
+		_Restdates_name = '休館';
+		_Description1	= 'memo1';
+		_Description2	= 'memo2';
+		_Diaper		= 'diaper';
+		_Diaper_name   = 'オムツ交換台';
+
+		_Zasiki	        = '';
+		_Zasiki_name    = '';
+		_Parking        = '';
+		_Parking_name   = '';
+
+		_Lat		= 'lat';
+		_Lng		= 'lng';
+
+		_Area		= 'area';
+		_Display	= 'display';
+
+		break;
+
+		//病児・病後児保育・一時預かり
+		case 5 :
+
+		_MapTable	= '../uploads/mapinfo/kidscare.csv';
+		_DefPin		= 'icons/blue-pin.png';
+		_BigPin		= '';
+
+		_Category 	= 'category';
+		_Name 		= 'name';
+		_Address	= 'address';
+		_Tel1		= 'phone1';
+		_Tel2		= 'phone2';
+		_Url		= 'URL';
+		_Opentime	= 'hours';
+		_Opentime_name  = '開館';
+		_Restdates	= 'closing';
+		_Restdates_name = '休館';
+		_Description1	= 'memo1';
+		_Description2	= 'memo2';
+		_Diaper		= 'diaper';
+		_Diaper_name   = 'オムツ交換台';
+
+		_Zasiki	        = '';
+		_Zasiki_name    = '';
+		_Parking        = '';
+		_Parking_name   = '';
+
+		_Lat		= 'lat';
+		_Lng		= 'lng';
+
+		_Area		= 'area';
+		_Display	= 'display';
+
+		break;
+
+
+		//トイレ休憩なら（道の駅、赤ちゃんの駅、他）
+		case 6 :
+	
+		_MapTable	= '../uploads/mapinfo/toilet.csv';
+		_DefPin		= 'icons/yellow-pin.png';
+		_BigPin		= '';
+
+		_Category 	= 'category';
+		_Name 		= 'name';
+		_Address	= 'address';
+		_Tel1		= 'phone1';
+		_Tel2		= 'phone2';
+		_Url		= 'URL';
+		_Opentime	= 'hours';
+		_Opentime_name  = '';
+		_Restdates	= 'closing';
+		_Restdates_name = '';
+		_Description1	= 'memo1';
+		_Description2	= 'memo2';
+		_Lat		= 'lat';
+		_Lng		= 'lng';
+
+		_Diaper		= 'diaper';
+		_Diaper_name    = 'オムツ交換台';
+
+		_Zasiki	        = '';
+		_Zasiki_name    = '';
+		_Parking        = '';
+		_Parking_name   = '';
+
+		_Area		= 'area';
+		_Display	= 'display';
+
+       		break;
+
+		//プレミアム・パスポートの使えるところ
+		case 7 :
+	
+		_MapTable	= '../uploads/mapinfo/openData_prepass.csv';
+		_DefPin		= 'icons/red_pin.png';
+		_BigPin		= '';
+
+		_Category 	= '';
+		_1st_id		= 'co_id';
+		_2nd_id		= 'shop_id';
+		_Name 		= 'name';
+		_Address	= 'address';
+		_Tel		= 'phone';
+		_Url		= 'url';
+		_Opentime	= 'servicetime';
+		_Restdates	= 'holiday';
+		_Description	= 'prepass';
+		_Lat		= 'lat';
+		_Lng		= 'lng';
+
+       		break;
+	}
+}
+
+function mapMakeInfo(mapNo,data){
+	switch(mapNo){
+		case 1 :
+		case 2 :
+		case 3 :
+		case 4 :
+		case 5 :
+		case 6 :
+		case 7 :
+
+            var html = "";
+            html +="<div style='width:150px;padding:0px;line-height:140%;'>";
+
+	    //googlemapのルート検索起動
+	    html += "<input type='button' style='font-size:12px;' onClick='googleRoot(" + data[_Lat] + "," + data[_Lng] + ")' value='ルート検索'><br />";
+
+	    if(data[_Category]){
+            	html += data[_Category] + "<br />"; }
+
+	    if(data[_Url]){
+		html += "<a href='" + data[_Url] + "' target='_blank'>";
+		html += "<b>" + data[_Name] + "</b></a><br />";
+	    }else{
+	    	html += "<b>" + data[_Name] + "</b><br />";
+	    }
+
+            //html += "<dl>";
+	    if(data[_Address]){
+		html += data[_Address] + "<br />"};
+            if(data[_Tel1]){
+		html += data[_Tel1] + "<br />"};
+	    if(data[_Tel2]){
+		html += data[_Tel2] + "<br />"};
+
+	    if(data[_Opentime]){
+		html += "【" + _Opentime_name + "】" + data[_Opentime] + "<br />"};
+	    if(data[_Restdates]){
+		html += "【" + _Restdates_name + "】" + data[_Restdates] + "<br />"};
+	    if(data[_Diaper]){
+		html += "【" + _Diaper_name + "】" + data[_Diaper] + "<br />"};
+
+	    if(data[_Zasiki]){
+		html += "【" + _Zasiki_name + "】" + data[_Zasiki] + "<br />"};
+	    if(data[_Parking]){
+		html += "【" + _Parking_name + "】" + data[_Parking] + "<br />"};
+
+	    if(data[_Description1]){
+		html += data[_Description1] + "<br />"};
+	    if(data[_Description2]){
+		html += data[_Description2] + "<br />"};
+	    if(data[_Area]){
+		html += data[_Area] + "㎡<br />"};
+
+            html += "</div>";
+
+	    //***********
+
+		break;
+
+	}
+
+	return html;
+}
+
+
+function googleRoot(lat,lng){
+	var url = "http://maps.google.com/maps?";
+	url += "daddr=" + lat + "," + lng + "&saddr=現在地&dirflg=d";
+
+	if(!win || win.closed){
+	}else{
+		win.close();
+	}
+
+	var features = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes";
+
+	win = window.open(url, "googleroot", features);
+}
+
+//プレパス、赤ちゃんの駅　画像取得用 （未使用）
+function getSpotImage(coid, ofid)
+{
+	var url = "http://www.i-oyacomi.net/prepass/upimages/" + coid + ofid + "ofPic1_small.jpg";
+	var img = new Image();
+    	img.src = url;
+
+	if(img.height > 0){
+        	return url;
+	}else{
+		return "";
+	}
+}
+</script>

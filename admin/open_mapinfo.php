@@ -1,7 +1,7 @@
 <?php
 include_once("include.php");
 
-$ThisFile   = "cont_mapinfo.php";
+$ThisFile   = "open_mapinfo.php";
 
 //使用するテキストDB
 if(isset($_GET['dir'])){
@@ -49,15 +49,21 @@ $DataString = csvDatabaseRead($db_Table,1);
 
 <title>能登ノットアローン｜オープンデータ</title>
 
-<link rel="stylesheet" href="../css/csvdatabase.css">
+<link rel="stylesheet" href="../css/csvdatabase2.css">
 
 <script type="text/javascript" src="../js/jquery-1.11.3.min.js"></script>
-<script type="text/javascript" src="../js/csvdatabase.js"></script>
+<script type="text/javascript" src="../js/csvdatabase2.js"></script>
 <script type="text/javascript" src="../js/sha256.js"></script>
+
+<script type="text/javascript" src="../js/setting.js"></script>
 
 <!--googlemaps api-->
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-<script src="http://maps.googleapis.com/maps/api/js?libraries=geometry,drawing&sensor=false"></script> 
+
+<!-- Include googlemaps api -->
+<script type="text/javascript" src="../js/googlemap_api.js"></script>
+
+
 <script type="text/javascript">
 
 //DataShow Mode Check
@@ -89,6 +95,27 @@ print("var DataTable ='" . $db_Table . "';" );
 print("var DataArray =" . $DataString  );
 ?>
 
+//**************
+// 呼び出し側のｐｈｐファイルで定義
+//フィールドの幅確保
+var Field_etc = new Array();
+Field_etc['no']         = 50;
+Field_etc['display']    = 50;
+Field_etc['list_no']    = 50;
+Field_etc['category']   = 100;
+Field_etc['name']       = 150;
+Field_etc['address']    = 200;
+Field_etc['lat']        = 150;
+Field_etc['lng']        = 150;
+Field_etc['memo']       = 200;
+Field_etc['memo1']      = 200;
+Field_etc['memo2']      = 200;
+Field_etc['phone']      = 100;
+Field_etc['phone1']      = 100;
+Field_etc['phone2']      = 100;
+//**************
+
+
 
 //**************
 
@@ -108,7 +135,8 @@ function locationInit(){
 
 	$('#data_count').html(buff);
 
-	ShowData();		//データの読み込みと表示
+	init();
+	//ShowData();		//データの読み込みと表示
 	locationGetLatLng();	//マップの初期設定
 }
 
@@ -120,9 +148,8 @@ function setOption(){
 
 function locationGetLatLng(){
 	//sub/js/main/js　で定義
-	//どこかで設定ファイルの作成が必要
-	var DEFAULT_LAT = 37.390556;
-    	var DEFAULT_LNG = 136.899167;
+	//var DEFAULT_LAT = 37.390556;
+    	//var DEFAULT_LNG = 136.899167;
 
 	showGoogleMap(DEFAULT_LAT,DEFAULT_LNG);
 }
