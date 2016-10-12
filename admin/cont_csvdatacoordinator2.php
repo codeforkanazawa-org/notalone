@@ -1,7 +1,7 @@
 <?php
 include_once("include.php");
 
-$ThisFile   = "cont_csvdatacoodinator.php";
+$ThisFile   = "cont_csvdatacoodinator2.php";
 //$NextFile   = $_SESSION["NextJob"];
 //$ReturnFile = $_SESSION['CallJob'];
 //$Case1File  = "common_user_append.php";  	//ユーザ登録なしの場合のアクセスファイル名
