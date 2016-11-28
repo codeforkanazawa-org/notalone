@@ -153,7 +153,7 @@ function brows_init(){
 	$("#privert").height(PrivertHeight);
 	$("#privert").css("display" , "none");	//初期非表示
 
-	var MenuHeight = ( DeviceHeight - TopHeight - ImageHeight ) / 3;
+	var MenuHeight = ( DeviceHeight - TopHeight - ImageHeight ) / 3.5;
 
 	$(".jobmenu").height(MenuHeight);
 	$(".jobmenu").css({"line-height" : MenuHeight + "px"});
