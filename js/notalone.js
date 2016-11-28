@@ -143,12 +143,12 @@ function brows_init(){
 	$("#menu-back").height(TopHeight);
 	$("#menu-back").css({"line-height" : TopHeight + "px"});
 
-	//縦幅 var ritu = 0.5;
-	var ImageHeight  = Math.round(DeviceHeight * 0.58);	//イメージ画像
+	//縦幅 var ritu = 0.58;
+	var ImageHeight  = Math.round(DeviceHeight * 0.5);	//イメージ画像
 	$("#notalone_image").height(ImageHeight);
 
-	//縦幅 var ritu = 0.35;
-	var PrivertHeight  = Math.round(DeviceHeight * 0.58);	//個人情報欄の縦幅確保
+	//縦幅 var ritu = 0.58;
+	var PrivertHeight  = Math.round(DeviceHeight * 0.5);	//個人情報欄の縦幅確保
 	var PhotoPadding = 5;				//個人情報　写真の余白
 	$("#privert").height(PrivertHeight);
 	$("#privert").css("display" , "none");	//初期非表示
