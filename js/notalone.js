@@ -100,13 +100,15 @@ var DeviceWidth;
 var DeviceHeight;
 var CalendarToolHeight;
 
+var TopHeight = 30;	//トップメニューの縦幅
+
 function brows_init(){
 
 	//共通部の設定****************
 	//for menu
 	DeviceWidth     = window.innerWidth;	//ブラウザの横幅、スマホの横幅
 	DeviceHeight   = window.innerHeight;	//ブラウザの縦幅、スマホの縦幅
-	var TopHeight = 30;			//トップメニューの縦幅
+	//var TopHeight = 30;			//トップメニューの縦幅
 	var PcWidth = 480;			//パソコンの場合の横幅
 	//*****************************
 
@@ -203,11 +205,11 @@ function brows_init(){
 		"width"  : BodyWidth,
 		"font-size" : "14px",
 		"background-color" : "#F5F5F5",
-		"z-index"  : 1 
+		"z-index"  : 1
 	});
 
 	//customMonthButton 初期非表示
-	$('.fc-myCustomMonth-button').css({'visibility':'hidden'});
+	$('.fc-myCustomMonth-button').css({'visibility':'hidden'}); 
 
 	//イベント欄ダミーの高さ(px)
 	$("#dummy").height(DeviceHeight);
@@ -234,8 +236,19 @@ function brows_init(){
 	var MapHeight = (BodyHeightMath - MapAjast - TopHeight); 
 
 	//map_area の表示位置を動的に調整
+	if($("#map_area").css('visibility') =='visible'){
+		//表示されている時
+		var nowHeight = TopHeight;
+	}else{
+		//非表示の時
+		var nowHeight = DeviceHeight;
+	}
+
 	$("#map_area").css({
-		"top"    : TopHeight,
+		//"top"    : TopHeight,
+		//"top"    : DeviceHeight,
+		"top"    : nowHeight,
+
 		"left"   : BodyLeftMargin,
 		"width"  : MapWidth,
 		"height" : MapHeight
@@ -280,16 +293,27 @@ function brows_init(){
 	var MapHeight = (BodyHeightMath - MapAjast - TopHeight); 
 
 	//map_area の表示位置を動的に調整
+	if($("#map_area").css('visibility') =='visible'){
+		//表示されている時
+		var nowHeight = TopHeight;
+	}else{
+		//非表示の時
+		var nowHeight = DeviceHeight;
+	}
+
 	$("#map_area").css({
-		"top"    : TopHeight,
+		//"top"    : TopHeight,
+		//"top"    : DeviceHeight,
+		"top"    : nowHeight,
+
 		"left"   : BodyLeftMargin,
 		"width"  : MapWidth,
-		"height" : MapHeight
+		"height" : MapHeight,
 	});
 	$("#map_canvas").css({
-		//"width"  : "100%",
+		//"width"  : "50%",
 		"width"  : MapWidth,
- 		"height" : MapHeight - 30
+ 		"height" : MapHeight - 30,
 	});
 
 
@@ -954,6 +978,7 @@ function getLocationAreaName(where){
 }
 
 
+var mapCanvas;	//googlemap canvas
 
 var now_marker;		//位置表示用マーカー
 var now_infowindow;	//インフォウインドウ
@@ -979,6 +1004,9 @@ function showGoogleMap(initLat, initLng) {
 		zoom: 16,
 
 		center: latlng,
+
+		//２本指でのマップ移動をキャンセル
+		gestureHandling: 'greedy',
 	};
 
         mapCanvas = new google.maps.Map(document.getElementById("map_canvas"), mapOpt);
@@ -1035,14 +1063,20 @@ function eventMap_visible(locationNo){
 	now_marker.setPosition(latlng);
 	mapCanvas.setCenter(latlng);
 
-	$('#map_area').css('visibility' , 'visible');
+	$('#map_area').css({
+		'visibility' : 'visible',
+		'top'        : TopHeight
+	});	
 }
 
 function eventMap_hidden(){
 	//openInfoWindow close
         now_infowindow.close();
 
-	$('#map_area').css('visibility' , 'hidden');
+	$('#map_area').css({
+		'visibility' : 'hidden',
+		'top'        : DeviceHeight
+	});
 }
 
 function Area_setting(){
@@ -2184,13 +2218,19 @@ function inquiryMap_visible(locationNo){
 	now_marker.setPosition(latlng);
 	mapCanvas.setCenter(latlng);
 
-	$('#map_area').css('visibility' , 'visible');
+	$('#map_area').css({
+		'visibility' : 'visible',
+		'top'        : TopHeight
+	});
 }
 
 function inquiryMap_hidden(){
         now_infowindow.close();
 
-	$('#map_area').css('visibility' , 'hidden');
+	$('#map_area').css({
+		'visibility' : 'hidden',
+		'top'        : DeviceHeight
+	});
 }
 
 
