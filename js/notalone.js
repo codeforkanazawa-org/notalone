@@ -7,6 +7,23 @@ $(window).resize(function(){
 });
 //**********************
 
+
+//GETデータの取得
+function getUrlVars(){
+    	var vars = {}; 
+    	var param = location.search.substring(1).split('&');
+    	for(var i = 0; i < param.length; i++) {
+        	var keySearch = param[i].search(/=/);
+        	var key = '';
+        	if(keySearch != -1) key = param[i].slice(0, keySearch);
+        	var val = param[i].slice(param[i].indexOf('=', 0) + 1);
+        	if(key != '') vars[key] = decodeURI(val);
+    	} 
+    	return vars; 
+}
+var getArray = new Array;
+
+
 //実行ページ名の格納変数
 var thispage ="";
 
@@ -37,6 +54,22 @@ function init(){
 
 		init_after();
 	});
+
+
+	//getデータ有無の判断
+	getArray = getUrlVars();
+
+	/*
+	//連想配列の要素数は Object.keys で検出できる
+	if(Object.keys(getArray).length == 0){
+		alert("getデータはありません");
+	}else{
+		for(key in getArray){
+  			alert(key + "：" + getArray[key]) ;
+		}
+	}
+	*/
+
 }
 
 function init_after(){
