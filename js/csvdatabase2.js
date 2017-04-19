@@ -3,9 +3,21 @@
 //conrol width（pxは付けない）
 var Field_up  = 20;
 var Field_dw  = 20;
-var Field_ecd = 120;
+var Field_ecd = 50;
 
 /* 呼び出し側のｐｈｐファイルで定義
+//フィールド構造ファイルの読み出し、または手動で設定
+//フィールド名
+var Fno = new Array();
+Fno[0] = 'no';
+Fno[1] = 'memo';
+
+//フィールドのラベル
+var Flabel = new Array();
+Flabel['no'] = 'No';
+Flabel['eventtitle'] = 'イベントタイトル';
+
+//フィールドの表示幅
 var Field_etc = new Array();
 Field_etc['no']           = 50;
 Field_etc['target_label'] = 200;
@@ -14,6 +26,11 @@ Field_etc['color']        = 80;
 Field_etc['text_color']   = 80;
 Field_etc['icon']         = 150;
 Field_etc['memo']         = 400;
+
+//フィールドの入力タイプ
+var Ftype = new Array();
+Ftype['what']    = "text";
+Ftype['contact'] = "text";
 */
 
 //width 定義のないフィールドの初期値
@@ -40,14 +57,14 @@ function ShowData(){
 	var buff = "";
 
 	if(!ReadOnly){
-		buff += "<input type='button' value='データをファイルに保存する' onClick='Mysave()' >　　";
-		buff += "<input type='button' value='新規追加' onClick='Myappend()' >　";
+		//buff += "<input type='button' value='データをファイルに保存する' onClick='Mysave()' >　　";
+		buff += "<div class='btns'><input type='button' value='項目を新規追加' onClick='Myappend()' ></div>";
 
-		buff += "<input type='button' value='表示条件を設定' onClick='SearchData(1)' >";
+		//buff += "<input type='button' value='表示条件を設定' onClick='SearchData(1)' >";
 	}
 
 
-	//table width の計算
+	//table tr/td width の計算
 	DbTable_width = Field_up + Field_dw + Field_ecd;
 	for(var s = 0 ; s < DataArray[0].length ; s++){
 		if(typeof(Field_etc[DataArray[0][s]]) =="undefined"){
@@ -75,16 +92,30 @@ function ShowData(){
 
 		buff += "<tr>";
 
-		if(!ReadOnly){
-			if(i == 0){
-				//Up Down の列追加
-				buff += "<th width='" + Field_up + "'>Up</th>";
-				buff += "<th width='" + Field_dw + "'>Dw</th>";
-			
+		if(!ReadOnly){//編集の時だけの項目(閲覧時は非出力)
+			if(i == 0){//最初の行
+				
 				//修正、複写、削除の列追加
-				buff += "<th width='" + Field_ecd + "'>処理</th>";
-			}else{
+				buff += "<th class='col_action' width='" + Field_ecd + "'></th>";
 				//Up Down の列追加
+				//buff += "<th width='" + Field_up + "'>Up</th>";
+				//buff += "<th width='" + Field_dw + "'>Dw</th>";
+				buff += "<th class='col_move' width='" + Field_up + "'>順番変更</th>";
+			
+			}else{//2行目以降
+				
+				//修正、複写、削除の列追加
+				//buff += "<td width='" + Field_ecd + "' nowrap >";
+				buff += "<td class='col_action' align='center'>";
+				buff += "<div>";
+				buff += "<input class='btn_ecd' type='button' value='編集' onClick='Myedit(" + i + ")' >";
+				buff += "<input class='btn_ecd btn2' type='button' value='複製' onClick='Mycopy(" + i + ")' >";
+				buff += "<input class='btn_ecd btn_negative' type='button' value='削除' onClick='Mydele(" + i + ")' >";
+				buff += "</div>";
+				buff += "</td>";
+				
+				//Up Down の列追加
+				/*
 				if( i == 1){
 					buff += "<td align='center' width='" + Field_up + "'></td>";
 				}else{
@@ -106,13 +137,14 @@ function ShowData(){
 					}
 					buff += "</td>";
 				}
-
-				//修正、複写、削除の列追加
-				//buff += "<td width='" + Field_ecd + "' nowrap >";
-				buff += "<td align='center' nowrap>";
-				buff += "<input class='btn_ecd' type='button' value='修正' onClick='Myedit(" + i + ")' >";
-				buff += "<input class='btn_ecd' type='button' value='複製' onClick='Mycopy(" + i + ")' >";
-				buff += "<input class='btn_ecd' type='button' value='削除' onClick='Mydele(" + i + ")' >";
+				*/
+				buff += "<td class='col_move' align='center' width='" + Field_up + "'>";
+				if( i !== 1 && jkn_disp == 0){//全件表示の場合のみ有効
+					buff += "<input class='btn_arrow' type='button' value='↑' onClick='Myup(" + i + ")' >";
+				}
+				if( i !== dlength - 1 && jkn_disp == 0){//全件表示の場合のみ有効
+					buff += "<input class='btn_arrow' type='button' value='↓' onClick='Mydw(" + i + ")' >";
+				}
 				buff += "</td>";
 
 			}
@@ -129,26 +161,39 @@ function ShowData(){
 			}
 
 			if( i == 0){
-				buff += '<th width="' + field_width + '" >';
+				buff += '<th class="col_'+DataArray[0][s]+'" width="' + field_width + '" >';
 				//buff += '<th width="' + Field_etc[DataArray[0][s]] + '" >';
 				//buff += '<th>';
 			}else{
-				buff += '<td width="' + field_width + '" >';
+				buff += '<td class="col_'+DataArray[0][s]+'" width="' + field_width + '" >';
 				//buff += '<td width="' + Field_etc[DataArray[0][s]] + '" >';
 				//buff += "<td>";
 			}
 
-			buff += DataArray[i][s];
+
+			//****************************
+			//i=0 の時、フィールド名の代替え設定
+			if(i == 0 && typeof Flabel !== "undefined"){
+				if(typeof(Flabel[DataArray[0][s]]) =="undefined"){
+					buff += DataArray[0][s];
+				}else{
+					buff += Flabel[DataArray[0][s]];
+				}
+			}else{
+				buff += DataArray[i][s];
+			}
+			//*****************************
 
 			//************
 			//sort
 			if( i == 0 ){
-				buff += "<br />";
+				buff += "<div class='sort'>";
 				//buff += "<input type='text'  value='' size='6' />";
 				//buff += "<input type='text'  id='search_" + DataArray[0][s] + "' value='' style='width:" + (field_width - 10) + "px;' />";
 				//buff += "<br />";
 				buff += "<input class='btn_arrow' type='button' onClick='SortAsc(" + s + ")' value='▲' id='sortasc_" + s + "' />";
 				buff += "<input class='btn_arrow' type='button' onClick='SortDsc(" + s + ")' value='▼' id='sortdsc_" + s + "' />";
+				buff += "</div>";
 			}
 			//************
 
@@ -165,10 +210,10 @@ function ShowData(){
 	buff += "</table>";
 
 	if(!ReadOnly){
-		buff += "<input type='button' value='データをファイルに保存する' onClick='Mysave()' >　　";
-		buff += "<input type='button' value='新規追加' onClick='Myappend()' >　";
+		//buff += "<input type='button' value='データをファイルに保存する' onClick='Mysave()' >　　";
+		//buff += "<input type='button' value='新規追加' onClick='Myappend()' >　";
 
-		buff += "<input type='button' value='表示条件を設定' onClick='SearchData(1)' >";
+		//buff += "<input type='button' value='表示条件を設定' onClick='SearchData(1)' >";
 	}
 
 	$('#list').html(buff);
@@ -274,12 +319,12 @@ function Myedit(no){
 	DataTemplate('edit',no);
 }
 
-function Mycopy(no){
+function Mycopy(no,is_next){
 	//0 : データ追加 1:コピー
-	DataTemplate('copy',no);
+	DataTemplate('copy',no,is_next);
 }
-function Mydele(no){
-	DataTemplate('dele',no);
+function Mydele(no,is_next){
+	DataTemplate('dele',no,is_next);
 }
 function Myappend(){
 	//0 : データ追加　0:新規
@@ -288,6 +333,15 @@ function Myappend(){
 function MyCansel(){
 	$('#cont_area').html("");
 	$('#cont_area').css('display' , 'none');
+
+	//**** 入力補助エリアがあるならば非表示にする
+	if(typeof inputSupport != "undefined"){
+		$('#inputSupport').css('visibility' , 'hidden');
+	}
+	if(typeof map_area != "undefined"){
+		$('#map_area').css('visibility' , 'hidden');
+	}
+	//**********************
 }
 
 //処理実行
@@ -299,10 +353,13 @@ function MyeditExec(no){
  			DataArray[no][i] = eraseBanString($('#Mydata_' + i).val());
 		}
 	}
-	MyCansel();
+
+	Mysave("項目を変更して<br>");	//強制保存
+
+	//MyCansel();
 	ShowData();	
 }
-function MyappendExec(no){
+function MyappendExec(is_next){
 	var field = DataArray[0].length;
 	var buffArray = new Array();
 	var dataNo = DataArray.length; 
@@ -318,10 +375,16 @@ function MyappendExec(no){
 	//データ行追加
 	DataArray.push(buffArray);
 
-	MyCansel();
+	Mysave("新規項目を追加して<br>");	//強制保存
+
 	ShowData();	
+	if(is_next){
+		Myedit(DataArray.length-1);
+	}else{
+		MyCansel();
+	}
 }
-function MydeleExec(no){
+function MydeleExec(no,is_next){
 	//配列を削除
 	DataArray.splice( no , 1 );
 
@@ -331,11 +394,23 @@ function MydeleExec(no){
 		DataArray[i][0] = i;	//0 field が no 必須
 	}
 
-	MyCansel();
-	ShowData();	
+	Mysave("項目を削除して<br>");	//強制保存
+
+	ShowData();
+	if(!is_next || DataArray.length<=0){
+		MyCansel();
+	}else{
+		if(no < DataArray.length){
+			Myedit(no);
+			
+		}else{
+			Myedit(DataArray.length-1);
+		}
+	}
 }
 
-function Mysave(){
+function Mysave(str){
+	if(!str){ str = "";}
  	//DataDir , DataHead , DataExt , DataArray
 	//呼び出し側で 外部名宣言のこと	
 	var data = ArrayToCsv(DataArray);
@@ -345,8 +420,40 @@ function Mysave(){
 	if(savename == false){
 		alert("ファイルの保存に失敗しました");
 	}else{
-		alert(savename + " を保存しました");
+		//alert(savename + " を保存しました");
+		add_dialog(str + savename + " を保存しました");
 	}
+}
+
+function MyMove(mode , now , flg){
+	var dcount = DataArray.length - 1;
+	var now_no = now;
+
+	if(flg == -1){
+		if(now_no == 1){
+			add_dialog(now + "　先頭の項目です");
+			return;
+		}else{
+			now_no --;
+			//alert(now_no + " に移動します");
+		}
+	}
+	if(flg == 1){
+		if(now_no == dcount){
+			add_dialog(now + "　最後の項目です");
+			return;
+		}else{
+			now_no ++;
+			//alert(now_no + "　に移動します");
+		}
+	}
+
+	DataTemplate(mode,now_no);
+
+	if(typeof map_area != "undefined"){
+		//map_visible();		
+	}
+
 }
 
 //検索条件の初期化
@@ -376,7 +483,8 @@ function SearchData(sw){
 
 	var field = DataArray[0];
 
-	var buff = "<form>";
+	var buff = "";
+	buff += "<form>";
 	buff += "<table border=1>";
 
 	for(var i = 0 ; i < field.length ; i++){
@@ -416,7 +524,7 @@ function SearchData(sw){
 
 //処理用の配列
 var TempData = new Array();
-function DataTemplate(mode,no){
+function DataTemplate(mode,no,is_next){
 	//sw 0:修正 1:追加
 	//no 0:データ追加　1以上:データ番号
 
@@ -441,30 +549,116 @@ function DataTemplate(mode,no){
 			TempData = copyArray(DataArray[no]);
 			TempData[0] = new_no;
 		}
+
 	}else{
 		TempData = DataArray[no];
 	}
 
-	var buff = "<form>";
+	var buff = "";
+	buff += "<div id='cont_area_inner'>";
+	buff += "<div id='cont_content'>";
+	if(mode==="append"){
+		buff += "<h2>項目の追加</h2>";
+	}else if(mode==="copy"){
+		buff += "<h2>複製を追加</h2>";
+	}else if(mode==="dele"){
+		buff += "<h2>項目を削除</h2>";
+	}else{
+		buff += "<h2>項目の編集</h2>";
+	}
+	buff += "<form>";
 	buff += "<table border=1>";
 
 	for(i = 0 ; i < fields.length ; i++){
-		buff += "<tr>";
-		buff += "<th>" + fields[i]  + "</th>";
+		buff += "<tr class='row_"+ fields[i] +"'>";
+		//buff += "<th>" + fields[i]  + "</th>";
+
+		//フィールドラベルの確認表示 *****
+		if(typeof Flabel !== "undefined"){
+
+				if(typeof(Flabel[fields[i]]) =="undefined"){
+					buff += "<th>" + fields[i] + "</th>";
+				}else{
+					buff += "<th>" + Flabel[fields[i]] + "</th>";
+				}
+		}else{
+			if(fields[i]!=="lat" && fields[i]!=="lng"){
+				buff += "<th>" + fields[i] + "</th>";
+			}
+		}
+		//***************************
 
 		//noは　各データ必須。自動整理
 		if(fields[i] == 'no'){
 			buff += "<td class='nofield'>" + TempData[i] + "</td>";
 		}else{
-			buff += "<td><input class='Mydata' type='text' id='Mydata_" + i + "' value='" + TempData[i] + "' ></td>";
+			//buff += "<td><input class='Mydata' type='text' id='Mydata_" + i + "' value='" + TempData[i] + "' ></td>";
+
+			//*******フィールド入力タイプの確認
+			//buff += "<td><input class='Mydata' type='text' id='Mydata_" + i + "' value='" + TempData[i] + "' ></td>";
+
+			if(typeof Ftype !== "undefined"){
+				if(fields[i]==="when"){
+						buff += "<td><input class='Mydata' type='text' id='Mydata_" + i + "' value='" + TempData[i] + "' readonly></td>";
+				}else if(fields[i]==="openTime" || fields[i]==="closeTime"){
+						buff += "<td><input class='Mydata' type='time' id='Mydata_" + i + "' value='" + TempData[i] + "' ></td>";
+				}else if(fields[i]==="where"){
+						buff += "<td><select class='Mydata' type='text' id='Mydata_" + i + "' data-value='" + TempData[i] + "' ><option value='other'>登録施設以外</option>"+where_option+"</select><input type='text' data-type='other' placeholder='未登録施設はこちらに入力'></td>";
+				}else if(fields[i]==="tag1"){
+						buff += "<td><select class='Mydata' type='text' id='Mydata_" + i + "' data-value='" + TempData[i] + "' ><option value=''>市町村未選択</option>"+tags_option+"</select></td>";
+				}else if(fields[i]==="uid"){
+						buff += "<td><input class='Mydata' disabled='disabled' type='text' id='Mydata_" + i + "' value='" + TempData[i] + "' ></td>";
+				}else{
+					switch(Ftype[fields[i]]){
+						case "text" :
+							buff += "<td><textarea class='Mydata' id='Mydata_" + i + "' rows='3'>" + TempData[i] + "</textarea></td>";
+							break;
+						default : 
+							buff += "<td><input class='Mydata' type='text' id='Mydata_" + i + "' value='" + TempData[i] + "' ></td>";
+					}
+				}
+			}else{
+				if(fields[i]==="address"){
+					console.log("address");
+						buff += "<td><div><label>住所<input class='Mydata' type='text' id='Mydata_" + i + "' value='" + TempData[i] + "' ></label>";
+						buff += "<label>緯度<input class='Mydata' type='text' id='Mydata_" + (i+1) + "' value='" + TempData[(i+1)] + "' ></label>";
+						buff += "<label>経度<input class='Mydata' type='text' id='Mydata_" + (i+2) + "' value='" + TempData[(i+2)] + "' ></label></div><div class='btns'><a class='btn btn2 btn_showmap'>地図で設定する</a></div></td>";
+				}else if(fields[i]==="lat"){
+				}else if(fields[i]==="lng"){
+				}else{
+					buff += "<td><input class='Mydata' type='text' id='Mydata_" + i + "' value='" + TempData[i] + "' ></td>";
+				}
+			}
+			//****************************
+
 		}		
 		buff += "</tr>";
 	}
 	buff += "</table>";
 	buff += "</form>";
+	buff += "</div>";
 
 
+	buff += "<div class='btns'>";
+	buff += "<div>";
+	if(mode!=="copy" && mode!=="dele" && mode!=="append"){
+		buff += "<input class='btn3' type='button' value='削除' onClick='Mydele(" + no + ",true)' >";
+	}
+	buff += "<input class='btn_negative' type='button' onClick='MyCansel()' value = '閉じる' >";
 	switch(mode){
+		case 'append' :
+			buff += "<input type='button' id='MySubmit' onClick='MyappendExec()' value = '保存' >";
+			break;
+		case 'copy' :
+			buff += "<input type='button' id='MySubmit' onClick='MyappendExec("+is_next+")' value = '保存' >";
+			break;
+		case 'edit' : 
+			buff += "<input type='button' id='MySubmit' onClick='MyeditExec("+ no + ")' value = '保存' >";
+			break;
+		case 'dele' :
+			buff += "<input type='button' id='MySubmit' onClick='MydeleExec(" + no +","+is_next+ ")' value = '削除する' >";
+			break;
+			/*
 		case 'append' :
 			buff += "<input type='button' id='MySubmit' onClick='MyappendExec()' value = '新規追加する' >";
 			break;
@@ -477,20 +671,65 @@ function DataTemplate(mode,no){
 		case 'dele' :
 			buff += "<input type='button' id='MySubmit' onClick='MydeleExec(" + no + ")' value = '削除する' >";
 			break;
+			*/
 	}
-
-	buff += "　　";
-	buff += "<input type='button' onClick='MyCansel()' value = '中止する' >";
+	buff += "</div>";
+	
+	//***データの移動***
+	if(mode == "edit"){
+		buff += "<div>";
+		buff += "<input class='btn_next' type='button' onClick='MyMove(\"" +mode + "\"," + no + ",-1)' value= '前の項目へ' >";
+		buff += "<input class='btn2' type='button' value='複製して編集' onClick='Mycopy(" + no + "," + is_next+ ")' >";
+		buff += "<input class='btn_back' type='button' onClick='MyMove(\"" +mode + "\"," + no + ",1)'  value= '次の項目へ' >";
+		buff += "</div>";
+	}
+	//****************
+	buff += "</div><!-- /.btns -->";
 
 	//this file 個別オプション
 	buff += setOption();
 	//*********************
+	buff += "</div><!-- /#cont_area_inner -->";
 
 	$('#cont_area').html(buff);
 	$('#cont_area').css('display' , 'block');
 
+	
+	//入力補助設定
+	if($( "#cont_area .row_when input" ).length>0){ $( "#cont_area .row_when input" ).datepicker(); }
+	$(".row_tag1 select").val($(".row_tag1 select").attr("data-value"));
+	$(".row_where select").val($(".row_where select").attr("data-value"));
+
+	set_cont_area_event();
+	
+	//**** 入力補助エリアがあるならば表示する
+	if(typeof inputSupport != "undefined"){
+		//$('#inputSupport').css('visibility' , 'visible');
+	}
+	if(typeof map_area != "undefined"){
+		//$('#map_area').css('visibility' , 'visible');
+		
+	}
+	$(".btn_showmap").click(function(){$('#map_area').css('visibility' , 'visible');});
+	//**********************
 	//return buff;
+
+
+
+	//UIDの初期設定（新規追加、複写追加のみ）
+	if(mode == "append" || mode == "copy"){
+		if("uidClass" in window){
+			//イベントデータの場合
+			if(uidClass == "evt"){
+				//alert("イベントデータの編集処理です");
+				getUID();
+			}else{
+				alert("イベントクラスの指定がありません");
+			}
+		}
+	}
 }
+
 
 //配列複写の関数
 function copyArray(arry){
@@ -551,14 +790,30 @@ function ArrayToCsv(from){
 	return buff;
 }
 
-//不要な文字の消去
+//不要な文字の消去（エスケープ文字の置換）
 function eraseBanString(from){
 	var buff = String(from);
 
+	
 	//'", を消去する
 	buff = buff.replace(/,/g,"");
 	buff = buff.replace(/\'|\"/g,"");
 	
+	//改行を<br />に変換する
+	buff = buff.replace(/\r\n/g, "<br />").replace(/(\n|\r)/g, "<br />");
+
+	/*
+ 	//buff = buff.replace(/&/g, '&amp;')
+	//buff = buff.replace(/</g, '&lt;')
+	//buff = buff.replace(/>/g, '&gt;')
+	buff = buff.replace(/"/g, '&quot;')	
+	buff = buff.replace(/'/g, '&#39;');
+
+	buff = buff.replace(/\r\n/g, "<br />").replace(/(\n|\r)/g, "<br />");
+
+	//buff = buff.replace(/<br \/>/g, "\n");
+	*/
+
 	return buff;
 }
 
@@ -600,7 +855,7 @@ function saveFile( outdir , fhead , fext , indata){
 
 		error : function(xhr, status, error) {
 			// 通信失敗時の処理
-        		console.log("error");
+        	console.log("error");
 			console.log("status ="+status);
 			console.log("xhr ="+xhr);
 			alert("データが転送がエラーとなりました");
@@ -611,3 +866,89 @@ function saveFile( outdir , fhead , fext , indata){
 
 	return sfilename;
 }
+
+
+(function($, window) {
+	"use strict";
+
+	var RANGE = 5,
+		events = ["click", "touchstart", "touchmove", "touchend"],
+		handlers = {
+			click: function(e) {
+				if(e.target === e.currentTarget)
+					e.preventDefault();
+			},
+			touchstart: function(e) {
+				this.jQueryTap.touched = true;
+				this.jQueryTap.startX = e.touches[0].pageX;
+				this.jQueryTap.startY = e.touches[0].pageY;
+			},
+			touchmove: function(e) {
+				if(!this.jQueryTap.touched) {
+					return;
+				}
+
+				if(Math.abs(e.touches[0].pageX - this.jQueryTap.startX) > RANGE ||
+				   Math.abs(e.touches[0].pageY - this.jQueryTap.startY) > RANGE) {
+					this.jQueryTap.touched = false;
+				}
+			},
+			touchend: function(e) {
+				if(!this.jQueryTap.touched) {
+					return;
+				}
+
+				this.jQueryTap.touched = false;
+				$.event.dispatch.call(this, $.Event("tap", {
+					originalEvent: e,
+					target: e.target,
+					pageX: e.changedTouches[0].pageX,
+					pageY: e.changedTouches[0].pageY
+				}));
+			}
+		};
+
+	$.event.special.tap = "ontouchend" in window? {
+		setup: function() {
+			var thisObj = this;
+			
+			if(!this.jQueryTap) {
+				Object.defineProperty(this, "jQueryTap", {value: {}});
+			}
+			$.each(events, function(i, ev) {
+				thisObj.addEventListener(ev, handlers[ev], false);
+			});
+		},
+		teardown: function() {
+			var thisObj = this;
+			
+			$.each(events, function(i, ev) {
+				thisObj.removeEventListener(ev, handlers[ev], false);
+			});
+		}
+	}: {
+		bindType: "click",
+		delegateType: "click"
+	};
+
+	$.fn.tap = function(data, fn) {
+		return arguments.length > 0? this.on("tap", null, data, fn): this.trigger("tap");
+	};
+})(jQuery, this);
+$(function() {
+	var isTD = (document.ontouchstart !== undefined)? true : false;
+	//var tap = (isTD) ? "touchstart" : "click"; 
+	//var tap = "click";
+	//-----------------------------------------● 開閉
+	$(document).on("tap","#DbTable tr .col_eventtitle, #DbTable tr .col_name, #DbTable tr .col_when, #DbTable tr .col_address", function(){
+		var tar = $(this).closest("tr");
+		if(tar.hasClass("on")){
+			tar.removeClass("on");
+		}else{
+			tar.addClass("on");
+		}
+	});
+	
+});
+
+

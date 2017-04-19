@@ -5,19 +5,32 @@
 <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
+<title>能登の子育てイベント情報｜輪島市・穴水市・能登町・珠洲市・七尾市｜のとノットアローン</title>
+
+
 <!-- キャッシュしない -->
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="cache-control" content="no-cache" />
 <meta http-equiv="expires" content="0" />
-<!--               -->
 
-<title>のとノットアローン｜イベント</title>
+<!-- 情報発信 -->
+<meta name="author" content="Code for Kanazawa ProjectNNA!">
+<meta name="descpription" content="石川県の能登地方の子育てをみんなで応援するための情報サイトです。イベント情報、地図、相談先などを集めています。">
+<meta name="keywords" content="能登町,輪島市,珠洲市,穴水町,子育て,子育て支援,育児,イベント">
 
-<link rel="stylesheet" href="css/notalone.css">
+<!-- webアプリモード（フルスクリーンモード）-->
+<!-- meta name="apple-mobile-web-app-capable" content="yes" /-->
+<!-- ホームアイコンの設定 -->
+<link rel="apple-touch-icon" sizes="114x114" href="apple-touch-icon-114x114.png" />
+<link rel="apple-touch-icon" sizes="120x120" href="apple-touch-icon-120x120.png" />
+
+
 
 <link rel="stylesheet" href="js/jquery-ui-1.11.4.custom/jquery-ui.min.css">
 
 <link type="text/css" href="js/fullcalendar-2.4.0/fullcalendar.css" rel="stylesheet" />
+<link rel="stylesheet" href="css/notalone.css?ver=170416-3">
+
 <link type="text/css" href="js/fullcalendar-2.4.0/fullcalendar.print.css" rel="stylesheet" media='print' />
 
 <script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
@@ -33,32 +46,44 @@
 <!-- Include googlemaps api -->
 <script type="text/javascript" src="js/googlemap_api.js"></script>
 
-<script type="text/javascript" src="js/notalone.js"></script>
+<script type="text/javascript" src="js/notalone.js?ver=170416-2"></script>
+<script type="text/javascript" src="js/notalone-event.js?ver=170416-2"></script>
 
 
 </head>
 
-<body onload="init()">
+<body class="event_search" onload="init()">
+
 
 <div id="contener">
 
-<!-- fix start -->
-<div id="top-menu" onClick="top_index()"></div>
-<div id="calendar">
-</div>
+<header id="header">
+	<div id="top-menu" onClick="top_index()"></div>
+	<h1><span>奥能登</span><span>イベント情報</span></h1>
+</header>
+<div id="fix_header">
+	<div id="set_wrap">
+		<a id="set_bar" class="bar"><span class="bar_left set_str">全てのイベント</span><span class="bar_right">条件を変更</span></a>
+		<div id="set_area"></div>
+	</div>
 
+	<div id="calendar_wrap">
+		<div id="calendar"></div>
+	</div>
+</div>
 <!--div id="showBlock">
 	<input type="button" onClick="showCalendar()" value="●">
 </div-->
 <!-- fix end -->
 <!-- fix div 調整用　-->
+
 <div id="menu-back"></div>
 
 
 <div id="events-title">
 </div>
-<div id="dummy">
-</div>
+
+<div id="dummy"></div>
 
 </div>
 
@@ -68,8 +93,6 @@
 	</div>　
 </div>
 
-<div id="set_area">
-</div>
 
 <!-- Page Checker (style display:none)-->
 <div id="thispage">events.html</div>

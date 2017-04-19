@@ -30,7 +30,7 @@ $PAGESTART_session = "NOTALONE_PAGESTART";	//表示開始のページ番号
 
 
 //このサイトのディレクトリ
-//$SITE_dir = "notalone/";	//サブディレクトリの場合
+//$SITE_dir = "test/";	//サブディレクトリの場合
 $SITE_dir ="/";			//ルートの場合
 
 //このアプリケーションのルートディレクトリ
@@ -88,7 +88,7 @@ function Access_check($ok_level,$id_disp,$error_disp,$ret_page){
       //$ret_page  :拒否時の戻りページ
 
       if($id_disp==1){
-         print("<<利用者情報 :" . $_SESSION[$USER_session] . " :" . $_SESSION[$LEVEL_session] . ">><br> "); 
+         //print("<p id='user_role_info'>利用者情報 :" . $_SESSION[$USER_session] . " :" . $_SESSION[$LEVEL_session] . "</p>"); 
       }
       //kanri_user テーブルと連動。変更する場合は下記も修正のこと。===================================
 	$user_level = $_SESSION[$LEVEL_session];
@@ -109,9 +109,7 @@ function Access_check($ok_level,$id_disp,$error_disp,$ret_page){
       if($user_level < $ok_level){
          //-----------
          if($error_disp==1){
-            	print("【警告】<BR>");
-            	print("あなたは、この処理は実施できません！！<BR>");
-
+            	print("<p class='info'>あなたは この処理は実施する権限がありません<BR>この処理を実施したい場合はシステム管理者にお問い合わせください</p>");
             	//print("<form method='POST' action='" . $ret_page . "'>");
             	//print("<input type='submit' value='戻る'>");
             	//print("</form>");
@@ -126,89 +124,93 @@ function Access_check($ok_level,$id_disp,$error_disp,$ret_page){
       	//print("user_level:" . $user_level . "ok_level:" . $ok_level);
 }
 
+//Body につける用のclassを出力
+function body_class($str = NULL,$return = false){
+	$dir = $_SERVER["SCRIPT_NAME"];
+	$body_class = "";
+	if($dir!=""){ $body_class = str_replace(array("/",".php",".html"), " ", $dir); }
+	if($str){ $body_class .= " ".$str; }
+	return " class='$body_class'";
+};
+
+//Header Body 統一用のサブルーチン2
+function user_header($title,$onload=NULL){
+	global $USER_session;
+
+	if($_SESSION[$USER_session] == ""){
+		$include_dir = dirname($_SERVER["SCRIPT_NAME"])."/";
+		//$file_name = basename($_SERVER['PHP_SELF']);
+		if($include_dir==="//" || $include_dir==="/" || $include_dir==="/noto/"){$css_dir = "admin/";}else{$css_dir = "./";}
+		//print("ログインしていません<br>");
+		//print("<hr>");
+		header('Location:'.$css_dir.'log_in.php');
+		exit;
+	}
+	common_header($title,$onload);
+}
 
 
 //Header Body 統一用のサブルーチン
-function user_header($title){
+function common_header($title,$onload=NULL){
 	//title:ページのタイトル名 
        	//color=#FF(red)FF(green)FF(blue)
 	global $ROOT_dir;
 	global $USER_session;
 	global $ThisFile;
+	global $LEVEL_session;
+	$body_onload = ($onload) ? " onload='$onload'" : "";
+	
+	 ?>
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta HTTP-EQUIV='Content-Type' CONTENT='text/html; charset=UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta http-equiv='Pragma' content='no-cache'>
+<meta http-equiv='Cache-Control' content='no-cache'>
+<title>管理ページ ｜ <?php echo $title; ?></title>
+<?php include_once('include_header.php'); ?>
+</head>
+<body<?php echo $body_onload; ?><?php echo  body_class(); ?>>
+<div id="body_inner">
+<header id="header">
+	<h1 id='page_title'><span>管理ページ</span><?php echo $title; ?></h1>
+	<?php if(isset($_SESSION[$LEVEL_session]) && $_SESSION[$LEVEL_session]>=2){ ?>
+		 <div id="header_admin">管理者</div>
+	<?php } ?>
+	<a id="header_back" href="#" onClick="history.back(); return false;"></a>
+</header>
 
-	print("<!DOCTYPE HTML>");
-       	print("<HTML>");
-       	print("<META HTTP-EQUIV='Content-Type' CONTENT='text/html; charset=UTF-8'>");
-	print("<meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no'>");
-	print("<TITLE>" . $title . "</TITLE>");
-       	print("</HEAD>");
-       	print("<BODY>");
-       	print("<center>");
-       	print("<table>");
-       	print("<tr><td><center>");
-		//print("<img src='" . $ROOT_dir . "title.gif'>");
-		print("</center></td>");
-            print("<td><font color='#FF0000' size=4 >　" . $title . "</font></td></tr>");
-       	print("</table>");
-       	print("</center>");
-       	print("<hr>");  
-
-
+<div id="container">
+	 <?php 
 	if($_SESSION[$USER_session] == ""){
-		print("ログインしていません<br>");
-		print("<hr>");
+		//print("ログインしていません<br>");
+		//print("<hr>");
 	}else{
-		print("<a href='log_out.php' target='_parent'>LogOut</a>　　");
-
+		//print("<a href='log_out.php'>LogOut</a>　　");
+/*
 		if($ThisFile != ""){
-			print("<a href='index.php' target='_parent'>index</a>");
+			print("<div class='btns'><a class='btn btn_modoru' href='index.php'>管理ページトップへ戻る</a></div>");
 		}
-		print("<hr>");
+		//print("<hr>");
+*/
 	}
-
 }
 
-
-//Header Body 統一用のサブルーチン
-function common_header($title){
-	//title:ページのタイトル名 
-       	//color=#FF(red)FF(green)FF(blue)
-	global $ROOT_dir;
-	global $USER_session;
-	global $ThisFile;
-
-	print("<!DOCTYPE HTML>");
-       	print("<HTML>");
-       	print("<HEAD>");
-       	print("<META HTTP-EQUIV='Content-Type' CONTENT='text/html; charset=UTF-8'>");
-	print("<meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no'>");
-	print("<TITLE>" . $title . "</TITLE>");
-       	print("</HEAD>");
-       	print("<BODY>");
-       	print("<center>");
-       	print("<table>");
-       	print("<tr><td><center>");
-		//print("<img src='" . $ROOT_dir . "title.gif'>");
-		print("</center></td>");
-            print("<td><font color='#FF0000' size=4 >　" . $title . "</font></td></tr>");
-       	print("</table>");
-       	print("</center>");
-       	print("<hr>"); 
-
-	if($_SESSION[$USER_session] == ""){
-		print("ログインしていません<br>");
-		print("<hr>");
-	}else{
-		print("<a href='log_out.php'>LogOut</a>　　");
-
-		if($ThisFile != ""){
-			print("<a href='index.php'>index</a>");
-		}
-		print("<hr>");
+function common_menu($ptn){
+	global $SITE_dir;
+	print('<div id="footer_btns">');
+	switch($ptn){
+		case 2 : 
+			print("
+			<a class='btn btn_modoru' href='/" . $SITE_dir . "index.html'>のとノットアローントップへ</a><a class='btn btn_negative' href='/" . $SITE_dir . "admin/log_out.php'>ログアウト</a>
+			");
+			break;
+		case 1 :
+			print("<a class='btn btn_modoru' href='" . $SITE_dir . "admin/index.php'>管理ページトップへ戻る</a>　");
 	}
-
+	print('</div>');
 }
-
 
 //フィールドデータの自動入力（オプション）
 function Auto_Input($no,$mode,$sw,$now_data){
@@ -488,6 +490,54 @@ function csvDatabaseWrite($filename , $data){
 		fputs($fp,$buff);
 	}
 	fclose($fp);
+}
+
+
+//フィールド定義ファイルを読み込み、定義をjavascript用に文字列で返す
+function fieldDataRead($fname){
+	$type = 0;	//配列で返す
+	$buff = csvDatabaseRead($fname , $type);
+	$ret  = "";
+
+	//fieldname
+	$ret .= "var Fno = [";
+	for($i = 0 ; $i < count($buff[0]) ; $i++){
+		$ret .= "'";
+		$ret .= $buff[0][$i];
+		$ret .= "'";
+		if($i < count($buff[0])-1){
+			$ret .= ",";
+		}
+	}
+	$ret .= "];\n";
+
+	//fieldlabel
+	$ret .= "var Flabel = {";
+	for($i = 0 ; $i < count($buff[1]) ; $i++){
+		$ret .= "'";
+		$ret .= $buff[0][$i];
+		$ret .= "':";
+		$ret .= "'" . $buff[1][$buff[0][$i]] . "'";
+		if($i < count($buff[1])-1){
+			$ret .= ",";
+		}
+	}
+	$ret .= "};\n";
+
+	//fieldwidth
+	$ret .= "var Field_etc = {";
+	for($i = 0 ; $i < count($buff[2]) ; $i++){
+		$ret .= "'";
+		$ret .= $buff[0][$i];
+		$ret .= "':";
+		$ret .= $buff[2][$buff[0][$i]];
+		if($i < count($buff[2])-1){
+			$ret .= ",";
+		}
+	}
+	$ret .= "};\n";
+
+	return $ret;
 }
 
 

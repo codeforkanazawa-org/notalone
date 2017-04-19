@@ -13,34 +13,29 @@ if(!isset($_POST["log_in_flg"])){
 
 //①---- Log in ：ＩＤ　パスワードの要求 ----
 if($_POST["log_in_flg"]==""){
-	common_header("Log in ");
+	common_header("ログイン");
 
-	print('<form method="POST" action="' . $ThisFile . '">');
-
-	echo '
-	★ＩＤとパスワードを入力してください。<br>
-	<input type="hidden" name="log_in_flg" value="1" >
-	ＩＤ：<br>
-	<input type="text"     name="log_in_id"   size=20 ><br>
-	パスワード：<br>
-	<input type="password" name="log_in_pass" size=20 ><br>
-	<input type="submit" value="送信">
+	 ?>
+	<form method="POST" name="log_in_form" id="log_in_form" action="<?php echo $ThisFile; ?>">
+		<p>ログインしてください。</p>
+		<div>
+			<input type="hidden"      name="log_in_flg"  id="log_in_flg"  value="1" >
+			<label>ＩＤ</label>
+			<input type="text"     name="log_in_id"      id="log_in_id">
+			<label>パスワード</label>
+			<input type="password" name="log_in_pass"    id="log_in_pass">
+		</div>
+		<div class="btns">
+			<input type="submit"   name="log_in_submit"  id="log_in_submit" value="ログイン">
+		</div>
 	</form>
-
-	<form method="POST" action="' . $ReturnFile . '">
-	<input type="hidden" name="mode" value="">
-	<input type="submit" value="戻る">
-	</form>
-	<br>
-	<br>
-
-	<!--input type="button" value="閉じる" onclick="self.close()"-->
-
-	<form method="POST" action="../admin/index.php">
-	<input type="hidden" name="mode" value="">
-	<input type="submit" value="indexに戻る">
-	</form>
-	';
+	<div id="footer_btns">
+		<form method="POST"  name="return_form"   id="return_form" action="../index.html">
+		<input type="hidden" name="mode"          id="mode" value="">
+		<input class="btn_modoru" type="submit" name="return_submit" id="return_submit" value="のとノットアローントップへ">
+		</form>
+	</div>
+	<?php 
 
 //①のIf Else -----------
 }else{
@@ -57,14 +52,15 @@ if($_POST["log_in_flg"]==""){
 		$rc = count($UserArray);
 
 	 	if($rc==0){
-			common_header("Log in ");
-
+			common_header("ログイン");
 			echo'
-		  	<form method="POST" action="' . $Case1File . '">
-                  	ユーザ登録数が０です。（管理者処理に移行）
-                  	<input type="hidden" name="log_in_flg" value="" >
-                  	<input type="submit" value="確認">
-              		</form>
+		  	<form method="POST"  name="log_in_form"   id="log_in_form" action="' . $Case1File . '">
+                  	<p class="info">ユーザ登録数が０です<p>
+					<div class="btns">
+						<input type="hidden" name="log_in_flg"    id="log_in_flg"    value="" >
+						<input type="submit" name="log_in_submit" id="log_in_submit" value="管理者処理に移行">
+					</div>
+              	</form>
 			';
 			exit();
 		}
@@ -75,14 +71,14 @@ if($_POST["log_in_flg"]==""){
 
 		//id,pwブランクの対策
 		if($user_id == "" || $user_pass == ""){
-			common_header("Log in ");
-
+			common_header("ログイン：エラー");
 			echo '
-			<form method="POST" action="' . $ThisFile . '">
-			ID、またはパスワードが入力されていません
-			<input type="hidden" name="log_in_flg" value="" >
-			<br />
-			<input type="submit" value="確認">
+			<form method="POST"  name="log_in_form"   id="log_in_form" action="' . $ThisFile . '">
+					<p class="info">IDまたはパスワードが入力されていません<p>
+					<div class="btns">
+						<input type="hidden" name="log_in_flg"    id="log_in_flg"    value="" >
+						<input type="submit" name="log_in_submit" id="log_in_submit" value="戻る">
+					</div>
 			</form>
 			';
 			exit();
@@ -101,16 +97,15 @@ if($_POST["log_in_flg"]==""){
 		}
 
 
-         	if($rcflg==false){
-			common_header("Log in ");
-
+		if($rcflg==false){
+			common_header("ログイン：エラー");
 			echo '
- 	          	<form method="POST" action="' . $ThisFile . '">
-                  	ID、またはパスワードが違います<BR>
-                  	<input type="hidden" name="log_in_flg" value="" >
-			<br />
-                  	<input type="submit" value="確認">
-               		</form>
+ 	          	<form method="POST"  name="log_in_form"   id="log_in_form" action="' . $ThisFile . '">
+                  	<p class="info">IDまたはパスワードが違います<p>
+					<div class="btns">
+						<input type="hidden" name="log_in_flg"    id="log_in_flg"    value="" >
+						<input type="submit" name="log_in_submit" id="log_in_submit" value="戻る">
+					</div>
 			';
 			exit();
 		}
@@ -122,24 +117,24 @@ if($_POST["log_in_flg"]==""){
 		$level  = $UserArray[$i]['user_level'];
 
 		if($active != 1){
-			common_header("Log in ");
-
+			common_header("ログイン：エラー");
 			echo '
- 	          	<form method="POST" action="' . $ThisFile . '">
-                  	ID、またはパスワードが違います<BR>
-                  	<input type="hidden" name="log_in_flg" value="" >
-			<br />
-                  	<input type="submit" value="確認">
-               		</form>
+ 	          	<form method="POST"  name="log_in_form"   id="log_in_form" action="' . $ThisFile . '">
+                  	<p class="info">IDまたはパスワードが違います<p>
+					<div class="btns">
+						<input type="hidden" name="log_in_flg"    id="log_in_flg"    value="" >
+						<input type="submit" name="log_in_submit" id="log_in_submit" value="戻る">
+					</div>
+				</form>
 			';
 			exit();
 		}
 
 		if(strcmp($user_pass,$pass)==0){
 
-			//cookieの書き込み
-			setcookie($USERid_cookie    , $id    , time()+60*60*24, "/"); 
-			setcookie($USERlevel_cookie , $level , time()+60*60*24, "/"); 
+			//cookieの書き込み（有効期限　1年間）
+			setcookie($USERid_cookie    , $id    , time()+60*60*24*365, "/"); 
+			setcookie($USERlevel_cookie , $level , time()+60*60*24*365, "/"); 
 
 		        //--- セッション情報の格納
                 	$_SESSION[$USER_session]  = $id;
@@ -154,15 +149,18 @@ if($_POST["log_in_flg"]==""){
 			}
 
 
-			common_header("Log in ");
+			//common_header("管理ページ｜ログイン");
 
-			print("あなたは　" . $id . "（" . $name . "）さんですね。<br>");
+			//print("あなたは　" . $id . "（" . $name . "）さんですね。<br>");
+			//print("Last Login : " . $last_login . " / Login Count : " . $access_count . "<br />");
+			$_SESSION['LastLogin']  = $last_login;
+			$_SESSION['LoginCount'] = $access_count;
 
-			print("Last Login : " . $last_login . " / Login Count : " . $access_count . "<br />");
+
 
 		        //---ログイン情報の更新
 			//---last_login time
-			$last_login = date("Y-m-d H:i:s");
+			$last_login = date("Y/m/d H:i:s");
 			$UserArray[$i]['last_login'] = $last_login;
 
 			//---access_count
@@ -173,27 +171,37 @@ if($_POST["log_in_flg"]==""){
 			$UserArray = csvDatabaseWrite($db_UserTable , $UserArray);
 			//*********
 
+			//ログイン完了時　ReturnFile　へ戻る
+			if($ReturnFile){
+				header('location:' . $ReturnFile);
+			}else{
+				header('location:' . "./index.php");
+			}
 
+			/*
 			echo '
-			<form method="POST" action="' . $ReturnFile . '">
-			ログインOK。
-			<input type="hidden" name="log_in_flg" value="" >
-			<input type="submit" value="確認">
+			<form method="POST"  name="log_in_form"   id="log_in_form" action="' . $ReturnFile . '">
+			' . $id . '（' . $name . '）さん　こんにちは！<br>
+			最終ログイン : ' . $last_login . '<br />
+			ログイン回数 : ' . $access_count . '<br />
+			<input type="hidden" name="log_in_flg"    id="log_in_flg"    value="" >
+			<input type="submit" name="log_in_submit" id="log_in_submit" value="確認">
 			</form>
 			';
-	//print("戻りファイル：" . $ReturnFile);
 
+			common_menu();
+			*/
 
 		}else{
-			common_header("Log in ");
-
-			print("あなたは　" . $id . "（" . $name . "）さんですね。<br>");
+			common_header("ログイン：エラー");
+			//print("あなたは　" . $id . "（" . $name . "）さんですね。<br>");
 			echo '
-			<form method="POST" action="' . $ThisFile . '">
-			ID、またはパスワードが違います
-			<input type="hidden" name="log_in_flg" value="" >
-			<br />
-			<input type="submit" value="確認">
+			<form method="POST"  name="log_in_form"   id="log_in_form" action="' . $ThisFile . '">
+				<p class="info">IDまたはパスワードが違います<p>
+				<div class="btns">
+					<input type="hidden" name="log_in_flg"    id="log_in_flg" value="" >
+					<input type="submit" name="log_in_submit" id="log_in_submit" value="戻る">
+				</div>
 			</form>
 			';
 		}
@@ -202,5 +210,4 @@ if($_POST["log_in_flg"]==""){
 
 ?>
 
-</BODY>
-</HTML>
+<?php include_once 'include_footer.php'; ?>

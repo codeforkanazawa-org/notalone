@@ -173,27 +173,4 @@ var colorCode = ['#000000','#FFFFEE','#EEFFFF','#FFEEFF','#FF0000','#00FF00','#0
 </div>
 
 
-</BODY>
-</HTML>
-
-<style>
-#color_area{
-	visibility : hidden;
-
-	position : fixed;
-	top  : 10px;
-	left : 200px;
-
-	padding : 5px;
-	border : 3px solid #000000;
-	background : lightgreen;
-
-	z-index : 10;
-}
-#color_canvas{
-	width : 600px;
-	height: 400px;
-}
-
-</style>
-
+<?php include_once 'include_footer.php'; ?>

@@ -255,8 +255,7 @@ function showGoogleMap(initLat, initLng) {
 </div>
 
 
-</BODY>
-</HTML>
+<?php include_once 'include_footer.php'; ?>
 
 <style>
 #map_area{

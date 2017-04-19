@@ -191,7 +191,8 @@ function chgMessHalf(VAL){
 
 
 <!--body onload="ShowData()"-->
-<body onload="init()">
+<?php //<body onload="init()">  ?>
+<script> window.onload = function() { init(); } </script>
 
 <div id="cont_area">
 </div>
@@ -199,5 +200,4 @@ function chgMessHalf(VAL){
 <div id="list">
 </div>
 
-</BODY>
-</HTML>
+<?php include_once 'include_footer.php'; ?>

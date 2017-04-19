@@ -31,7 +31,6 @@ ini_set( 'display_startup_errors', "1" );
 	$save_fname = $header . "." . $ext;
 	$file_name = $dir . "/" . $save_fname;
 
-
 	// ファイル保存のおまじない
 	file_put_contents($file_name , $data);
 

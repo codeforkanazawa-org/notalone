@@ -413,13 +413,14 @@ function csvToArray(filename, cb) {
 
 
 <!--body onload="ShowData()"-->
-<body onload="init()">
+<?php //<body onload="init()">  ?>
+<script> window.onload = function() { init(); } </script>
 
 <div id="cont_area">
 </div>
 
 <div id="inputSupport">
-	<input type="text" id="Mydate" size="12" value="" readonly="readonly"><br />
+	<input type="text" id="Mydate" size="12" value="" readonly><br />
 	<input type="button" id="MydateSet" onClick="setData('when')" value="日付をwhenに設定する" />
 	<br />
 	<input type="button" onClick="inputSupportClose()" value="閉じる" />
@@ -428,27 +429,4 @@ function csvToArray(filename, cb) {
 <div id="list">
 </div>
 
-</BODY>
-</HTML>
-
-<style>
-#inputSupport{
-	visibility : hidden;
-
-	position : fixed;
-	top  : 400px;
-	left : 350px;
-
-	padding : 5px;
-	border : 3px solid #000000;
-	background : lightgreen;
-
-	z-index : 10;
-}
-
-#errorArea{
-	display : none;
-}
-
-</style>
-
+<?php include_once 'include_footer.php'; ?>

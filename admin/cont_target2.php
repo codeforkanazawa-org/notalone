@@ -177,8 +177,7 @@ var colorCode = ['#000000','#FFFFEE','#EEFFFF','#FFEEFF','#FF0000','#00FF00','#0
 </div>
 
 
-</BODY>
-</HTML>
+<?php include_once 'include_footer.php'; ?>
 
 <style>
 #color_area{

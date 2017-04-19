@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>PC表示（OSM)｜ラベルの装飾</title>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+    </head>
+
+
+<body bgcolor="lightgrey" onload="initDesin()">
+<div class="labeldiv">ラベルの修飾</div>
+<div id="status"></div>
+
+<br />
+文字のサイズ：
+<select id="msize" onChange="testView('font-size')">
+	<option value="10">10px</option>
+	<option value="12">12px</option>
+	<option value="14">14px</option>
+	<option value="16">16px</option>
+	<option value="18">18px</option>
+	<option value="20">20px</option>
+</select>
+<br />
+文字の色：
+<select id="mcolor" onChange="testView('color')">
+	<option value="0,0,0">黒</option>
+	<option value="0,0,255">青</option>
+	<option value="0,255,0">緑</option>
+	<option value="0,255,255">水色</option>
+	<option value="255,0,0">赤</option>
+	<option value="255,0,255">紫</option>
+	<option value="255,255,0">黄</option>
+	<option value="255,255,255">白</option>
+</select>
+<br />
+背景の色：
+<select id="bcolor" onChange="testView('bcolor')">
+	<option value="0,0,0">黒</option>
+	<option value="0,0,255">青</option>
+	<option value="0,255,0">緑</option>
+	<option value="0,255,255">水色</option>
+	<option value="255,0,0">赤</option>
+	<option value="255,0,255">紫</option>
+	<option value="255,255,0">黄</option>
+	<option value="255,255,255">白</option>
+</select>
+背景の透明度：
+<select id="bopacity" onChange="testView('bopacity')">
+	<option value="0">0(透明)</option>
+	<option value="0.1">0.1</option>
+	<option value="0.2">0.2</option>
+	<option value="0.3">0.3</option>
+	<option value="0.4">0.4</option>
+	<option value="0.5" selected>0.5(半透明）</option>
+	<option value="0.6">0.6</option>
+	<option value="0.7">0.7</option>
+	<option value="0.8">0.8</option>
+	<option value="0.9">0.9</option>
+	<option value="1">1(不透過)</option>
+</select>
+<br />
+枠の色：
+<select id="bborder" onChange="testView('border')">
+	<option value="0,0,0">黒</option>
+	<option value="0,0,255">青</option>
+	<option value="0,255,0">緑</option>
+	<option value="0,255,255">水色</option>
+	<option value="255,0,0">赤</option>
+	<option value="255,0,255">紫</option>
+	<option value="255,255,0">黄</option>
+	<option value="255,255,255">白</option>
+	<option value=""">なし</option>
+</select>
+<br />
+<br />
+<input type="button" onClick="setDesin()" value="ラベルの装飾を変更する" />
+
+</body>
+</html>
+
+<script type="text/javascript">
+var oDiv = ".my-div-icon";
+ 
+var fsize   = opener.$(oDiv).css("font-size");
+var fcolor  = opener.$(oDiv).css("color");
+var bcolor  = opener.$(oDiv).css("background-color");
+
+// jquery ie では、一括で色コードを取得できない
+var bborder_color = opener.$(oDiv).css("border-left-color");
+var bborder_style = opener.$(oDiv).css("border-left-style"); 
+var bborder_width = opener.$(oDiv).css("border-left-width"); 
+
+//var status = "・" + fsize + "<br />・" + fcolor + "<br />・" + bcolor + "<br />・" + bborder_color + " " + bborder_style + " " + bborder_width + "<br />";
+
+$("#status").html(status);
+
+//alert(fcolor  + " : " + fsize);
+//alert(bborder + " : " + bcolor);
+
+
+function initDesin(){
+	var code = fsize.replace(/(px)/gi,"");
+	$("#msize").val(code);
+
+	code = fcolor.replace(/(rgb|\(|\)| )/gi,"");
+	$("#mcolor").val(code);
+
+	//border なし　の検出
+	if(bborder_width.match(/none/gi)){
+		code = "";
+	}else{
+		//rgb(*,*,*) パターンを抽出
+		var scode = bborder_color.match(/rgb\(.+\,.+\,.+\)/gi);
+		code = scode[0].replace(/(rgb|\(|\)| )/gi,"");
+	}
+	$("#bborder").val(code);
+
+
+	//rgba(*,*,*,*) パターンを抽出
+	scode = bcolor.match(/rgba\(.+\,.+\,.+,.+\)/gi);
+	code = scode[0].replace(/(rgba|\(|\)| )/gi,"");
+
+	// , で分離
+	scode = code.split(",");
+	var scolor   = scode[0] + "," + scode[1] + "," + scode[2];
+	var sopacity = scode[3];
+	
+	$("#bcolor").val(scolor);
+	$("#bopacity").val(sopacity);
+}
+
+
+
+var nDiv = ".labeldiv";
+$(nDiv).css({
+	"color"     : fcolor,
+	"font-size" : fsize,
+	"border"    : bborder_width + " " + bborder_style + " " + bborder_color,
+
+	"background-color": bcolor,
+
+	"width"       : "35%",
+	"padding"     : "0px",
+	"white-space" : "nowrap",	//文字を折り返さない
+	"margin" : "auto",
+	"text-align" : "center"
+});
+ 
+function testView(sel){
+	switch(sel){
+		case "color" :
+			var val = "rgb(" + $("#mcolor").val() + ")";
+			$(nDiv).css( sel , val );
+			break;
+		case "font-size" :
+			var val = $("#msize").val();
+			$(nDiv).css( sel , val + "px" );
+			break;
+		case "bcolor" :
+		case "bopacity" :
+			var val = $("#bcolor").val();
+			var opt = $("#bopacity").val();
+			var code = "rgba(" + val + "," + opt + ")";
+
+			$(nDiv).css("background-color" , code );
+			break;
+		case "border" :
+			var val  = $("#bborder").val();
+			if(val == ""){
+				var code = "";
+			}else{
+				var code = "1px solid rgb(" + val + ")";
+				//var code = "rgb(" + val + ")";
+			}
+
+			$(nDiv).css( sel , code );
+			break;
+		
+	}
+}
+
+
+function setDesin(){
+	var fcolor  = $(nDiv).css("color");
+	var fsize   = $(nDiv).css("font-size");
+
+	var bborder_color = $(nDiv).css("border-left-color");
+	var bborder_width = $(nDiv).css("border-left-width");
+	var bborder_style = $(nDiv).css("border-left-style");
+	var bborder = bborder_width + " " + bborder_style + " " + bborder_color;
+
+	var bcolor    = $(nDiv).css("background-color");
+	opener.$(oDiv).css({
+		"color"      : fcolor,
+		"font-size"  : fsize,
+		"border-left"    : bborder,
+		"border-right"   : bborder,
+		"border-top"     : bborder,
+		"border-bottom"  : bborder,
+
+		"background-color" : bcolor
+	});
+
+
+	//ローカルストレージに記録
+	localStorage.setItem("labelColor" , fcolor);
+
+	var labelSize = fsize.replace(/px/g,"");
+	localStorage.setItem("labelSize"   , labelSize);
+	localStorage.setItem("labelBorder" , bborder);	
+	localStorage.setItem("labelBack"   , bcolor);	
+}
+
+</script>

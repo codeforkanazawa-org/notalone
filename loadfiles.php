@@ -6,7 +6,6 @@ ini_set( 'display_errors', "1" );
 ini_set( 'display_startup_errors', "1" ); 
 
 
-
 //ファイルの一覧を表示する
 //$flist   = getFileList("files/");
 if(isset($_GET['dir'])){
@@ -16,16 +15,45 @@ if(isset($_GET['dir'])){
 	exit();
 }
 
+//**** event / map ファイルの切り分け(class)
+//event ファイル　＝　username_evt.csv  -> rename : username_evt_xxxxx.csv
+//map 　ファイル　＝　username_map.csv  -> rename : username_map_xxxxx.csv
+if(isset($_GET['class'])){
+	$file_class = "_" . $_GET['class'];	//接続用 _ 追加
+}else{
+	$file_class = "";
+}
+//********************************
+
+
+//新規作成フィールドファイルの追加
+if(isset($_GET['field'])){
+	$fields_File = $_GET['field'];
+}else{
+	$fields_File = "";
+} 
+
+//ファイルのタイプ
 if(isset($_GET['ftype'])){
 	$ftype = $_GET['ftype'];
 }else{
 	$ftype = "";
 }
 
+//filelist sortの追加
+if(isset($_GET['fsort'])){
+	$fsort = $_GET['fsort'];
+}else{
+	$fsort = "sort";	//<--> rsort
+}
+
 $dir  = $this_dir;
 $dir .= "/";
-$flist = getFileList($dir);
+$flist = getFileList($dir , $fsort);
 $flength = count($flist);
+
+
+////////////////
 
 if(isset($_GET['key'])){
 	$key = $_GET['key'];
@@ -39,14 +67,20 @@ if(isset($_GET['next'])){
 }else{
 	$next = "";
 }
-$next = "admin/" . $next;
 
 
 //log_in.php からの戻り場所指定
 //@$ReturnFile = $_SESSION['CallJob'];
 $this_file = "../loadfiles.php";	//admin/からみたファイル位置
-$_SESSION['CallJob'] = $this_file . "?dir=" . $this_dir . "&ftype=" . $ftype . "&key=" . $key;
 
+//$_SESSION['CallJob'] = $this_file . "?dir=" . $this_dir . "&ftype=" . $ftype . "&key=" . $key . "&fsort=" . $fsort . "&field=" . $fields_File . "&next=" . $next;
+
+$_SESSION['CallJob'] = $this_file . "?" . $_SERVER["QUERY_STRING"];	//log_in.php　からの戻り用
+
+
+//ファイルの階層固定
+$next = "admin/" . $next;
+$fields_File = "localhost/" . $fields_File;
 
 
 //複数ファイルを選択（exifファイルの選択を想定）
@@ -61,7 +95,26 @@ if(isset($_GET['multi'])){
 }
 
 
-?>
+$sub_title = "";
+switch($this_dir){
+	case "uploads/events" :
+		$sub_title = "イベント情報一覧";
+		break;
+	case "events" :
+		$sub_title = "イベント情報集計一覧";
+		break;
+	case "uploads/mapinfo" :
+		$sub_title = "公園・施設情報一覧";
+		break;
+}
+
+//user_header("管理ページ" . $sub_title);
+
+user_header($sub_title , "loadxml_init()");
+//common_menu(1);
+
+/*
+<!--
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -75,10 +128,13 @@ if(isset($_GET['multi'])){
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 
 <title>ファイルの選択</title>
+-->
+
 <!--script type="text/javascript" src="js/myScript.js"></script-->
 
 <!-- jquery ライブラリ -->
-<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+ <script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+*/?>
 
 <script type="text/javascript">
 
@@ -93,7 +149,7 @@ if(isset($_GET['multi'])){
 		$dname = dirname($flist[$i]);
 
 		//ファイルの更新日時
-		$timestamp = date("Y/m/d H:m:s",filemtime($flist[$i]));
+		$timestamp = date("Y/m/d H:i:s",filemtime($flist[$i]));
 
 		if($ftype == "image"){
 			//exifから　lat lng 付加
@@ -107,8 +163,26 @@ if(isset($_GET['multi'])){
 		}
 		//////////////////////
 
-		//$buff .= '{ dir : "' . $dname . '", file : "' . $fname . '", lat : "' . $lat . '", lng : "' . $lng . '" }';
-		$buff .= '{ dir : "' . $dname . '", file : "' . $fname . '", timestamp : "' . $timestamp . '", lat : "' . $lat . '", lng : "' . $lng . '" }';
+		//$buff .= '{ dir : "' . $dname . '", file : "' . $fname . '", timestamp : "' . $timestamp . '", lat : "' . $lat . '", lng : "' . $lng . '" }';
+
+		//myfile の追加 ************************
+		//ファイルリストから自分のファイルのみを表示する
+		$id = $_SESSION[$USER_session];
+
+		//先頭のIDと拡張子
+		$FstPT = "/^" . $id . ".csv$/i";
+		//先頭のIDと_とxxxxxと拡張子
+		$SndPT = "/^" . $id . "_[0-9_.-a-z]*.csv$/i";
+
+		if(preg_match($FstPT , $fname) || preg_match($SndPT , $fname)){
+			$myfile = 1;
+		}else{
+			$myfile = 0;
+		}
+		//**************************************
+
+		$buff .= '{ dir : "' . $dname . '", file : "' . $fname . '", myfile : "' . $myfile . '", timestamp : "' . $timestamp . '", lat : "' . $lat . '", lng : "' . $lng . '" }';
+
 
 		if($i < ($flength - 1)){
 			$buff .= ',';
@@ -122,6 +196,11 @@ if(isset($_GET['multi'])){
 	print('var next_job = "' . $next . '";' . $cr );
 
 	print('var this_dir = "' . $this_dir . '";' . $cr );
+
+	//ファイルクラス(種別　event / map)の追加
+	print('var file_class = "' . $file_class . '";' . $cr );
+	//************
+
 	print('var ftype    = "' . $ftype . '";' . $cr );
 	print('var initkey  = "' . $key . '";' . $cr ); 
 
@@ -129,6 +208,9 @@ if(isset($_GET['multi'])){
 	print('var flength  = ' . $flength . ';' . $cr);
 
 	print('var multi = ' . $multi . ';' . $cr);
+
+	//fields_File追加
+	print('var fields_File = "' . $fields_File . '";' . $cr);
 
 ?>
 
@@ -155,14 +237,19 @@ function loadxml_init(){
 	var jkn = initkey;
 	document.getElementById("keyword").value = jkn;
 
-	show_flist(jkn);
+	//自分のファイル
+	show_flist(jkn , "1");
+
+	//自分以外のファイル
+	show_flist(jkn , "0");
+
 
 //アップロード画像のthumbnailをoutput listに表示する
 document.getElementById('upload-form').addEventListener('change', handleFileSelect, false);
 
 }
 
-function show_flist(jkn){
+function show_flist(jkn , myfile){
 	var buff = "";
 
 	//jkn の　and 検索を検出
@@ -181,6 +268,11 @@ function show_flist(jkn){
 
 	var delf = 0;
 	for(i = 0 ; i < flength ; i++){
+		//myfile の切り分け
+		if(flist[i]['myfile'] != myfile){
+			continue;
+		}
+
 		fname = flist[i]['file'];
 		dname = flist[i]['dir'];
 		lat   = flist[i]['lat'];
@@ -215,15 +307,16 @@ function show_flist(jkn){
 		if(ftype.indexOf("image") != -1){
 			buff += '<img src="' + dname + '/' + fname + '" width="30" />';
 		}
-
-		buff += '<a href="' + dname + '/' + fname + '" target="_blank">' + fname + '</a>';
-		buff += '</td><td>';
-		buff += timestamp;
+ 
+		//buff += '<a href="' + dname + '/' + fname + '" target="_blank">' + fname + '</a>';
+		buff += '<a href="#" onClick="setFile(' + i + '); return false;">' + fname + '</a>';
+		//buff += '</td><td>';
+		//buff += timestamp;
 
 		//downloadボタンの追加　******
 		buff += '</td><td>';
 		
-		buff += '<input type="button" onClick="download(' + i + ');" value="ダウンロード">';
+		buff += '<input class="btn3" type="button" onClick="download(' + i + ');" value="ダウンロード">';
 
 		//*************************
 
@@ -233,15 +326,7 @@ function show_flist(jkn){
 			buff += ' *';
 		}
 
-		buff += '</td><td>';
-
-		//複数の画像ファイル選択
-		if(ftype == 'image' && multi){
-			buff += ' <input type="checkbox" name="multi_sel" id="multi_sel"  value="' + i + '" />';
-
-		}else{		
-			buff += ' <input type="button" onClick="setFile(' + i + ');" value="ファイル選択" />';
-		}
+		//buff += '</td><td>';
 
 		
 		//ファイル登録ユーザは、自分のファイルの削除が可能
@@ -256,16 +341,33 @@ function show_flist(jkn){
 		}
 
 		if(delf == 1){
-			buff += ' <input type="button" onClick="renFile(' + i + ');" value="名前変更" />';
-			buff += ' <input type="button" onClick="delFile(' + i + ');" value="削除" />';
+			buff += '<input class="btn_negative" type="button" onClick="delFile(' + i + ');" value="削除" />';
+			buff += '<input class="btn2" type="button" onClick="renFile(' + i + ');" value="ファイル名変更" />';
 		}
+
+		//複数の画像ファイル選択
+		if(ftype == 'image' && multi){
+			buff += '<input type="checkbox" name="multi_sel" id="multi_sel"  value="' + i + '" />';
+
+		}else{		
+			if(myfile == "1" || UserLevel > 1 ){
+				buff += '<input type="button" onClick="setFile(' + i + ');" value="編集" />';
+			}else{
+				buff += '<input class="btn2" type="button" onClick="setFile(' + i + ');" value="見る" />';
+			}
+		}
+
 
 		//buff += '<br />';
 		buff += '</td></tr>';
 	}
 	buff += '</table>';
 
-	document.getElementById("filelist").innerHTML = buff;
+	if(myfile == 1){
+		document.getElementById("myfilelist").innerHTML = buff;
+	}else{
+		document.getElementById("filelist").innerHTML = buff;
+	}
 
 
 	//ログイン状態が変化した場合callBackを実行する
@@ -280,7 +382,8 @@ function download(valNo){
 
 	var link = "download.php?dir=" + dir + "&file=" + fname;
 
-	if($('input[name=fencode]:checked').val() === 'siftjis'){
+	//if($('input[name=fencode]:checked').val() === 'shiftjis'){
+	if($('[name=fencode]').val() === 'shiftjis'){
   		link += "&enc=sjis";
 	}
 	//default : utf8
@@ -395,17 +498,45 @@ function renFile(valNo){
 	//file_name.match(reg)[1];	//demon_uploader
 	//file_name.match(reg)[2];	//jpg
 
+	var fhead = nowfile.match(reg)[1];
 	var ext = nowfile.match(reg)[2];
+
+
+	//管理者の場合　旧ファイル名をベースにするか、自分のファイル名にベースにするか確認する。
+	if( UserLevel >= 2){
+		if(confirm("現在のファイル名をベースにしますか？")){
+			var newname = fhead;
+		}else{
+			var newname = inputName + file_class;
+		}
+	}else{
+		var newname = inputName + file_class; 
+	}
+
+
 
 	var flog =0;
 
 	while(flog == 0){
-		var rename = prompt(inputName + "_*****." + ext + "（*****の部分のみ変更）", "");
+		//var rename = prompt(inputName + "_*****." + ext + "（*****の部分のみ変更）", "");
+		//var rename = prompt(inputName + file_class + "_*****." + ext + "（*****の部分のみ変更）", "");
 
-		//キャンセル　または　文字入力なしで　処理中止
-		if((rename == null) || (rename == "")) { return false; }
+		if(UserLevel == 1){
+			var rename = prompt(newname  + "_*****." + ext + "（*****の部分のみ変更）", "");
+			//キャンセル　または　文字入力なしで　処理中止
+			if((rename == null) || (rename == "")) { return false; }
+			//var renfile = inputName + file_class + "_" + rename + "." + ext;
+			var renfile = newname + "_" + rename + "." + ext;
+		}else{
+			var newname = prompt(nowfile + "：管理者は自由に名前を変更できます", newname );
+			//キャンセル　または　文字入力なしで　処理中止
+			if((newname == null) || (newname == "")) { return false; }
+			//var renfile = inputName + file_class + "_" + rename + "." + ext;
+			var renfile = newname + "." + ext;
 
-		var renfile = inputName + "_" + rename + "." + ext;
+		}
+
+
 
 		//ファイル名のチェック
 		if(renfile.match( /^.*[(\\|/|:|\*|?|\"|<|>|\|)].*$/ )){
@@ -556,9 +687,97 @@ function callBack(o, n){
 
 function flist_reflesh(){
 	var jkn = document.getElementById("keyword").value;
-	show_flist(jkn);
+	show_flist(jkn , "1");
+	show_flist(jkn , "0");
 }
 
+//ファイルの新規作成
+function NewFileMake(){
+
+	//var fields_File の分解
+	var pathinfo = fields_File.split('/');
+	var filename = pathinfo[1].split('.');
+
+	var fdir  = pathinfo[0];
+	var basename = filename[0];
+	var extname  = filename[1]; 
+
+	//alert(fdir + " / " + basename + " / " + extname);
+
+	//フィールドファイルの確認
+	var result = checkFile( fdir , basename , extname);
+	if(result){
+		//alert(fields_File + "　が見つかりました");
+	}else{
+		alert(fields_File + "　がありません");
+		return;			
+	}
+
+
+	//新規作成ファイルの確認（上書き）
+	var outdir = this_dir;
+	//var fhead  = inputName;
+	var fhead  = inputName + file_class;
+
+	switch(ftype){
+		case "text/xml"   : fext = "xml"; break;
+		case "text/csv"   : fext = "csv"; break;
+	}
+
+
+	//管理者の場合　自分のファイルを作成するか、フリーネームのファイルを作成するか確認する。
+	if( UserLevel >= 2){
+		var flg = 1
+		var newname = fhead;
+		while(flg == 1){
+			newname = prompt("管理者はファイル名を自由に設定できます",newname);
+			if(newname == null || newname ==""){ return false; }
+
+			if(confirm(newname + "." + fext + " これでいいですか")){
+				//alert(newname + "." + fext);
+				fhead = newname;
+				flg = -1;
+			}
+		}
+	}
+	
+
+	var fname  = fhead + "." + fext;
+	var result = checkFile( outdir , fhead , fext );
+
+	if(result){
+		if(confirm(fname + "は既に存在します。上書きしてよろしいですか？")){
+		}else{
+			//キャンセルして戻る
+			alert("新規作成をキャンセルしました");
+			return;			
+		}
+	}else{
+		if(confirm(fname + "　を新規作成します")){
+		}else{
+			//キャンセルして戻る
+			alert("新規作成をキャンセルしました");
+			return;			
+		}
+	}
+
+
+	//フィールドファイルのデータ読み込み・保存
+	var data;
+  	$.get(fields_File , function(data){
+		//alert(fields_File + "\n" + data);
+		//１行目のフィールドデータのみ抽出（正規表現の改行で分割）
+		fieldData = data.split(/\r\n|\r|\n/);
+
+		//テキストファイルの保存（１行目のみ）
+		//var filename = saveFile( outdir , fhead , fext , data);
+		var filename = saveFile( outdir , fhead , fext , fieldData[0]);
+		alert(filename + " を新規に作成しました");
+
+		location.reload();
+
+	});
+}
 
 function LocalFileLoad(){
 
@@ -608,7 +827,8 @@ function LocalFileLoad(){
 
   		//テキスト形式で読み込む
 		//readAsText 文字エンコード機能あり　デフォルトはUTF8
-		if($('input[name=fencode]:checked').val() === 'siftjis'){
+		//if($('input[name=fencode]:checked').val() === 'shiftjis'){
+		if($('[name=upfencode]').val() === 'shiftjis'){
   			reader.readAsText(file[0],"Shift-JIS");
 		}else{
   			reader.readAsText(file[0]);
@@ -617,9 +837,34 @@ function LocalFileLoad(){
   		//読込終了後の処理
   		reader.onload = function(ev){
     			//テキストエリアに表示する
-    			document.test.txt.value = reader.result;
+    			//document.test.txt.value = reader.result;
+
+			//（データチェック）***********
+			var ret = checkData( this_dir , reader.result );
+			var obj = JSON.parse(ret);
+
+			switch(obj.flg){
+				case -1 ://チェック対象外は、そのまま読み込む
+		    			document.test.txt.value = reader.result;
+					break;
+				case 0 ://エラーなしの場合、戻ったデータを読み込む
+				case 1 ://修正済みの場合、戻ったデータを読み込む
+    					document.test.txt.value = obj.data;
+					break;
+				case 2 ://ワーニングの場合、メッセージをつけて読み込む
+				case 3 ://エラーの場合、メッセージをつけて読み込む
+	    				document.test.txt.value = obj.msg + "\n" + obj.data;
+					//アップロードボタンを表示しない	
+					document.getElementById("Lexcec_bt").style.display = "none";
+
+			}
+
+			//alert(ret);
+
+			//*********************			
   		}
 	},false);
+
 
 
 	//************
@@ -653,7 +898,8 @@ function LocalExcec(){
 	var buff = document.getElementById("txt").value;
 
 	var outdir = this_dir;
-	var fhead  = inputName;
+	//var fhead  = inputName;
+	var fhead  = inputName + file_class;
 
 	//var fext   = "txt";
 	switch(ftype){
@@ -661,18 +907,54 @@ function LocalExcec(){
 		case "text/csv"   : fext = "csv"; break;
 	}
 
+
+	//管理者の場合　自分のファイルを作成するか、フリーネームのファイルを作成するか確認する。
+	if( UserLevel >= 2){
+		var flg = 1
+		var newname = fhead;
+		while(flg == 1){
+			newname = prompt("管理者はファイル名を自由に設定できます",newname);
+			if(newname == null || newname ==""){ return false; }
+
+			if(confirm(newname + "." + fext + " これでいいですか")){
+				//alert(newname + "." + fext);
+				fhead = newname;
+				flg = -1;
+			}
+		}
+	}
+
+
 	var indata = buff;
+
+
+	//ファイルの存在確認
+	var fname  = fhead + "." + fext;
+	var result = checkFile( outdir , fhead , fext );
+
+	if(result){
+		if(confirm(fname + "は既に存在します。上書きして保存してよろしいですか？")){
+		}else{
+			//キャンセルして戻る
+			return;			
+		}
+	}
 
 	//テキストファイルの保存
 	var filename = saveFile( outdir , fhead , fext , indata);
-
-	alert(filename + " をアップロードしました");
+	alert(filename + " で保存しました");
 
 	location.reload();
 }
 
-function LocalClose(){
+function LocalClose(cb){
 	document.getElementById("LocalText").style.display = "none";
+
+	if(cb){
+		setTimeout(function(){
+			cb();
+		},500);
+	}
 }
 //***************
 
@@ -833,6 +1115,98 @@ function user_logout(){
 
 }
 
+
+//テキストデータの個別エラーチェック
+function checkData( outdir , indata ){
+
+	//admin/checkdata.php の位置から見た dir　に補正する
+	outdir = "../" + outdir;
+
+	//**************************
+	send_data = { dir : outdir , data : indata };
+
+	//alert(outdir);
+	//alert(indata);
+
+	var result;
+        // 送信処理
+	$.ajax({
+		url: "admin/checkdata.php", // 送信先のPHP
+		type: "POST", // POSTで送る
+		async : false,	//同期通信
+		data:send_data ,
+		success : function(data, status, xhr) {
+ 			// 通信成功時の処理
+			console.log("success");
+			console.log("data ="+data);
+			console.log("status ="+status);
+			console.log("xhr ="+xhr);
+
+			//処理した結果を返す
+			result = data;
+
+			//通信OK後、データベース処理でエラーとなった場合の確認処理が必要。
+		} ,
+
+		error : function(xhr, status, error) {
+			// 通信失敗時の処理
+        	console.log("error");
+			console.log("status ="+status);
+			console.log("xhr ="+xhr);
+			alert("データが転送がエラーとなりました");
+		}
+	});
+
+	return result;
+}
+
+
+//テキストファイルの存在チェック
+function checkFile( outdir , fhead , fext){
+
+	//admin/checkfile.php の位置から見た dir　に補正する
+	outdir = "../" + outdir;
+
+	//**************************
+	//xml データをサーバーへ送信する
+	send_data = { dir : outdir , header : fhead , ext : fext };
+
+	//alert(send_data);
+
+	var result;
+
+        // 送信処理
+	$.ajax({
+		url: "admin/checkfile.php", // 送信先のPHP
+		type: "POST", // POSTで送る
+		async : false,	//同期通信
+		data:send_data ,
+		success : function(data, status, xhr) {
+ 			// 通信成功時の処理
+			console.log("success");
+			console.log("data ="+data);
+			console.log("status ="+status);
+			console.log("xhr ="+xhr);
+
+			//処理した結果を返す
+			result = data;
+
+			//通信OK後、データベース処理でエラーとなった場合の確認処理が必要。
+		} ,
+
+		error : function(xhr, status, error) {
+			// 通信失敗時の処理
+        		console.log("error");
+			console.log("status ="+status);
+			console.log("xhr ="+xhr);
+			alert("データが転送がエラーとなりました");
+		}
+	});
+
+	return result;
+
+}
+
 //テキストファイルの保存
 function saveFile( outdir , fhead , fext , indata){
 
@@ -883,94 +1257,122 @@ function saveFile( outdir , fhead , fext , indata){
 
 </script>
 
-<style>
-  .thumb {
-    height: 150px;
-    border: 1px solid #000;
-    margin: 10px 5px 0 0;
-  }
-</style>
-
+<!--
 </head>
 <body onload="loadxml_init()">
+-->
 
 <!--ID:--><input type="hidden" size="10" id="inputName" value = "" />
 <!--PW:--><input type="hidden" size="10" id="inputPass" value = "" />
+
+<div style="display:none">
 <input type="button" id="login_bt"  onClick="user_login();"  value="ログイン" />
 <input type="button" id="logout_bt" onClick="user_logout();" value="ログアウト" style="visibility:hidden" />
+</div>
+
 <!--input type="button" id="close_bt"  onClick="window.close();" value="閉じる" /-->
+
+<!--
 <input type="button" id="close_bt"  onClick="location.href='admin/index.php'" value="indexに戻る" />
-<hr />
-<h5>
-<input type="radio" id="fencode" name="fencode" value="utf8" >utf-8 
-<input type="radio" id="fencode" name="fencode" value="siftjis" checked>sift_jis 
-：アップロード、ダウンロードの文字エンコード
-</h5>
+-->
+<div id="data_create" class="sec">
+	<h2>新しくデータを作成</h2>
+	<div id="LocalRead" style="display:none">
+		<?php //<input type="button" id="localf" onClick="LocalFileLoad()" value="csvファイルをアップロード" /> ?>
+		<label class="btn btn2" for="selfile" id="localf" onClick="LocalFileLoad()">csvファイルをアップロード</label>
 
-<div id="LocalRead" style="display:none">
-	<hr />
-	<input type="button" id="localf" onClick="LocalFileLoad()" value="ローカルのファイルをアップロード" />
-</div>
-
-<div id="LocalText" style="display:none">
-
-	<input type="hidden" id="lfilename" value="" style="display:none" />
-	<input type="hidden" id="lfiletype" value="" style="display:none" />
-	<input type="hidden" id="lfilesize" value="" style="display:none" />
-
-	<div id="textform" style="display:none">
-	<!-- テキストファイル-->
-	<form name="test">
-
-		<input type="file" id="selfile"><br />
-		<input type="reset" value="クリア"><br />
-		
-
-		<textarea name="txt" id="txt" rows="10" cols="100" readonly></textarea>
-
-
-	</form>
-	<input type="button" id="Lexcec_bt" onClick="LocalExcec()" value="アップロード実行" /><br />
+		<!--input type="button" id="makefile" onClick="NewFileMake()" value="新規作成" /--> 
+		<input type="button" id="makefile" onClick="LocalClose(NewFileMake)" value="新規作成" /> 
 	</div>
 
-	<div id="imageform" style="display:none">
-	<!-- 画像ファイル -->
-	<form id="upload-form" method="post" enctype="multipart/form-data" onSubmit="return uploader(this);">
-		<input type="file" name="upfile[]" id="upfile" multiple /><br />
+	<div id="LocalText" style="display:none"><div>
+		<input type="hidden" id="lfilename" value="" style="display:none" />
+		<input type="hidden" id="lfiletype" value="" style="display:none" />
+		<input type="hidden" id="lfilesize" value="" style="display:none" />
 
-		<output id="list"></output><br />
+		<div id="textform" style="display:none">
+		<!-- テキストファイル-->
+		<form name="test">
+			<p class="info">ファイルを選択して、内容を確認してください</p>	
+			<textarea name="txt" id="txt" rows="10" cols="100" wrap="off" readonly></textarea>
+			<p id="upload_code"><span>文字化けする場合は、文字コードを変更してください。</span><label>文字コード<select id="upfencode" name="upfencode">
+					<!--option value="auto" selected>自動</option-->
+					<option value="utf8" selected>utf-8</option> 
+					<option value="shiftjis">shift_jis</option> 
+				</select>
+			</label>
+			</p>
+			<div class="btns">
+			<input class="btn btn_negative" type="reset" id="Lclose_bt" onClick="LocalClose()" value="キャンセル" />
+			<label class="btn btn2"><span><span class="forPC">ファイルを</span>再選択</span><input type="file" id="selfile"></label>
+			<!--input type="reset" onClick="LocalFileLoad()" value="クリア"-->
+			<input type="button" id="Lexcec_bt" onClick="LocalExcec()" value="保存" />
+			</div>
+		</form>
 
-		<!-- photouploader への引き継ぎ情報 -->
-		<input type="hidden" name="username" id="username" value="" />
-		<input type="hidden" name="updir" id="updir" value="" />
 
-		<input type="submit" id="Iexcec_bt" value="アップロード実行" /><br />
-	</form>
-	</div>
+		</div>
 
-	<input type="button" id="Lclose_bt" onClick="LocalClose()" value="中止／閉じる" />
-</div> 
+		<div id="imageform" style="display:none">
+		<!-- 画像ファイル -->
+		<form id="upload-form" method="post" enctype="multipart/form-data" onSubmit="return uploader(this);">
 
-<hr />
-<h5>
-　ファイルを選択してください<br />
-（アップロード、削除、名前変更は、ログインが必要です）<br />
-</h5>
+			<input type="button" id="Lclose_bt" onClick="LocalClose()" value="キャンセル" />
+			<input type="file" name="upfile[]" id="upfile" multiple /><br />
 
-<input type="text" size="30" id="keyword" value="" />
-<input type="button" id="key_bt" onClick="flist_reflesh()" value="and検索" /> 
-<input type="button" onClick="document.getElementById('keyword').value=''" value="クリア" />
+			<output id="list"></output><br />
 
-<div id="filelist">
+			<!-- photouploader への引き継ぎ情報 -->
+			<input type="hidden" name="username" id="username" value="" />
+			<input type="hidden" name="updir" id="updir" value="" />
 
+			<input type="submit" id="Iexcec_bt" value="アップロード実行" /><br />
+		</form>
+		</div>
+
+		<!--input type="button" id="Lclose_bt" onClick="LocalClose()" value="キャンセル" /-->
+	</div></div> <!-- /#LocalText -->
 </div>
 
-</body>
-</html>
+<div id="data_lists" class="sec">
+	<h2>データの編集・閲覧・ダウンロード</h2>
 
+	<div id="data_actions">
+		<div id="search_box">
+			<input type="text" size="30" id="keyword" value="" placeholder="データ名でファイルを検索" />
+			<input type="button" id="key_bt" onClick="flist_reflesh()" value="検索" /> 
+			<?php //<input type="button" onClick="document.getElementById('keyword').value=''; flist_reflesh();" value="クリア" /><br /> ?>
+		</div>
+		<div id="code_box">
+			<label>ダウンロードデータの文字コード</label>
+			<select id="fencode" name="fencode">
+				<option value="utf8">utf-8</option> 
+				<option value="shiftjis" selected>shift_jis</option> 
+			</select>
+		</div>
+	</div>
+	<!--
+	<input type="radio" id="fencode" name="fencode" value="utf8" >utf-8 
+	<input type="radio" id="fencode" name="fencode" value="shiftjis" checked>shift_jis 
+	-->
+	<div>
+		<h3>自分のデータ</h3>
+		<div id="myfilelist" class="sec_body">
+		</div>
+	</div>
+	<div>
+		<h3>他のデータ</h3>
+		<div id="filelist" class="sec_body">
+		</div>
+	</div>
+</div>
+<?php
+common_menu(1);
+?>
+<?php include_once './admin/include_footer.php'; ?>
 
 <?php
-function getFileList($dir) {
+function getFileList($dir , $sort) {
 	$files = glob(rtrim($dir, '/') . '/*');
 	$list = array();
 	foreach ($files as $file) {
@@ -982,8 +1384,12 @@ function getFileList($dir) {
 		}
 	}
 
-	//ファイル名の降順にソート
-	rsort($list);
+	//ファイル名のソート
+	if($sort == "rsort"){
+		rsort($list);
+	}else{
+		sort($list);
+	}
 
 	return $list;
 }

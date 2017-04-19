@@ -112,5 +112,4 @@ function setOption(){
 </div>
 
 
-</BODY>
-</HTML>
+<?php include_once 'include_footer.php'; ?>

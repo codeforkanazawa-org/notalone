@@ -24,9 +24,19 @@ if(isset($_GET['dir'])){
 }
 if(isset($_GET['fname'])){
 	$db_filename = trim($_GET['fname']);
+
+	/*
 	$files = explode("." , $db_filename);
 	$db_Head = $files[0];
 	$db_Ext  = $files[1];
+	*/
+
+	//ファイル名(filename)に　. が入っても拡張子(extension)抽出可能
+	$filepath = pathinfo($db_filename);
+	$db_Head = $filepath['filename'];
+	$db_Ext  = $filepath['extension'];
+
+	//print($db_Head . " / " . $db_Ext . "<br />");
 }else{
 	$db_Head = "201512";
 	$db_Ext  = "csv";
@@ -34,10 +44,10 @@ if(isset($_GET['fname'])){
 $db_Table = $db_Dir . "/" . $db_Head . "." . $db_Ext;
 
 
-common_header("control EventTable");
+//common_header("control EventTable");
 
-$user_level = Access_check( $acc_level ,1,1,$ReturnFile);
-print('レベル　＝　1:一般ユーザ　2:管理ユーザ　3:システム管理者<br>');
+$user_level = Access_check( $acc_level ,0,1,$ReturnFile);
+//print('レベル　＝　1:一般ユーザ　2:管理ユーザ　3:システム管理者<br>');
 
 //ファイルの存在確認
 if(!file_exists($db_Table)){
@@ -66,9 +76,13 @@ if($user_level == 1){
 //***********************
 
 //*************
+$falename = $db_filename;
 if($ReadOnly == 'true'){
-	echo 'あなたのファイルではありません（閲覧のみ可能）';
+	common_header("イベントファイルの閲覧<span class='sub_title'>$falename</span>");
+	//echo 'あなたのファイルではありません（閲覧のみ可能）';
 }else{
+	common_header("イベントファイルの編集<span class='sub_title'>$falename</span>");
+/*
 	echo '
 	<ul>
 	<li>,（カンマ）"（ダブルクオーテーション）\'（シングルクオーテーション）は使用できません</li>
@@ -80,16 +94,19 @@ if($ReadOnly == 'true'){
 	echo '
 	<input type="button" onClick="DataCheck()" value="イベントデータの簡易チェック">
 	<div id="errorArea" style="position:fixed; top:180px; left:10px;">
-		<textarea id="errorResult" rows="10" cols="100" style="background:lightyellow;">
+		<textarea id="errorResult" rows="10" cols="100" style="background:lightyellow;" wrap="off">
 		</textarea>
 		<input type="button" onClick="errorAreaClose()" value="閉じる">
 	</div>
 	';	
 	//***********************
+*/
+	
 }
 
 //*************
-print("<h3>【ファイル名：" . $db_Table . "】</h3>");
+
+//print("<h3>【ファイル名：" . $db_Table . "】</h3>");
 
 //db内容をjavascript用に読み込む
 $DataString    = csvDatabaseRead($db_Table,1);
@@ -98,12 +115,10 @@ $DataString    = csvDatabaseRead($db_Table,1);
 
 ?>
 
-<link rel="stylesheet" href="../css/csvdatabase2.css">
-
 <link rel="stylesheet" href="../js/jquery-ui-1.11.4.custom/jquery-ui.min.css">
 
-<script type="text/javascript" src="../js/jquery-1.11.3.min.js"></script>
-<script type="text/javascript" src="../js/csvdatabase2.js"></script>
+<?php //<script type="text/javascript" src="../js/jquery-1.11.3.min.js"></script> ?>
+<script type="text/javascript" src="../js/csvdatabase2.js?ver=160120"></script>
 <script type="text/javascript" src="../js/sha256.js"></script>
 
 <script type="text/javascript" src="../js/jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
@@ -121,17 +136,17 @@ print("var ReadOnly = " . $ReadOnly . ";" );
 
 <?php 
 //datadir
-print("var DataDir   ='" . $db_Dir  . "';" );
+print("var DataDir   ='" . $db_Dir  . "';\n" );
 ?>
 <?php
-print("var DataHead  ='" . $db_Head . "';" );
+print("var DataHead  ='" . $db_Head . "';\n" );
 ?>
 <?php 
-print("var DataExt   ='" . $db_Ext  . "';" );
+print("var DataExt   ='" . $db_Ext  . "';\n" );
 ?>
 <?php 
 //datatable
-print("var DataTable ='" . $db_Table . "';" );
+print("var DataTable ='" . $db_Table . "';\n" );
 ?>
 
 <?php
@@ -139,38 +154,52 @@ print("var DataTable ='" . $db_Table . "';" );
 print("var DataArray    =" . $DataString  );
 ?>
 
+<?php
+
+//イベントファイルのフィールド定義を読み出す
+//個別に手動で定義することも可能
+$fields_File = "../localhost/eventfields.csv";
+$result = fieldDataRead($fields_File);
+echo $result;
+
+?>
+
+/*
 //**************
 // 呼び出し側のｐｈｐファイルで定義
-//フィールドの幅確保
+//フィールド構造ファイルの読み出し、または手動で設定
+//フィールド名
+var Fno = new Array();
+Fno[0] = 'no';
+Fno[1] = 'memo';
+
+//フィールドのラベル
+var Flabel = new Array();
+Flabel['no'] = 'No';
+Flabel['eventtitle'] = 'イベントタイトル';
+
+//フィールドの表示幅
 var Field_etc = new Array();
 Field_etc['no']           = 50;
 Field_etc['eventtitle'] = 200;
 Field_etc['where']      = 150;
+Field_etc['place']      = 120;
 Field_etc['whom']       = 150;
 Field_etc['what']       = 300;
 Field_etc['who']        = 200;
 Field_etc['contact']    = 150;
 Field_etc['fee']        = 50;
+Field_etc['when']       = 100;
 Field_etc['openTime']   = 80;
 Field_etc['closeTime']  = 80;
 Field_etc['tag1']       = 100;
 Field_etc['url']        = 150;
-/*
-no
-eventtitle
-where
-whom
-what
-who
-contact
-fee
-when
-openTime
-closeTime
-tag1
-url
 */
-//
+
+//フィールドの入力タイプ
+var Ftype = new Array();
+Ftype['what']    = "text";
+Ftype['contact'] = "text";
 
 
 //**************
@@ -184,13 +213,44 @@ var whereFieldNo   = DataFieldNo(whereFieldName);
 var tagFieldName  = "tag1";
 var tagFieldNo    = DataFieldNo(tagFieldName);
 
+var uidFieldName  = "uid";
+var uidFieldNo    = DataFieldNo(uidFieldName);
+
+//login user name
+//var uidHead       = "<?php echo $id ?>";
+
+//login timestamp 16
+var uidHead;
+function getUidHead(){
+	var date = new Date();
+	var uidHead = Math.floor( date.getTime() / 1000 ).toString(16);
+	return uidHead;
+}
+var uidClass      = "evt";
+
+
+/* befor UID //////
+function setOption(){
+	//var buff = '<br /><br /><input type="button" onClick="inputSupportOpen()" value="入力補助を表示する"/>';
+	//return buff;
+	return "";
+}
+*/
 
 
 function setOption(){
-	var buff = '<br /><br /><input type="button" onClick="inputSupportOpen()" value="入力補助を表示する"/>';
-	
-	return buff;
+	var option = "";
+	option += "<div style='display:none'>";
+	option += "<br /><input type='button' value='UIDの生成' onclick='getUID()' />";
+	option += "<br /><input type='text'   name='keta' id='keta' size='2' value='3' />桁";
+	option += "<input type='hidden' name='kazu' id='kazu' size='1' value='1' />";
+	option += "<input type='checkbox' name='suuji' id='suuji' checked />数字";
+	option += "<input type='checkbox' name='small' id='small' />英語小文字";
+	option += "<input type='checkbox' name='big'   id='big' />英語大文字";
+	option += "</div>";
+	return option;
 }
+
 
 function setData(field){
 	if(field == 'when'){
@@ -208,6 +268,12 @@ function setData(field){
 		var tagId = "#taglist";
 		var gettarget = $(tagId).val();
 		$('#Mydata_' + tagFieldNo).val(gettarget);		
+	}
+
+	if(field == 'uid'){
+		var uidId = "#uidlist";
+		var gettarget = $(uidId).val();
+		$('#Mydata_' + uidFieldNo).val(gettarget);		
 	}
 }
 
@@ -404,26 +470,50 @@ var locationTable = "../localhost/location.csv";
 var targetArray   = new Array();
 var locationArray = new Array();
 
+var where_option="";
+var tags_option="";
+//タグセレクトボックスのoption要素を設定
+setRensouArray(targetTable , targetArray , function(){
+	var ren = targetArray;
+	for(var i = 0 ; i < ren.length ; i++){
+		tags_option += '<option value="'+ren[i][tagId]+'">'+ren[i][tagName] + "(" + ren[i][tagId] + ")"+'</option>';
+	}
+});
+//場所セレクトボックスのoption要素を設定
+setRensouArray(locationTable , locationArray , function(){
+	var ren = locationArray;
+	for(var i = 0 ; i < ren.length ; i++){
+		where_option += '<option value="'+ren[i][locId]+'">'+ren[i][locId]+'</option>';
+	}
+});
+
+/*
 $(function() {
 	//連想配列の設定
+	set_tagSelect($("#taglist"));
+	set_placeSelect($("#wherelist"));
+});
+//タグセレクトボックスの設定
+function set_tagSelect(target_select){
 	setRensouArray(targetTable , targetArray , function(){
 		//入力補助機能
 		var ren = targetArray;
 		for(var i = 0 ; i < ren.length ; i++){
-			$("#taglist").append($("<option>").val(ren[i][tagId]).html(ren[i][tagName] + "(" + ren[i][tagId] + ")" ));
+			target_select.append($("<option>").val(ren[i][tagId]).html(ren[i][tagName] + "(" + ren[i][tagId] + ")" ));
 		}
 	});
-
+}
+//場所セレクトボックスの設定
+function set_placeSelect(target_select){
 	setRensouArray(locationTable , locationArray , function(){
 		//入力補助機能
 		var ren = locationArray;
 		for(var i = 0 ; i < ren.length ; i++){
-			$("#wherelist").append($("<option>").val(ren[i][locId]).html(ren[i][locId]));
+			target_select.append($("<option>").val(ren[i][locId]).html(ren[i][locId]));
 		}
 	});
-
-
-});
+}
+*/
 
 //csvデータを読み込み、連想配列に設定する
 function setRensouArray(table , rensouArray , cr){
@@ -468,60 +558,131 @@ function csvToArray(filename, cb) {
 	});
 }
 
+//uid をチェックして返す（ユニーク）
+function getUID(){
+	var comp = 0;
+	var booking = 0;
+	var returnUid = "";
+
+	while(comp == 0){
+		returnUid = makeUID();
+		for(var i = 1 ; DataArray.length <= i ; i++){
+			if(DataArray[i][uidFieldNo] == returnUid){
+				//重複あり
+				booking = 1;
+				//alert("重複しています");
+				break;
+			}
+		}
+		//重複なし
+		if(booking == 0){
+			comp = 1;
+		}
+	}
+
+	return returnUid;	
+}
+
+//var uidHead , var uidClass 
+//uidをランダム発生
+function makeUID( ){
+  	//エラーフラグ
+  	err = "off";
+
+  	keta = chgMessHalf($('#keta').val());
+  	kazu = chgMessHalf($('#kazu').val());
+
+  	//文字定義
+  	moji = "";
+  	if($('#suuji').prop('checked')){
+    		moji += "0123456789";
+  	}
+  	if($('#small').prop('checked')){
+    		moji += "abcdefghijklmnopqrstuvwxyz";
+  	}
+  	if($('#big').prop('checked')){
+    		moji += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  	}
+  	if(err == "off"){
+    		uid = "";
+    		//ユニークIDの生成
+    		for(i=0; i< kazu; i++){
+      			for(j=0; j< keta; j++){
+        			num = Math.floor(Math.random() * moji.length);
+       				uid += moji.charAt(num);
+      			}
+      			uid += "\n";
+    		}
+		var emt  = $('#Mydata_' + uidFieldNo);
+
+		//UID の形式
+		//emt.val( uidHead + uidClass + uid);
+		//emt.val( getUidHead() + uidClass + uid);
+		emt.val( uidClass + getUidHead() + uid);
+
+ 	} else {
+    		alert("数字を入力してください。");
+  	}//end makeUID
+}
+
+//make random uid
+//半角数字変換用文字定義
+var half = "0123456789";
+var full = "０１２３４５６７８９";
+function chgMessHalf(VAL){
+
+  	messIn = VAL;
+  	messOut = "";
+
+  	for(i=0; i<messIn.length; i++){
+    		oneStr = messIn.charAt(i);
+    		num = full.indexOf(oneStr,0);
+    		oneStr = num >= 0 ? half.charAt(num) : oneStr;
+    		messOut += oneStr;
+  	}
+
+  	//数字か空かチェック
+  	if(isNaN(messOut) || messOut==""){
+    		err = "on";
+  	}
+
+  	return messOut;
+}
+
 </script>
 
 
 <!--body onload="ShowData()"-->
-<body onload="init()">
+<?php //<body onload="init()">  ?>
+<script> window.onload = function() { init(); } </script>
 
 <div id="cont_area">
 </div>
-
+<?php /*
 <div id="inputSupport">
+	開催日の設定<br />
+	<input type="text" id="Mydate" size="12" value="" readonly><br />
+	<input type="button" id="MydateSet" onClick="setData('when')" value="設定する" />
+	<hr />
+
+	施設名の選択<br />
 	<select id="wherelist">
-	</select>
-	<input type="button" id="MywhereSet" onClick="setData('where')" value="whereに設定する" />
-	<br />
-	<br />
-
-	<input type="text" id="Mydate" size="12" value="" readonly="readonly">
-	<input type="button" id="MydateSet" onClick="setData('when')" value="whenに設定する" />
-	<br />
-	<br />
-
+	</select><br />
+	<input type="button" id="MywhereSet" onClick="setData('where')" value="設定する" />
+	<hr />
+	
+	任意区分の選択<br />
 	<select id="taglist">
-	</select>
-	<input type="button" id="MytagSet" onClick="setData('tag')" value="tag1に設定する" />
-	<br />
-	<br />
+	</select><br />
+	<input type="button" id="MytagSet" onClick="setData('tag')" value="設定する" />
+	<hr />
 	<input type="button" onClick="inputSupportClose()" value="閉じる" />
 </div>
+*/ ?>
 
 <div id="list">
 </div>
 
-</BODY>
-</HTML>
+<?php common_menu(1); ?>
 
-<style>
-#inputSupport{
-	visibility : hidden;
-
-	position : fixed;
-	top  : 400px;
-	left : 250px;
-
-	padding : 5px;
-	border : 3px solid #000000;
-	background : lightgreen;
-
-	z-index : 10;
-}
-
-#errorArea{
-	display : none;
-}
-
-
-</style>
-
+<?php include_once 'include_footer.php'; ?>

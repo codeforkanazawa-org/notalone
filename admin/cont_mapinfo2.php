@@ -23,9 +23,19 @@ if(isset($_GET['dir'])){
 }
 if(isset($_GET['fname'])){
 	$db_filename = trim($_GET['fname']);
+
+	/*
 	$files = explode("." , $db_filename);
 	$db_Head = $files[0];
 	$db_Ext  = $files[1];
+	*/
+
+	//ファイル名(filename)に　. が入っても拡張子(extension)抽出可能
+	$filepath = pathinfo($db_filename);
+	$db_Head = $filepath['filename'];
+	$db_Ext  = $filepath['extension'];
+
+	//print($db_Head . " / " . $db_Ext . "<br />");
 }else{
 	$db_Head = "201512";
 	$db_Ext  = "csv";
@@ -33,10 +43,10 @@ if(isset($_GET['fname'])){
 $db_Table = $db_Dir . "/" . $db_Head . "." . $db_Ext;
 
 
-common_header("control MapInfoTable");
+//common_header("control MapInfoTable");
 
 $user_level = Access_check( $acc_level ,1,1,$ReturnFile);
-print('レベル　＝　1:一般ユーザ　2:管理ユーザ　3:システム管理者<br>');
+//print('レベル　＝　1:一般ユーザ　2:管理ユーザ　3:システム管理者<br>');
 
 //ファイルの存在確認
 if(!file_exists($db_Table)){
@@ -65,19 +75,25 @@ if($user_level == 1){
 //***********************
 
 //*************
+$falename = $db_filename;
+
 if($ReadOnly == 'true'){
-	echo 'あなたのファイルではありません（閲覧のみ可能）';
+	//echo 'あなたのファイルではありません（閲覧のみ可能）';
+	common_header("公園・施設情報の閲覧<span class='sub_title'>$falename</span>");
 }else{
+	common_header("公園・施設情報の編集<span class='sub_title'>$falename</span>");
+	/*
 	echo '
 	<ul>
 	<li>,（カンマ）"（ダブルクオーテーション）\'（シングルクオーテーション）は使用できません</li>
 	<li>データを更新する場合は、必ずファイルに保存してください</li>
 	</ul>
 	';
+	*/
 }
 
 //*************
-print("<h3>【ファイル名：" . $db_Table . "】</h3>");
+//print("<h3>【ファイル名：" . $db_Table . "】</h3>");
 
 //db内容をjavascript用に読み込む
 $DataString = csvDatabaseRead($db_Table,1);
@@ -85,10 +101,10 @@ $DataString = csvDatabaseRead($db_Table,1);
 
 ?>
 
-<link rel="stylesheet" href="../css/csvdatabase2.css">
+<?php //<link rel="stylesheet" href="../css/csvdatabase2.css"> ?>
 
-<script type="text/javascript" src="../js/jquery-1.11.3.min.js"></script>
-<script type="text/javascript" src="../js/csvdatabase2.js"></script>
+<?php //<script type="text/javascript" src="../js/jquery-1.11.3.min.js"></script> ?>
+<script type="text/javascript" src="../js/csvdatabase2.js?ver=160120"></script>
 <script type="text/javascript" src="../js/sha256.js"></script>
 
 <script type="text/javascript" src="../js/setting.js"></script>
@@ -131,6 +147,17 @@ print("var DataTable ='" . $db_Table . "';" );
 print("var DataArray =" . $DataString  );
 ?>
 
+<?php
+
+//マップファイルのフィールド定義を読み出す
+//個別に手動で定義することも可能
+$fields_File = "../localhost/mapfields.csv";
+$result = fieldDataRead($fields_File);
+echo $result;
+
+?>
+
+/*
 //*************
 // 呼び出し側のｐｈｐファイルで定義
 //フィールドの幅確保
@@ -150,6 +177,13 @@ Field_etc['phone']      = 100;
 Field_etc['phone1']      = 100;
 Field_etc['phone2']      = 100;
 //**************
+*/
+
+//フィールドの入力タイプ
+var Ftype = new Array();
+Ftype['address'] = "text";
+Ftype['memo1']   = "text";
+Ftype['memo2']   = "text";
 
 
 //**************
@@ -208,12 +242,14 @@ function mapGetLatLng(){
 	var x = mPoint.lng();	//x : lng
 	var y = mPoint.lat();	//y : lat
 
-	if(confirm("この位置を設定しますか？" + x +" , "+y)){
+	
+	//if(confirm("この位置を設定しますか？" + x +" , "+y)){
 		$('#Mydata_' + latFieldNo).val(y);
 		$('#Mydata_' + lngFieldNo).val(x);
-	}else{
-		return false;
-	}
+		add_dialog("緯度・経度を設定しました");
+	//}else{
+	//	return false;
+	//}
 
 	//住所の取得
 	var request = {
@@ -225,11 +261,12 @@ function mapGetLatLng(){
 		if(status == google.maps.GeocoderStatus.OK){
 			//,の除去
 			var address = results[0].formatted_address.replace(","," ");
-			if(confirm(address + "　この住所を取得しますか？")){
+			if(confirm(address + "　この位置の住所を設定しますか？")){
 				$('#Mydata_' + addressFieldNo).val(address);
+				add_dialog("住所をを設定しました");
 			}
 		}else{
-			alert("住所は確認できませんでした");
+			alert("この位置の住所は確認できませんでした");
 		}
 	});
 
@@ -327,37 +364,18 @@ function showGoogleMap(initLat, initLng) {
 </div>
 
 <div id="map_area">
-	<div id="map_canvas">
+	<div id="map_area_inner">
+		<div id="map_canvas">
+		</div>
+		<div class="btns">
+			<input type="button" id="map_getlatlng" onClick="mapGetLatLng()" value="この位置の緯度・経度を設定する" />
+			<span class="input_btn_set"><input type="text" id="searchAddr" value="" />
+			<input type="button" id="map_hidden" onClick="map_AddrToSearch()" value="住所で検索する" />
+			</span>
+			<input type="button" id="map_hidden" onClick="map_hidden()" value="キャンセル" />
+		</div>
 	</div>
-	<input type="button" id="map_getlatlng" onClick="mapGetLatLng()" value="位置座標を取得する" />
-	　
-	<input type="text" id="searchAddr" value="" />
-	<input type="button" id="map_hidden" onClick="map_AddrToSearch()" value="住所で検索する" />
-	　
-	<input type="button" id="map_hidden" onClick="map_hidden()" value="マップを閉じる" />
 </div>
 
-
-</BODY>
-</HTML>
-
-<style>
-#map_area{
-	visibility : hidden;
-
-	position : fixed;
-	top  : 10px;
-	left : 200px;
-
-	padding : 5px;
-	border : 3px solid #000000;
-	background : lightgreen;
-
-	z-index : 10;
-}
-#map_canvas{
-	width : 600px;
-	height: 400px;
-}
-
-</style>
+<?php common_menu(1); ?>
+<?php include_once 'include_footer.php'; ?>

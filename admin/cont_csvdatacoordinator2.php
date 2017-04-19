@@ -747,26 +747,4 @@ function fieldDw(no){
 </div>
 
 
-</BODY>
-</HTML>
-
-<style>
-#map_area{
-	visibility : hidden;
-
-	position : fixed;
-	top  : 10px;
-	left : 200px;
-
-	padding : 5px;
-	border : 3px solid #000000;
-	background : lightgreen;
-
-	z-index : 10;
-}
-#map_canvas{
-	width : 600px;
-	height: 400px;
-}
-
-</style>
+<?php include_once 'include_footer.php'; ?>

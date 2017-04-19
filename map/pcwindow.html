@@ -1,31 +1,37 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>のとノットアローン｜PC用表示</title>
-	<!--link rel="stylesheet" href="../css/notalone.css"-->
-
+        <title>のとノットアローン｜PC用表示(osm)</title>
         <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-
-        <!--meta name="viewport" content="initial-scale=1, maximum-scale=1"-->
 
         <!-- Include fork origin -->
         <link href="css/main.css" rel="stylesheet">
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-        <!--script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script-->
-        <!--script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBPD7qxgGcYSxJnDNzNeaq5Ekjz3QH3d-Q"></script-->
 
         <!-- Include googlemaps api -->
+	<!-- google map との互換性保持（エラー回避）のため残置 -->
 	<script type="text/javascript" src="../js/googlemap_api.js"></script>
 
         <script src="js/main.js"></script>
+
+	<!-- Open Street Map -->
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+	<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+	<!-- =============== -->
+
+	<!-- googlemap tile plugin -->
+	<script src="http://matchingnotes.com/javascripts/leaflet-google.js"></script>
+
     </head>
 
 <body onload="initlaizePC();">
 <div id="Pccontent">
 	<div id="PcsetSetting">
-		【<label><input type="checkbox" id="mapIconDrag" onChange="iconDragCheck()" value="1">ドラッグ機能</label>】<label><input type="checkbox" id="mapIconMove" onChange="iconMoveCheck()" value="1">アイコンを移動する</label>
-		<label><input type="checkbox" id="labelMove" onChange="labelMoveCheck()" value="1">ラベルを移動する</label>　｜　
-		<label><input type="checkbox" id="labelView" onChange="labelViewCheck()"  value="1">ラベルを表示する</label>　｜　<label><input type="checkbox" id="centerMarker" onChange="centerMarkerCheck()" checked />センターマーカー</label><br />
+		【<label><input type="checkbox" id="mapIconDrag" onChange="osm_iconDragCheck()" value="1">ドラッグ機能</label>】<label><input type="checkbox" id="mapIconMove" onChange="iconMoveCheck()" value="1">アイコンを移動する</label>
+		<label><input type="checkbox" id="labelMove" onChange="osm_labelMoveCheck()" value="1">ラベルを移動する</label>｜
+		<label><input type="checkbox" id="labelView" onChange="osm_labelViewCheck()"  value="1">ラベルを表示する</label>
+		<input type="button" onClick="labeldesin()" value="ラベルの装飾">｜
+		<label><input type="checkbox" id="centerMarker" onChange="centerMarkerCheck()" checked />センターマーカー</label><br />
 		<label><input type="radio" name="PcSize" onClick="PcSizeCheck()" value="1" checked >A4縦</label>
 		<label><input type="radio" name="PcSize" onClick="PcSizeCheck()" value="2">A4横</label>
 		<label><input type="radio" name="PcSize" onClick="PcSizeCheck()" value="3">A3縦</label>
@@ -41,6 +47,7 @@
 
         <div id="map_canvas" style="width:500px; height:500px;"></div>
 </div>
+
 
 </body>
 </html>
@@ -59,13 +66,27 @@ body{
 	border  : solid 3px #000000;
 }
 
+
+/* stringsIcon のスタイル定義 */
+.my-div-icon{
+	color : red;
+	font-size  : 12px;
+
+	border: 1px solid black;
+
+	/*background-color : white;*/
+	background-color: rgba(255, 255, 255, 0.8);
+	/*文字を折り返さない*/
+	white-space: nowrap;
+}
+
 </style>
 
 <script type="text/javascript">
 var oMarray = opener.markersArray;
 var markersArray = new Array();
 var oSarray = opener.stringsArray;
-var stringsArray = new Array();
+var stringsArray_osm = new Array();
 
 var oMap = opener.googlemap;
 var pcmap;
@@ -81,17 +102,31 @@ var heightPlus;
 
 var centerMarker;
 
+//***** label
+var labelSize = localStorage.getItem("labelSize");
+if(labelSize == null){
+	var labelSize   = 12;
+}
+var labelFont   = labelSize + "px";
+var labelHeight = 1.4; 
+
+
 //親ページ(opener)の配列から、マップアイコンを表示する
 function initlaizePC(){
 	//check 
-	DRAGGABLEI = opener.$("#mapIconDrag").prop("checked");
+	DRAGGABLE = opener.$("#mapIconDrag").prop("checked");
 	ICONMOVE  = opener.$("#mapIconMove").prop("checked");
 	LABELMOVE = opener.$("#labelMove").prop("checked");
 	LABELVIEW = opener.$("#labelView").prop("checked");
+
+	CENTERMARKER = opener.$("#cMarkerView").prop("checked"); 
+
 	$("#mapIconDrag").prop("checked",DRAGGABLE);
 	$("#mapIconMove").prop("checked",ICONMOVE);
 	$("#labelMove").prop("checked",LABELMOVE);
 	$("#labelView").prop("checked",LABELVIEW);
+
+	$("#centerMarker").prop("checked",CENTERMARKER);
 	//
 
 	//PcSizeのチェック
@@ -114,113 +149,170 @@ function initlaizePC(){
 
 
 	var center = oMap.getCenter();
+
+	//(osm)
+	centerMarker = center;
+	
 	var initLat = center.lat();
 	var initLng = center.lng();
 	var zoom    = oMap.getZoom();
 
-        var latlng = new google.maps.LatLng(initLat, initLng);
- 
-        var opts = {
-	    zoom  : zoom,
-	    center: latlng,
+	PcSizeCheck();
 
-	    //mapTypeId: google.maps.MapTypeId.ROADMAP,
-	    mapTypeControl: true,
-	    mapTypeControlOptions: {
-		//mapTypeIds: ['noText',google.maps.MapTypeId.ROADMAP,google.maps.MapTypeId.HYBRID],
-		mapTypeIds: ['noLabel','noText',google.maps.MapTypeId.ROADMAP,google.maps.MapTypeId.HYBRID],
-	    },
-    	    zoomControl: true,
-	    zoomControlOptions: {
-        	position: google.maps.ControlPosition.LEFT_TOP
-	    },
-	    streetViewControl: false,
+/*
+        //var latlng = new google.maps.LatLng(initLat, initLng);
+	var pcmap = L.map('map_canvas').setView([initLat　, initLng], zoom);
 
-	    //disableDoubleClickZoom: true	//ダブルクリックズームを無効化
-        };
-        pcmap = new google.maps.Map(document.getElementById("map_canvas"), opts);
-
-	
-	//***********
-	//スタイル付き地図
-	var styleOptions0 = [
-	{
-		"featureType" : 'all',
-  		"elementType" : 'labels',
-  		"stylers" : [
+	//地理院地図レイヤー追加
+	L.tileLayer(
+		'http://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
 		{
-			visibility: 'off'
-		}]
-	}
-	];
-
-	var styledMapOptions0 = { name: '超簡素' }
-	var lopanType = new google.maps.StyledMapType(styleOptions0, styledMapOptions0);
-	pcmap.mapTypes.set('noLabel', lopanType);
-	pcmap.setMapTypeId('noLabel');
-	
-	
-	//***********
-	var styleOptions = [{
-		"elementType": "labels.text",
-		"stylers" : [{ "visibility": "off" }]
-	}];
-
-	var styledMapOptions = { name: '簡素' }
-	var lopanType = new google.maps.StyledMapType(styleOptions, styledMapOptions);
-	pcmap.mapTypes.set('noText', lopanType);
-	pcmap.setMapTypeId('noText');
-	//***********
-	
-
-	//center marker
-	centerMarker = new google.maps.Marker({
-            	position: pcmap.getCenter(),
-	    	title   : "センターマーカー",
-		label : "C",
-	    	//icon    : icon,		
-            	map: pcmap
-        });
-
-        var infowindow = new google.maps.InfoWindow({
-		//position : latlng,
-		content  : centerMarker.getTitle()
-	});
-
-        google.maps.event.addListener(centerMarker , 'click', function() {
-	    	if(carrent_infowindow){
-			carrent_infowindow.close();
-	    	}
-	    	infowindow.open(pcmap , centerMarker);
-	    	carrent_infowindow = infowindow;
-        });
-
-	//マップ画面の移動
-	google.maps.event.addListener(pcmap, 'bounds_changed', function(){
-		centerMarker.setPosition(pcmap.getCenter());
-	});
-
-/*	//ズームチェンジ 0-20
-	google.maps.event.addListener(pcmap, 'zoom_changed', function(){
-		alert("zoomSize=" + pcmap.getZoom());
-	});
+			attribution: "<a href='http://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html' target='_blank'>国土地理院</a>"
+		}
+	).addTo(pcmap);
 */
 
-	PcSizeCheck();
-	pcmap.setCenter(latlng);
+	//**** googlemap add on 
+	var googleRoad = new L.Google('ROADMAP');
+	var googleSate = new L.Google('SATELLITE');
+	var googleHybr = new L.Google('HYBRID');
+	var googleTerr = new L.Google('TERRAIN');
+	//pcmap.addLayer(googlemap);
+	//*********************
+
+	var osm = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            { id: 'osmmap', attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors' }),
+            osm_jp = L.tileLayer('http://tile.openstreetmap.jp/{z}/{x}/{y}.png',
+            { id: 'osmjpmap', attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors' }),
+	    mono = L.tileLayer('http://www.toolserver.org/tiles/bw-mapnik/{z}/{x}/{y}.png',
+            {id: 'OSM-monochrome', attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'}),
+	    pale = L.tileLayer('http://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png',
+            {id: 'palemap', attribution: "<a href='http://portal.cyberjapan.jp/help/termsofuse.html' target='_blank'>国土地理院</a>"}),
+            blank = L.tileLayer('http://cyberjapandata.gsi.go.jp/xyz/blank/{z}/{x}/{y}.png',
+            {id: 'blankmap', attribution: "<a href='http://portal.cyberjapan.jp/help/termsofuse.html' target='_blank'>国土地理院</a>"}),
+	    deep = L.tileLayer('http://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
+	    { id: 'deepmap' , attribution: "<a href='http://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html' target='_blank'>国土地理院</a>"}),
+	    gRoad = L.tileLayer(googleRoad,{id: 'gRoad' }),
+	    gSate = L.tileLayer(googleSate,{id: 'gSate' }),
+	    gHybr = L.tileLayer(googleHybr,{id: 'gHybr' }),
+	    gTerr = L.tileLayer(googleTerr,{id: 'gTerr' });
+
+    	pcmap = L.map('map_canvas', {
+        	//layers: [pale, hyakumeizan]
+        	layers: [osm]
+		//layers: [googleRoad]
+    	});
+
+    	var baseMaps = {
+        	"OpenStreetMap（本家）"  : osm,
+        	"OSM-monochrome（本家）"  : mono,
+        	"OpenStreetMap（日本）"  : osm_jp,
+		"国土地理院（基本地図）" : deep,
+        	"国土地理院（淡色地図）" : pale,
+        	"国土地理院（白地図）"   : blank,
+		"googlemap（基本地図）" : googleRoad,
+		"googlemap（航空写真）" : googleSate,
+		"googlemap（写真+ラベル）" : googleHybr,
+		"googlemap（地形地図）" : googleTerr
+    	};
+
+
+	/*
+	var overlayMaps = {
+        	"百名山" : hyakumeizan
+    	};
+	*/
+
+
+    	//L.control.layers(baseMaps, overlayMaps).addTo(pcmap);     
+    	L.control.layers(baseMaps , null , 
+	{
+		//option
+		//collapsed: false,	//地図切り替え開きっぱなし
+		collapsed: true,	//地図切り替え閉じる
+		position: 'topleft'	//コントロールの位置
+	}).addTo(pcmap);
+
+	pcmap.setView([initLat　, initLng], zoom);
+
+
+	//centerMarkeの設定
+	centerMarker = L.marker(
+		[initLat　, initLng],
+		{
+			title : 'センターマーカー'
+			//draggable : true
+		}
+	).addTo(pcmap);
+
+	//マーカークリック時のポップアップ
+	centerMarker.bindPopup(centerMarker.options.title);
+
+
+	// 地図移動に合わせてセンターマーカーを移動する
+        pcmap.on('moveend', function(e){
+		//pcmap.panTo([initLat　, initLng]);
+		var cLatLng = pcmap.getCenter();
+		centerMarker.setLatLng(cLatLng);		
+	});
+
+	//*** googlemap tile overlayer 対策
+	//マップの切り替え時を捉え　googlemap の　layer を　leaflet layer の下にする
+	//切り替え毎に　スタイルがリセットされるため
+	pcmap.on('baselayerchange' , function(e){
+		//$(".leaflet-google-layer").css({"opacity" : 0.5});
+		$(".leaflet-google-layer").css({"z-index" : 0});
+	});
+	//******************************
+
+
+	//センターマーカーの初期状態チェック
+	centerMarkerCheck();
+
+
+	//PcSizeCheck();
+	//pcmap.setCenter(latlng);
+	//pcmap.setView([ initLat　, initLng] );
 
 	ShowMarker();
+
+	//** marker 表示した後にフォントサイズを設定
+	$(".my-div-icon").css("font-size" , labelFont );
+
+	//ローカルストレージをチェック
+	var fcolor  = localStorage.getItem("labelColor");
+	if(fcolor){
+		$(".my-div-icon").css("color" , fcolor );
+	}
+	var bborder = localStorage.getItem("labelBorder");
+	if(bborder){
+		$(".my-div-icon").css({
+			//ie対策
+			"border-left"   : bborder,
+			"border-right"  : bborder,
+			"border-top"    : bborder,
+			"border-bottom" : bborder
+		});
+	} 	
+	var bcolor  = localStorage.getItem("labelBack");	
+	if(bcolor){
+		$(".my-div-icon").css("background-color" , bcolor );
+	} 	
+
+	//********
+
 }
 
 
 function ShowMarker(){
 	for(var i = 0 ; i < oMarray.length ; i++){
 		setMarker(oMarray[i] , oSarray[i] , i);
+		//oSarray は、osm では未使用
 	}
 }
 
-
 function setMarker(elm , els , markerIndex){
+	//親ウィンドウの　googlemap array から情報を取得する
 	var pos    = elm.getPosition();
 	var lat    = pos.lat();
 	var lng    = pos.lng();	
@@ -229,80 +321,91 @@ function setMarker(elm , els , markerIndex){
 	var title  = elm.getTitle();
 	var icon   = elm.getIcon();
 	var draggable = elm.getDraggable();
-		
-        var marker = new google.maps.Marker({
-            	position: latlng,
-	    	title   : title,
-	    	icon    : icon,
-	    	//draggable : draggable,
-		draggable : DRAGGABLE,
-		
-            	map: pcmap
-        });
+	//****************
 
-	//マップごとのinfoWindowを整形
-        var infowindow = new google.maps.InfoWindow({
-		//position : latlng,
-		content  : title
+	//osm icon
+	var image = new Image();
+	image.src = icon;
+	var width  = image.width;
+	var height = image.height;
+
+	var Licon = L.icon(
+	{
+		iconUrl : icon,
+		iconSize : [width , height],
+		iconAnchor : [ width/2 , height],
+		popupAnchor: [ 0 , -height]
 	});
 
-        google.maps.event.addListener(marker , 'click', function() {
-	    	if(carrent_infowindow){
-			carrent_infowindow.close();
-	    	}
-	    	infowindow.open(pcmap , marker);
-	    	carrent_infowindow = infowindow;
-        });
+        var marker = L.marker([ lat , lng ],
+	{
+	    	title   : title,
+	    	icon    : Licon,
+		draggable : DRAGGABLE
+	}).bindPopup(title).addTo(pcmap);
 
 	markersArray.push(marker);
 
-
-	//*****************
-	//文字列の表示
-	lat = els.lat_;
-	lng = els.lng_;
-
-	
-	var txt = title;
-	var visi = opener.$("#labelView").prop("checked");
-	var string_marker = new StringMarker( pcmap, lat, lng , txt , visi);
-
-	stringsArray.push(string_marker);
-
-	//*****************
-
-
 	//マーカーのドラッグstart検出時の動作
-        google.maps.event.addListener(marker, 'dragstart', function() {
+        marker.on('dragstart', function(e) {
 		//現在のpositionを記憶
-		dragstartIconNo     = markerIndex;
-		dragstartIconLatLng = marker.getPosition();
-		dragstartIconLat = marker.position.lat();
-		dragstartIconLng = marker.position.lng();
-	});
-
-	//マーカーのドラッグ中の動作
-        google.maps.event.addListener(marker, 'drag', function() {
-		//現在のpositionを記憶
-		if(LABELMOVE == true){
-			var dno  = markerIndex;
-			var dlat = marker.position.lat();
-			var dlng = marker.position.lng();
-
-			moveStrings(dno , dlat , dlng); 
-			//alert(marker.position.lat());
-		}
+		dragstartIconLatLng = this.getLatLng();
 	});
 
 	//マーカーのドラッグend検出時の動作
-        google.maps.event.addListener(marker, 'dragend', function() {
+        marker.on('dragend', function(e) {
 		if(ICONMOVE == false){
 			//元の座標に戻す
-			//var dno  = markerIndex;
-			marker.setPosition(dragstartIconLatLng);			
+			this.setLatLng(dragstartIconLatLng);			
 		}
 	});
+
+
+
+	//osm 文字列の表示 ***************
+	var sLength = title.length;
+	var sSize   = labelSize;
+
+	var stringIcon = L.divIcon(
+	{
+		//iconSize : [sSize * sLength , sSize * labelHeight ],	//文字サイズ、色等は、スタイルで定義
+		iconSize : 'auto',
+		iconAnchor : [ 0 , 0 ],
+		className : 'my-div-icon',
+		html : title
+	});
+
+	var string_marker = L.marker([ lat , lng ],
+	{
+		icon : stringIcon,
+		draggable : LABELMOVE
+	}).addTo(pcmap);
+	
+	stringsArray_osm.push(string_marker);
+
+
+	//文字列をクリックした時に、文字列を消す
+	string_marker.on('click',function(e){
+		this.setOpacity(0);	//非表示にする
+	});
+
+
+	//マーカーのドラッグstart検出時の動作
+        string_marker.on('dragstart', function(e) {
+		//現在のpositionを記憶
+		dragstartIconLatLng = this.getLatLng();
+	});
+
+	//マーカーのドラッグend検出時の動作
+        string_marker.on('dragend', function(e) {
+		if(LABELMOVE == false){
+			//元の座標に戻す
+			this.setLatLng(dragstartIconLatLng);			
+		}
+	});
+
 }
+
 
 function PcSizeCheck(){
 	pcmapSize = $("input[name=PcSize]:checked").val();
@@ -348,8 +451,7 @@ function PcSizeCheck(){
 	});
 
 	//キャンパスサイズの変更をgooglemap api に通知し地図を再読み込みする
-	google.maps.event.trigger(pcmap, 'resize'); 
-
+	//google.maps.event.trigger(pcmap, 'resize'); 
 
 	$("body").css({
 		"align"  : "center",
@@ -359,6 +461,7 @@ function PcSizeCheck(){
 		"padding-right"  : "20px"
 	});
 
+
 	localStorage.setItem("PcSize" , pcmapSize);
 	localStorage.setItem("widthPlus"  , widthPlus);
 	localStorage.setItem("heightPlus" , heightPlus);	
@@ -366,9 +469,164 @@ function PcSizeCheck(){
 
 function centerMarkerCheck(){
 	if($("#centerMarker").prop("checked")){
-		centerMarker.setVisible(true);
+		//centerMarker.setVisible(true);
+		centerMarker.setOpacity(1);
 	}else{
-		centerMarker.setVisible(false);
+		//centerMarker.setVisible(false);
+		centerMarker.setOpacity(0);
 	}
 }
+
+//****** osm カスタマイズ
+    //アイコンのドラッグの設定
+    function osm_iconDragCheck(){
+	if($("#mapIconDrag").prop("checked")){
+		osm_iconDragTrue();
+	}else{
+		osm_iconDragFalse();
+	}
+    }
+
+    //アイコンをドラッグしない
+    function osm_iconDragFalse(){
+	$("#mapIconDrag").prop("checked",false);
+
+	for(var i = 0 ; i < markersArray.length ; i++){
+		//markersArray[i].setDraggable( false );
+		markersArray[i].dragging.disable();
+	}
+
+	stringsArray_osm.forEach(function (marker, idx){
+		marker.dragging.disable();
+	});
+
+	localStorage.setItem("IconDrag", false);
+	DRAGGABLE = false;
+    }
+
+    //アイコンをドラッグする
+    function osm_iconDragTrue(){
+	$("#mapIconDrag").prop("checked",true);
+
+	for(var i = 0 ; i < markersArray.length ; i++){
+		//markersArray[i].setDraggable( true );
+		markersArray[i].dragging.enable();
+	}
+
+	stringsArray_osm.forEach(function (marker, idx){
+		marker.dragging.enable();
+	});
+
+	localStorage.setItem("IconDrag", true);
+	DRAGGABLE = true;
+    }
+
+
+    //アイコンの移動設定
+    function osm_iconMoveCheck(){
+	if($("#mapIconMove").prop("checked")){
+		osm_iconMoveTrue();
+	}else{
+		osm_iconMoveFalse();
+	}
+    }
+
+    //アイコンを移動しない
+    function osm_iconMoveFalse(){
+	$("#mapIconMove").prop("checked",false);
+
+	localStorage.setItem("IconMove", false);
+	ICONMOVE = false;
+    }
+
+    //アイコンを移動する
+    function osm_iconMoveTrue(){
+	$("#mapIconMove").prop("checked",true);
+
+	localStorage.setItem("IconMove", true);
+	ICONMOVE = true;
+    }
+
+
+    //ラベルの表示設定
+    function osm_labelViewCheck(){
+	if($("#labelView").prop("checked")){
+		osm_labelViewTrue();
+	}else{
+		osm_labelViewFalse();
+	}
+    }
+    //ラベルを表示しない
+    function osm_labelViewFalse(){
+	$("#labelView").prop("checked",false);
+	osm_hiddenStrings();
+	
+	localStorage.setItem("LabelView", false);
+	LABELVIEW = false;
+    }
+    //ラベルを表示する
+    function osm_labelViewTrue(){
+	$("#labelView").prop("checked",true);
+	osm_visibleStrings();
+
+	localStorage.setItem("LabelView", true);
+	LABELVIEW = true;
+    }
+
+
+    //ラベルの移動設定
+    function osm_labelMoveCheck(){
+	if($("#labelMove").prop("checked")){
+		osm_labelMoveTrue();
+	}else{
+		osm_labelMoveFalse();
+	}
+    }
+
+    //ラベルを移動しない
+    function osm_labelMoveFalse(){
+	$("#labelMove").prop("checked",false);
+
+	localStorage.setItem("LabelMove", false);
+	LABELMOVE = false;
+    }
+
+    //ラベルを移動する
+    function osm_labelMoveTrue(){
+	$("#labelMove").prop("checked",true);
+
+	localStorage.setItem("LabelMove", true);
+	LABELMOVE = true;
+    }
+
+
+//hidden
+function osm_hiddenStrings(){
+	stringsArray_osm.forEach(function (marker, idx){
+		marker.setOpacity(0);
+	});
+	//stringsArray_osm = new Array();
+}
+
+//visible
+function osm_visibleStrings(){
+	stringsArray_osm.forEach(function (marker, idx){
+		marker.setOpacity(1);
+	});
+	//stringsArray_osm = new Array();
+}
+
+
+var win;
+function labeldesin(){
+	if(!win || win.closed){
+	}else{
+		win.close();
+	}
+
+	var features = "width=400,height=400,menubar=no,location=yes,resizable=yes,scrollbars=yes,status=yes";
+	win = window.open("labeldesin.html", "labeldesinWindow", features);
+
+}
+
 </script>

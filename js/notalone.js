@@ -23,6 +23,25 @@ function getUrlVars(){
 }
 var getArray = new Array;
 
+//不要なGETデータを消去し、その他を次に引き継ぐデータを再構成
+function eraseGetString(erasekey){
+	var urlstring = "";
+	var i = 0;
+	for(key in getArray){
+  		if(key != erasekey){
+			if( i == 0 ){
+				urlstring += "?";
+			}else{
+				urlstring += "&";
+			}
+			urlstring += key + "=" + getArray[key];
+			i++;
+		}
+	}
+	return urlstring;
+}
+
+
 
 //実行ページ名の格納変数
 var thispage ="";
@@ -59,18 +78,34 @@ function init(){
 	//getデータ有無の判断
 	getArray = getUrlVars();
 
-	/*
 	//連想配列の要素数は Object.keys で検出できる
 	if(Object.keys(getArray).length == 0){
-		alert("getデータはありません");
+		//alert("getデータはありません");
 	}else{
 		for(key in getArray){
-  			alert(key + "：" + getArray[key]) ;
+  			//alert(key + "：" + getArray[key]) ;
+		}
+
+		//class引数があった場合、当該メニューにジャンプする
+		//class以外の引数は、次のメニューに引き継ぐ
+		switch(getArray['class']){
+			case 'evt' :
+				var nextString = eraseGetString('class');
+				location.href = "events.html" + nextString;
+				break; 
+			case 'map' :
+				var nextString = eraseGetString('class');
+				location.href = "map/map.html" + nextString;
+				break;
+			case 'inq' :
+				var nextString = eraseGetString('class');
+				location.href = "inquiry.html" + nextString;
+				break;
 		}
 	}
-	*/
-
 }
+
+
 
 function init_after(){
 	//実行ページのチェック
@@ -100,6 +135,67 @@ function init_after(){
 			//FullCalendarの初期化を先に実行
 			events_init();
 			brows_init();
+
+			//***************
+			//イベント表示　基準月の確認（初期は今日）
+			//初期値は今月
+			DefYear  = TodayYear;
+			DefMonth = ("0" + TodayMonth).substr(-2);
+			DefDay   = TodayDay;
+
+			//年月の指定がある場合 
+			if(getArray['mon'] && getArray['mon'].length == 6){
+				var getAry   = getArray['mon'];
+				var getYear  = getAry.substr(0,4);
+				var getMonth = getAry.substr(4,2);
+
+				//月のチェック
+				if( getMonth <= 0 || getMonth >=13){
+					//alert("月指定エラー");
+				}else{
+					//mon　で指定の月
+					DefYear  = getYear;
+					DefMonth = getMonth;
+					DefDay   = "1";
+				}
+			}
+			
+			//基準月のカレンダーを表示
+			//$('#calendar').fullCalendar('gotoDate',"2016-11");
+			$('#calendar').fullCalendar('gotoDate',DefYear + "-" + DefMonth);
+
+			//イベントデータの設定
+			readEvents(0 , function(){
+				eventSetCalendar(function(){
+
+					//UIDによる指定イベントのオープン
+					if(getArray['uid']){
+						var suid = getArray['uid'];
+						var euid = SearchEvent( 'uid' , suid , 'eno');
+						if(euid == -1){
+							alert(suid + "：指定のUIDが見つかりません");
+						}else{
+							//selectEvent(euid);
+							uidCallEvent(euid);
+						}
+					}else{
+	
+						//当日直近日にスクロール
+						TodayEvent();
+					}
+				});
+			});
+
+
+
+			//alert(eventArray.length);
+			//eventArray;
+			//selectEvent(idno);
+
+			//****************
+
+
+
 
 			//googlemap の初期設定
 			mapInit();
@@ -159,15 +255,15 @@ function brows_init(){
 
 		var BodyLeftMargin = "0px";
 	}
-
 	$("body").width(BodyWidth);
 	$("body").css({"margin-left" : BodyLeftMargin });
 
+/*
 	$("#top-menu").width(BodyWidth);
 	$("#top-menu").css({"left" : BodyLeftMargin });
 	$("#top-menu").height(TopHeight);
 	$("#top-menu").css({"line-height" : TopHeight + "px"});
-
+*/
 	
 	//個別部の設定
 	//************************
@@ -214,8 +310,10 @@ function brows_init(){
 		case "events.html" :
 
 	//カレンダーの高さ
-	$('#calendar').fullCalendar('option', 'contentHeight', DeviceHeight * 0.5);
-
+	//$('#calendar').fullCalendar('option', 'contentHeight', DeviceHeight * 0.5);
+	//$('#calendar').fullCalendar();
+	$('#calendar').fullCalendar('option', 'contentHeight', 1000);
+			
 	// コンテンツの高さ(px)
 	var calendar_div = $("#calendar").height();
 
@@ -230,7 +328,7 @@ function brows_init(){
 	}else{
 		modeCalendarTop = 0;
 	}
-
+	/*
 	$("#calendar").css({
 		"display"  : "block",
 		"position" : "fixed",
@@ -261,6 +359,7 @@ function brows_init(){
 	$('.fc-center h2').css({
 		"font-size" : "20px",
 	});
+*/
 
 
 
@@ -831,16 +930,26 @@ function imgStorageClear(){
 
 //本日年月
 var Today    = new Date();
+//var Today    = new Date(2016,10,11);
 
 var TodayYear  = Today.getFullYear();
 var TodayMonth = Today.getMonth() + 1; 	//month = 0から始まる
 var TodayDay   = Today.getDate();
 
-//基準年月
+/*
+//基準年月（初期）
 var SetYear  = TodayYear;
 var SetMonth = TodayMonth;
 var SetDay   = TodayDay; 
+*/
 
+var DefYear;
+var DefMonth;
+var DefDay;
+
+var SetYear;
+var SetMonth;
+var SetDay;
 
 var event_dir = "events/";	//イベントファイルの保存ディレクトリ
 var event_ext = ".csv";		//イベントファイルの拡張子
@@ -863,11 +972,12 @@ function readEvents(target , cb){
 	$('#events-title').empty();
 	$('#calendar').fullCalendar('removeEvents');
 
-
 	switch(target){
 		case  0 : //初期・当月または基準月
-			  SetYear  = Today.getFullYear();
-			  SetMonth = Today.getMonth() + 1; 
+			  //SetYear  = Today.getFullYear();
+			  //SetMonth = Today.getMonth() + 1; 
+			  SetYear  = DefYear;
+			  SetMonth = DefMonth; 
 			  break;
 			  //翌月
 		case  1 : SetMonth++;
@@ -890,34 +1000,37 @@ function readEvents(target , cb){
 
 	var thisMonth = SetYear + ("0" + SetMonth).substr(-2);
 	var eventfile = event_dir + thisMonth + event_ext;
-
-	csvToArray( eventfile , function(data) {
-
-		//1行目をフィールド名として扱い連想配列にする
-		for(var i = 1 ; i < data.length ; i++){
-			var rensou = new Object();
-			for(var s = 0; s < data[i].length ; s++){
-				rensou[data[0][s]] = data[i][s]; 
+	//alert(eventfile);
+	csvToArray( eventfile , csv_function);
+	function csv_function(data) {
+		if(!data){
+			csvToArray( event_dir+"blank.csv" , csv_function);
+		}else{
+			//1行目をフィールド名として扱い連想配列にする
+			for(var i = 1 ; i < data.length ; i++){
+				var rensou = new Object();
+				for(var s = 0; s < data[i].length ; s++){
+					rensou[data[0][s]] = data[i][s]; 
+				}
+				eventArray.push(rensou);
 			}
-			eventArray.push(rensou);
+
+
+			//eventArray を日付、開始時間で昇順ソートする
+			//降順は、-1 , 1 を逆にする
+			//ev_when : 年月 ev_open : 開始時間
+			eventArray.sort(function(a,b){
+				if(a[ev_when] < b[ev_when]) return -1;
+				if(a[ev_when] > b[ev_when]) return 1;
+				if(a[ev_open] < b[ev_open]) return -1;
+				if(a[ev_open] > b[ev_open]) return 1;
+				return 0;
+			});
+			//callback化
+			cb();
+			//*********
 		}
-
-
-		//eventArray を日付、開始時間で昇順ソートする
-		//降順は、-1 , 1 を逆にする
-		//ev_when : 年月 ev_open : 開始時間
-		eventArray.sort(function(a,b){
-			if(a[ev_when] < b[ev_when]) return -1;
-			if(a[ev_when] > b[ev_when]) return 1;
-			if(a[ev_open] < b[ev_open]) return -1;
-			if(a[ev_open] > b[ev_open]) return 1;
-			return 0;
-		});
-
-		//callback化
-		cb();
-		//*********
-	});
+	}
 }
 
 //target（tag1）ファイルを読み込みtargetArrayに保存
@@ -1097,7 +1210,7 @@ function eventMap_visible(locationNo){
 	mapCanvas.setCenter(latlng);
 
 	$('#map_area').css({
-		'visibility' : 'visible',
+		'display' : 'block',
 		'top'        : TopHeight
 	});	
 }
@@ -1107,7 +1220,7 @@ function eventMap_hidden(){
         now_infowindow.close();
 
 	$('#map_area').css({
-		'visibility' : 'hidden',
+		'display' : 'none',
 		'top'        : DeviceHeight
 	});
 }
@@ -1138,25 +1251,28 @@ function Area_setting(){
 	}else{
 		var check_tag  = "";
 	}
-
-
+	
+	if(window.localStorage["AreaName"] || window.localStorage["LocName"] || window.localStorage["TagId"]){
+		area_mode = 1;
+	}
 
 	//条件設定エリアの内容作成
-	var buff = "<b>イベントの絞り込み</b><br />";
-	buff += "<input type='button' value='絞り込んで表示する' onClick='checkArea_setting(1)' /><br />";
-	buff += "<input type='button' onClick='checkArea_setting(0)' value='全てのイベントを表示する' /><br />";
-	buff += "<input type='button' value='キャンセルして閉じる' onClick='setArea_hidden()' /><br />";
+	var buff = "<h3>イベントの絞り込み</h3>";
+	buff += "<div class='btns'><input class='btn_search' type='button' value='この内容で表示' onClick='checkArea_setting(1)' />";
+	buff += "<input class='btn_all' type='button' onClick='checkArea_setting(0)' value='絞り込みを解除' />";
+	buff += "<input class='btn_close' type='button' value='×' onClick='setArea_hidden()' /></div>";
 
-	buff += "<hr />";
+	buff += "<div class='set_area_content' >";
 	buff += "<form >";
 
-	buff += "<input type='button' value='絞り込み条件を保存する' onClick='setArea_save()' /><br />";
+	//buff += "<input type='button' value='絞り込み条件を保存する' onClick='setArea_save()' /><br />";
 
-	buff += "<input type='checkbox' name='area_mode' ";
+	//buff += "<input type='checkbox' name='area_mode' ";
+	buff += "<input style='display:none;' type='checkbox' name='area_mode' ";
 	if(area_mode == '1'){
 		buff += " checked ";
 	}
-	buff += " value='1' />：絞り込み条件の有効化<br />";
+	buff += " value='1' />";//：絞り込み条件の有効化<br />
 
 	//areaArrayの一覧を表示
 	var areaName  = "";
@@ -1172,9 +1288,10 @@ function Area_setting(){
 		areaText  = areaArray[s][area_text];
 		areaVisi  = areaArray[s][area_visi];
 
-		buff += "<div style='background:" + areaColor + ";";
-		buff += "color:" + areaText + ";'>";
-		buff += "　<input type='checkbox' class='area'";
+//		buff += "<div style='background:" + areaColor + ";";
+//		buff += "color:" + areaText + ";'>";
+		buff += "<div class='search_areas'>";
+		buff += "<label class='search_areas_name'><input type='checkbox' class='area'";
 		for(var l = 0 ; l < check_area.length ; l++){
 			if(check_area[l] == areaName){
 				buff += " checked ";
@@ -1182,39 +1299,40 @@ function Area_setting(){
 		}
 
 		buff += " name='" + areaName + "' value='" + areaName + "' />：";
-		buff += areaName;
-
+		buff += areaName+"</label>";
+		buff += "<div class='search_areas-body'>";
 		for(var m = 0 ; m < locationArray.length ; m++){
 			if(locationArray[m][loc_area] == areaName){
 				locName = locationArray[m][loc_name];
 				locVisi = locationArray[m][loc_visi];
 
-				buff += "<br />";
-				buff += "<input type='checkbox' class='loc'";
+				//buff += "<br />";
+				buff += "<label><input type='checkbox' class='loc'";
 				for(var l = 0 ; l < check_loc.length ; l++){
 					if(check_loc[l] == locName){
 						buff += " checked ";
 					}
 				}
 				buff += " name='" + locName + "' value='" + locName + "' />";
-				buff += locName;
+				buff += locName+"</label>";
 			}
 		}
-
 		buff += "</div>";
+		buff += "</div><!-- /.search_areas -->";
 	}
 
 	//地域区分なし　targetArray を設定する
+	
 	buff += "<div style='background:" + default_area_color + ";";
 	buff += "color:" + default_area_text + ";'>";
-	buff += "　<input type='checkbox' class='area'";
+	buff += "<label><input type='checkbox' class='area'";
 	for(var l = 0 ; l < check_area.length ; l ++){
 		if(check_area[l] == "area_non"){
 			buff += " checked ";
 		}
 	}
 	buff += " name='area_non' value='area_non' />：";
-	buff += "任意(tag1)";
+	buff += "任意タグ</label>";
 	for(var m = 0 ; m < targetArray.length ; m++){
 		tarName  = targetArray[m][tar_label];
 		tarId    = targetArray[m][tar_id];
@@ -1224,7 +1342,7 @@ function Area_setting(){
 
 		buff += "<div style='background:" + tarColor + ";";
 		buff += "color:" + tarText + ";'>";
-		buff += "<input type='checkbox' class='tag1'";
+		buff += "<label><input type='checkbox' class='tag1'";
 		for(var l = 0 ; l < check_tag.length ; l++){
 			if(check_tag[l] == tarId){
 				buff += " checked ";
@@ -1232,31 +1350,58 @@ function Area_setting(){
 		}
 		buff += " name='" + tarId + "' value='" + tarId + "' />";
 		buff += tarName;
-		buff += "</div>";
+		buff += "</label></div>";
 	}
 
 	buff += "</div>";
 
 	buff += "</form>";
+	buff += "</div>";
 
 
 	$("#set_area").html(buff);
+	set_bar_str();
 }
 
+
+function set_bar_str(bar_text){
+	if(!bar_text){
+		bar_text = "";
+		if(window.localStorage["AreaName"]){
+			bar_text = window.localStorage["AreaName"].split(",").join("・");
+		}else{
+			bar_text = "";
+		}
+		if(window.localStorage["LocName"]){
+			if(bar_text!==""){bar_text+="/"}
+			bar_text = window.localStorage["LocName"].split(",").join("・");
+		}
+		if(window.localStorage["TagId"]){
+			if(bar_text!==""){bar_text+="/"}
+			bar_text = window.localStorage["TagId"].split(",").join("・");
+		}
+	}
+	if(bar_text===""){
+		bar_text = "全てのイベント";
+	}
+	$("#set_bar .set_str").text(bar_text);
+}
 function setArea_hidden(){
 	$('#set_area').css('visibility' , 'hidden');
+	$('body').removeClass("search_open");
 }
 
 function setArea_visible(){
 	//topへスクルール
-	$("html,body").animate({scrollTop:0},{duration: 1000});
-
+	//$("html,body").animate({scrollTop:0},{duration: 1000});
+	$("body").addClass("search_open");
 	$('#set_area').css('visibility' , 'visible');
 }
 
 //イベント地域条件で再表示
 function setArea_setting(){
 	setArea_hidden();
+	
 
 	$('#calendar').fullCalendar('changeView','month');
 
@@ -1272,19 +1417,21 @@ function setArea_setting(){
 //イベント表示条件をチェックしイベントを表示する
 function checkArea_setting(sw){
 	//sw 0 : all  sw : 1 area
-
-	if(sw == 1){
+	
+	if(sw == 1 && ($('[class="area"]:checked').length > 0 || $('[class="loc"]:checked').length > 0 || $('[class="tag1"]:checked').length > 0)){
 		$('input[name="area_mode"]').prop('checked',true);		
 	}else{
-		$('input[name="area_mode"]').prop('checked',false);		
+		$('input[name="area_mode"]').prop('checked',false);
 	}
 
 	setArea_setting();
+	setArea_save();
+	set_bar_str();
 }
 
 //地域条件の保存
 function setArea_save(){
-	if($('input[name="area_mode"]').prop('checked')){
+	if($('input[name="area_mode"]').prop('checked') && $('[class="area"]:checked').length > 0){
 		var area_mode = 1;
 	}else{
 		var area_mode = 0;
@@ -1333,7 +1480,7 @@ function setArea_save(){
 	window.localStorage["LocName"]  = loc_buff;
 	window.localStorage["TagId"]    = tag_buff;
 
-	alert("表示条件を保存しました");
+	//alert("表示条件を保存しました");
 }
 
 
@@ -1385,13 +1532,16 @@ var ev_place = "place";		//開催場所（部屋など）
 var ev_whom  = "whom";		//対象者
 var ev_what  = "what";		//内容
 var ev_who   = "who";		//主催者
-var ev_cont  = "contact";	//申し込み先
+var ev_phone = "phone";		//連絡電話番号
+var ev_email = "email";		//連絡電子メール
+var ev_cont  = "contact";	//連絡記事
 var ev_fee   = "fee";		//参加費
 var ev_when  = "when";		//開催日　　yyyy/mm/dd
 var ev_open  = "openTime";	//開始時間　hh:mm:ss  or  hh:mm
 var ev_close = "closeTime";	//終了時間　hh:mm:ss  or  hh:mm
 var ev_cat   = "tag1";		//識別・カテゴリー
 var ev_url   = "url";		//URL
+var ev_uid   = "uid";		//UID
 
 //スクリプト内で作成
 var ev_no    = "no";		//必須
@@ -1476,9 +1626,12 @@ function eventSetCalendar(cb){
 	var tcolor = default_tar_text;
 
 	//地図リンク用画像
-	var maplink   = "<img src='images/maplink.png' height='20px' ";
+	var maplink   = "<span class='icon maplink' ";
 
 	var ev,loc,edata,areaName;
+	var s_evtday="";
+	var evt_day_content="";
+	
 	for(var i =0 ; i < eventArray.length ; i++){
 
 		//var ev = eventArray[i];
@@ -1558,54 +1711,80 @@ function eventSetCalendar(cb){
 		ev[ev_day]   = buff[2];	
 
 		//イベント日から曜日を取得
-		evtday  = new Date(ev[ev_year] + "/" + ev[ev_month] + "/" + ev[ev_day]);
-		weekday = JpWeekday[evtday.getDay()];
-
-		//イベントのタイトル
-		evttitle  = "<div id='evtid_" + ev[ev_no] + "_title' ";
-		evttitle += "onClick='selectEvent(" + ev[ev_no] + ")' ";
-
-		evttitle += "class='" + evtclass + "' "; 
-		evttitle += "style='background-color:" + edata['color'] + "; ";
-		evttitle += "color:" + edata['textColor'] + ";' >";
+		var evtday_str = ev[ev_year] + "/" + ev[ev_month] + "/" + ev[ev_day];
+		evtday  = new Date(evtday_str);
+		var week_num = evtday.getDay();
+		weekday = JpWeekday[week_num];
+		
+		var evt_time = ev[ev_open].substr(0,5) + "〜" + ev[ev_close].substr(0,5);
 
 		//過去イベントの表示
 		if(PastEvent(ev[ev_when]) == 1){
-			evttitle += "_";
+			evtclass += " past";
+		}
+		
+		evttitle = "";
+		
+		//日付のくくり
+		if(s_evtday !== evtday_str){
+			evt_day_content = $("<div id='day"+parseInt(ev[ev_day])+"' class='calendar-event-day w"+week_num+"'/>").appendTo("#events-title");
+			//タイトルの日にち部分
+			evttitle += "<div class='evt_date'><span class='evt_daynum'>"+ parseInt(ev[ev_day]) + "<span class='mint'>日</span></span><span class='evt_week'>（" + weekday + "）</span></div>";
 		}
 
-		evttitle += ev[ev_day] + "日(" + weekday + ") ";
+		
+		//イベントのタイトル+内容をまとめるラッパー
+		evttitle += "<div class='calendar-event-wrap'>";
+		
+		//イベントのタイトル
+		evttitle += "<div id='evtid_" + ev[ev_no] + "_title' ";
+		//evttitle += "onClick='selectEvent(" + ev[ev_no] + ")' ";
 
+		evttitle += "class='" + evtclass + "' "; 
+		evttitle += ">"; 
+		//evttitle += "style='background-color:" + edata['color'] + "; ";
+		//evttitle += "color:" + edata['textColor'] + ";' >";
+		
+		//タイトルの時間・場所
+		evttitle += "<div class='ti_param'><span class='ti_time'>"+ evt_time + "</span><span class='tit_where'>" + ev[ev_where] + "</span></div>";
+		
+		evttitle += "<div class='tit_title'>" + ev[ev_title] + "</div>"
+		
 		//AM PM　fullcalendar に合わす
 		//evttitle += (ev[ev_open].substr(0,2) < 12 ? 'Am' : 'Pm') + " ";
-		evttitle += (ev[ev_open].substr(0,2) < 12 ? 'A' : 'P') + " ";
+		//evttitle += (ev[ev_open].substr(0,2) < 12 ? 'A' : 'P') + " ";
 
 
 		//area*************
 		//location位置情報の確認
 		if(loc == -1){
-
+			if(ev[ev_area]){
+				evttitle += "<div class='tit_loc'>" + ev[ev_area] + "</div> ";
+			}
 		}else{
 			//地域名を表示しない仕様に変更
-			//evttitle += "(" + locationArray[loc][loc_area] + ") ";
+			evttitle += "<div class='tit_loc' style='background-color:"+edata['color']+";'>" + locationArray[loc][loc_area] + "</div> ";
 		}
 		//*****************
 
-		evttitle += ev[ev_title];
 		evttitle += "</div>";
 
-		$("#events-title").append(evttitle);
+		//$("#events-title").append(evttitle);
 
 		//イベントの詳細
 		evtcont  = "<div id='evtid_" + ev[ev_no] +"' ";
 		evtcont += "class='calendar-event-cont'>";
+		
+		if(ev[ev_what]){
+			evtcont += "<div class='calendar-event-cont-body'>"+ev[ev_what]+"</div>";
+		}
 
-		evtcont += "<table class='eventclass'>";
-
+		evtcont += "<table class='evt_table eventclass'>";
+		
 		evtcont += tg1 + "名称"  + tg2 + ev[ev_title] + tg3;
-		evtcont += tg1 + "日時"  + tg2 + ev[ev_when].substr(5,2)+ "月" + ev[ev_when].substr(8,2) + "日(" + weekday + ") " + ev[ev_open].substr(0,5) + "〜" + ev[ev_close].substr(0,5) + tg3;
+		evtcont += tg1 + "日時"  + tg2 + "<b>" + ev[ev_year]+ "年" + parseInt(ev[ev_month])+ "月" + parseInt(ev[ev_day]) + "日(" + weekday + ") </b>" + evt_time + tg3;
 
-		evtcont += tg1 + "内容"  + tg2 + ev[ev_what] + tg3;
+		//evtcont += tg1 + "内容"  + tg2 + ev[ev_what] + tg3;
 		evtcont += tg1 + "対象者" + tg2 + ev[ev_whom] + tg3;
 
 		if(ev[ev_fee] == 0 || ev[ev_fee] ==""){
@@ -1617,16 +1796,17 @@ function eventSetCalendar(cb){
 		//location位置情報の確認
 		if(loc == -1){
 			//evtcont += tg1 + "場所"  + tg2 + ev[ev_where] + tg3;
-			evtcont += tg1 + "場所"  + tg2 + ev[ev_where];
+			evtcont += tg1 + "場所"  + tg2 + "<b>" + ev[ev_where] + "</b>";
 			if(ev[ev_place] != undefined){
 				evtcont += ev[ev_place];
 			}
 			evtcont += tg3;
 
 		}else{
-			evtcont += tg1 + "場所"  + tg2;
-			evtcont += ev[ev_where] + " ";
-			evtcont += maplink + " onClick='eventMap_visible(" + loc + ")' />";
+			evtcont += tg1 + "場所<br>";
+			evtcont += maplink + " onClick='eventMap_visible(" + loc + ")' >地図</span>";
+			evtcont += tg2;
+			evtcont += "<b>"+ev[ev_where] + "</b>";
 			if(ev[ev_place] != undefined){
 				evtcont += ev[ev_place];
 			}
@@ -1641,6 +1821,7 @@ function eventSetCalendar(cb){
 			evtcont += tg3;
 		}
 
+		/*
 		//電話発信機能 電話番号のチェック
 		var teldata = telNumber(ev[ev_cont]);
 		if(teldata == -1 ){
@@ -1648,12 +1829,41 @@ function eventSetCalendar(cb){
 		}else{
 			evtcont += tg1 + "連絡先" + tg2 + "<a href='tel:" + teldata + "' >" + ev[ev_cont] + "</a>" + tg3;
 		}
+		*/
+
+		//連絡先を電話番号、メールアドレス、その他記事に分離
+		//電話発信機能 電話番号のチェック
+		if(ev[ev_phone]){
+			var teldata = telNumber(ev[ev_phone]);
+			if(teldata == -1 ){
+				evtcont += tg1 + "連絡番号" + tg2 + ev[ev_phone] + tg3;
+			}else{
+				evtcont += tg1 + "連絡番号" + tg2 + "<a href='tel:" + teldata + "' >" + ev[ev_phone] + "</a>" + tg3;
+			}
+		}
+
+		//電子メールのチェック
+		if(ev[ev_email]){
+			var emaildata = mailAddress(ev[ev_email]);
+			if(emaildata == -1 ){
+				evtcont += tg1 + "連絡メール" + tg2 + ev[ev_email] + tg3;
+			}else{
+				evtcont += tg1 + "連絡メール" + tg2 + "<a href='mailto:" + emaildata + "' >" + ev[ev_email] + "</a>" + tg3;
+			}
+		}
+
+		//連絡記事（簡易チェック）
+		if(ev[ev_cont] != ""){
+			evtcont += tg1 + "連絡記事" + tg2 + ev[ev_cont] + tg3;
+		}
+
+		
 
 
 		evtcont += tg1 + "主催者" + tg2 + ev[ev_who] + tg3;
 
 		//url 追加（簡易チェック）
-		if(ev[ev_url] != ""){
+		if(ev[ev_url]){
 			if(urlStrings(ev[ev_url]) == 1){
 				evtcont += tg1 + "URL" + tg2;
 				evtcont += "<a href='" + ev[ev_url] + "' target='_blank'>";
@@ -1661,17 +1871,45 @@ function eventSetCalendar(cb){
 			}
 		}
 
+		//uid 追加
+		var link_copy_btn = "";
+		if(ev[ev_uid]){
+			if(ev[ev_uid]){
+				var linkstring = "?mon=" + ev[ev_year] + ev[ev_month] + "&uid=" + ev[ev_uid];
+
+				evtcont += tg1 + "リンク" + tg2;
+				evtcont += "<a href='" + linkstring + "'>" + ev[ev_uid] + "</a>";
+
+				//link url copy
+				var baseurl = window.location.href.split('?');
+				//evtcont += '　<input type="button" value="URLをコピー" onClick="copyTextToClipboard(\'' + baseurl[0] + linkstring + '\')" />';
+				link_copy_btn = '　<input type="button" value="このイベントのリンクをコピー" onClick="copyTextToClipboard(\'' + baseurl[0] + linkstring + '\')" />';
+				evtcont += tg3;
+			}
+		}
+
+
 		//色別検証用
-		evtcont += tg1 + "(color)" + tg2;
-		evtcont += "tag1:" + ev[ev_cat]  + "　";
-		evtcont += "area:" + ev[ev_area] + tg3;
+		//evtcont += tg1 + "(color)" + tg2;
+		//evtcont += "tag1:" + ev[ev_cat]  + "　";
+		//evtcont += "area:" + ev[ev_area] + tg3;
 
 
 		evtcont +="</table>";
 
-		evtcont += "</div>";	
+		//evtcont +="<div class='btns'><button class='btn_close'>閉じる</button>"+link_copy_btn+"</div>"
+		//evtcont +="<div class='btns'><button class='btn_close' onClick='selectEvent(" + ev['no'] + ")'>閉じる</button>"+link_copy_btn+"</div>"
+		evtcont +="<div class='btns'><button class='btn_close' >閉じる</button>"+link_copy_btn+"</div>"
 
-		$("#events-title").append(evtcont);	
+		evtcont += "</div><!-- /.calendar-event-cont -->";	
+		evtcont += "</div><!-- /.calendar-event-wrap -->";	
+
+		evt_day_content.append(evttitle+evtcont);	
+		
+		if(s_evtday !== evtday_str){
+			s_evtday = evtday_str;
+		}
+
 	}
 
 	//連想配列でsourceを渡し、カレンダーにイベントを追加する	
@@ -1689,6 +1927,44 @@ function eventSetCalendar(cb){
 
 }
 
+var is_iOS = false;
+if (navigator.userAgent.indexOf('iPhone') > 0 || navigator.userAgent.indexOf('iPod') > 0 || navigator.userAgent.indexOf('iPad') > 0) {
+    is_iOS=true;
+}
+//クリップボードに文字列をコピーする
+function copyTextToClipboard(textVal){
+	// テキストエリアを用意する
+	var copyFrom = document.createElement("textarea");
+	// テキストエリアへ値をセット
+	copyFrom.textContent = textVal;
+ 
+	// bodyタグの要素を取得
+	var bodyElm = document.getElementsByTagName("body")[0];
+	// 子要素にテキストエリアを配置
+	bodyElm.appendChild(copyFrom);
+ 
+	// テキストエリアの値を選択
+	copyFrom.select();
+	// コピーコマンド発行
+	var retVal = document.execCommand('copy');
+	// 追加テキストエリアを削除
+	bodyElm.removeChild(copyFrom);
+ 
+	//return retVal;
+	//alert(textVal + "\n：クリップボードにコピーしました");
+	
+	/*
+	var yourCode = document.getElementById('day4');
+	var range = document.createRange();
+	range.selectNode(yourCode);
+	window.getSelection().addRange(range);
+	document.execCommand('copy');
+	alert('コピーした');
+	*/
+
+	add_dialog(textVal + "<br>をクリップボードにコピーしました");
+}
+
 
 //イベントタイトルのアコーディオン機能
 var openEvt = "";
@@ -1697,20 +1973,30 @@ function evtScroll(callEvt){
 	
 	//スクロール量の計算
 	var targetY  = $(callEvt).offset().top;		//イベントタイトルの現在位置
-	targetY -= $(callEvt + "_title").height();	//イベントタイトルの高さ減算
-	targetY -= $("#menu-back").height(); 		//メニューバックの高さ減算
+	//targetY -= $(callEvt + "_title").height();	//イベントタイトルの高さ減算
+	//targetY -= $("#menu-back").height();//メニューバックの高さ減算
+	var plus_y = 0;
+	if($("#header").length>0){
+		plus_y = $("#header").height()+$("#fix_header").height();
+		console.log("plus_y: "+plus_y);
+	}
+	//targetY+=plus_y;
+	console.log("targetY: "+targetY);
+	//int($("events-title").css("margin-top").split("px").join(""));
 	//スクロール実施
-	$("html,body").animate({scrollTop:targetY},{duration: 1000});
+	$("html,body").animate({scrollTop:targetY},{duration: 300});
 
 	//alert(callEvt);
 	//alert(targetY);
 }
 
-//イベントの選択
+//イベントの選択 //notalone-event.jsに移行
+/*
 function selectEvent(idno){
 	var callEvt = '#evtid_' + idno;
 
-	if(openEvt != ""){
+	//if(openEvt != ""){
+	if(false){
 		//イベント詳細が開いている場合は、閉じてから次のオープンに進む
 		$(openEvt).hide("blind" , "" , 200 ).promise().done(function(){
 
@@ -1726,11 +2012,54 @@ function selectEvent(idno){
 		});	
 	}else{
 		//イベント詳細が開いていない場合
+		$(callEvt).show("blind", "", 400 );
+		openEvt = '#evtid_' + idno;
+
+		//evtScroll(openEvt);
+	}
+
+	//UID指定の後処理
+	$(".calendar-event").css("visibility" , "visible");
+	$("#calendar").css("visibility" , "visible");
+}
+*/
+
+//UID指定のイベント表示
+function uidCallEvent(idno){
+	var callEvt = '#evtid_' + idno;
+/*
+	if(openEvt != ""){
+		//イベント詳細が開いている場合は、閉じてから次のオープンに進む
+		$(openEvt).hide("blind" , "" , 200 ).promise().done(function(){
+
+			if(openEvt == callEvt){
+				openEvt = "";
+			}else{
+				$(callEvt).show("blind", "", 500 );
+				openEvt = '#evtid_' + idno;
+
+				//evtScroll(openEvt);
+			}
+
+		});	
+	}else{
+		//イベント詳細が開いていない場合
 		$(callEvt).show("blind", "", 1000 );
 		openEvt = '#evtid_' + idno;
 
-		evtScroll(openEvt);
+		//evtScroll(openEvt);
 	}
+*/
+
+	//UID指定のイベントのみ表示する
+	//$(".calendar-event").css("visibility" , "hidden");
+	//$("#calendar").css("visibility" , "hidden");
+	
+	//CSSで表示・非表示を切り替え /*-- 個別ページ表示 --*/
+	var event_wrap = $(callEvt).parent();
+	$("body").addClass("event_single");
+	event_wrap.addClass("single");
+	event_wrap.append('<div class="btns"><a class="btn btn3" href="'+location.href.split("&uid")[0]+'">← 同じ月の他のイベントを見る</a></div>');
 }
 
 
@@ -1780,6 +2109,25 @@ function TodayEvent(){
 	}
 }
 
+//eventArray の　keyにヒットしたイベント情報を返す
+function SearchEvent( ukey , uword , type){
+	//ukey  : eventArray[ukey]　検索するキー
+	//uword : 検索ワード 
+	//tyep  : 'eno' イベント番号を返す（デフォルト）
+
+ 	var data   = "";
+	var len = eventArray.length;
+
+	for(var i = 0 ; i < len ; i++){ 
+		data = eventArray[i][ukey];
+		if(uword == data){
+			return i+1;
+		}
+	}
+	return -1;
+}
+
+
 //eventLimit Click した日のイベントをスクロールアップ
 //機能していない
 function LimitEvent(fdate){
@@ -1816,13 +2164,14 @@ function events_init(){
 			//カスタムボタンによるヘッダーの設定
 			customButtons: {				
         			myCustomToday: {
-            				text: '今月',
+            				text: '基月',
 					size: 'small',
             				click: function() {
                					//alert('今日へ');
 						$('.fc-myCustomMonth-button').css({'visibility':'hidden'});
 						$('#calendar').fullCalendar('changeView','month');
-						$('#calendar').fullCalendar('today');
+						//$('#calendar').fullCalendar('today');
+						$('#calendar').fullCalendar('gotoDate',DefYear + "-" + DefMonth);
 
 						readEvents(0 , function(){
 							eventSetCalendar(function(){
@@ -1898,7 +2247,7 @@ function events_init(){
 						readEvents(-1 , function(){
 							eventSetCalendar(function(){
 								//topへスクロール
-								$("html,body").animate({scrollTop:0},{duration: 1000});
+								$("html,body").animate({scrollTop:0},{duration: 0});
 							});
 						});
 
@@ -1915,7 +2264,7 @@ function events_init(){
 						readEvents(1 , function(){
 							eventSetCalendar(function(){
 								//topへスクロール
-								$("html,body").animate({scrollTop:0},{duration: 1000});
+								$("html,body").animate({scrollTop:0},{duration: 0});
 							});
 						});
 
@@ -1976,7 +2325,7 @@ function events_init(){
 
 			//イベントのクリック
 			eventClick : function(event){
-				selectEvent(event.id);
+				//selectEvent(event.id);
 			},
 
 			//日のクリック
@@ -1991,10 +2340,10 @@ function events_init(){
 			*/
 
 			//イベントの最大表示数
-    			eventLimit: true,
+    			eventLimit: false,
     			views: {
         			agenda: {
-            				eventLimit: 1
+            				eventLimit: 5
         			}
     			},
 			eventLimitText: '件',
@@ -2013,12 +2362,14 @@ function events_init(){
 
 		});
 
+		/* 関数外に出す
 		//callback化
 		readEvents(0 , function(){
 			eventSetCalendar(function(){
 				TodayEvent();
 			});
 		});
+		*/
 	});
 }
 
@@ -2045,7 +2396,7 @@ function inqScroll(callInq){
 	targetY -= $("#menu-back").height(); 		//メニューバックの高さ減算
 
 	//スクロール実施
-	$("html,body").animate({scrollTop:targetY},{duration: 1000});
+	$("html,body").animate({scrollTop:targetY},{duration: 500});
 
 }
 
@@ -2061,7 +2412,7 @@ function selectInquiry(idno){
 
 				//topに戻る
 				var targetY = 0;
-				$("html,body").animate({scrollTop:targetY},{duration: 1000});
+				$("html,body").animate({scrollTop:targetY},{duration: 500});
 			}else{
 				$(callInq).show("blind", "", 500 );
 				openInq = '#inqid_' + idno;
@@ -2122,7 +2473,7 @@ var inq_url   = "url";
 var inq_lat   = "lat";
 var inq_lng   = "lng";
 
-var maplink   = "<img src='images/maplink.png' height='20px' ";
+var maplink   = "<span class='icon maplink' ";
 
 function inquirySetData(){
 	var ary = inquiryArray;
@@ -2179,7 +2530,7 @@ function inquirySetData(){
 		//位置情報がある場合　名前をボタンに表示しマップ起動可能とする
 		if(ary[i][inq_lat] != "" && ary[i][inq_lng] != ""){
 			//buff += "<input class='inq_map' type='button' onClick='inquiryMap_visible(" + i + ")' value='地図' ><br />";
-			buff += "　" + maplink + " onClick='inquiryMap_visible(" + i + ")' /><br />";
+			buff += "　" + maplink + " onClick='inquiryMap_visible(" + i + ")' >地図</span><br />";
 
 		}else{
 			buff += "<br />";
@@ -2311,7 +2662,30 @@ function csvToArray(filename, cb) {
 	$.ajaxSetup({
 		cache: false
 	});
+	/*
+	$.get({
+	  url:  filename
+	}).(function(csvdata, textStatus, jqXHR){
+		//CSVのパース作業
+		//CRの解析ミスがあった箇所を修正しました。
+		//以前のコードだとCRが残ったままになります。
+		// var csvdata = csvdata.replace("\r/gm", ""),
+		csvdata = csvdata.replace(/\r/gm, "");
 
+		var line = csvdata.split("\n"),
+		ret = [];
+		for (var i in line) {
+				//空行はスルーする。
+				if (line[i].length == 0) continue;
+
+				var row = line[i].split(",");
+				ret.push(row);
+			}
+			cb(ret);
+	}).fail(function(jqXHR, textStatus, errorThrown){
+		cb(false);
+	});
+	*/
 	$.get(filename, function(csvdata) {
 		//CSVのパース作業
 		//CRの解析ミスがあった箇所を修正しました。
@@ -2389,6 +2763,38 @@ function telNumber(txt){
 		return -1;
 	}
 }
+
+//メールアドレスのチェック
+function mailAddress(txt){
+	var txt0 = txt;
+
+	return txt;
+
+
+	/* メールアドレスのチェックに変更してください
+	// -- () を削除して評価する
+	var txt1 = txt0.replace(/-/g, '');
+	var txt2 = txt1.replace(/\(/g, '');
+	var number = txt2.replace(/\)/g, '');
+
+	//data1 = txt.match(/^[0-9-]{6,9}$|^[0-9-]{12}$/);
+	//data2 = txt.match(/^\d{1,4}-\d{4}$|^\d{2,5}-\d{1,4}-\d{4}$/);
+	data1 = number.match(/^[0-9-]{9,12}$/);
+
+	//if(!data1 && !data2){
+	if(!data1){
+		//alert(number + "　電話番号が不正です");
+		return -1;
+	}else if(number.substr(0,1) == "0"){
+		//alert(number);
+		return number;
+	}else{
+		//alert(number + "　0がありません");
+		return -1;
+	}
+	*/
+}
+
 
 //URLのチェック
 function urlStrings(txt){

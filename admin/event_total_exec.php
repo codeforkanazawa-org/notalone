@@ -60,6 +60,20 @@ if (!function_exists('json_encode')) {
 		$fields[$i] = $data[$i];
 	} 
 
+	//集計フィールドの追加
+	$fields[$i] = 'timestamp';
+	$key_cnt++;
+
+	$i++;
+	$fields[$i] = 'soucefile';
+	$key_cnt++;
+
+	$i++;
+	$fields[$i] = 'totaluser';
+	$key_cnt++;
+	//*****************
+
+
 	print_r($fields);
 	fclose($fp);
 	
