@@ -1,7 +1,7 @@
 <?php 
 $include_dir = dirname($_SERVER["SCRIPT_NAME"])."/";
 //$file_name = basename($_SERVER['PHP_SELF']);
-if($include_dir==="//" || $include_dir==="/" || $include_dir==="/noto/"){$css_dir = "admin/";}else{$css_dir = "./";}
+if($include_dir==="//" || $include_dir==="/" || $include_dir==="/notalone/"){$css_dir = "admin/";}else{$css_dir = "./";}
  ?>
  
 <link rel="stylesheet" href="<?php echo $css_dir; ?>admin_style.css?ver=170414">
