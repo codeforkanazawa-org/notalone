@@ -818,7 +818,8 @@ function LocalFileLoad(){
 		}else{
 			document.getElementById("Lexcec_bt").style.display = "none";
 
-			alert(file[0].type + "です　" + ftype + "のファイルを選択してください");
+			//alert(file[0].type + "です　" + ftype + "のファイルを選択してください");
+			document.test.msg.value = file[0].type + "です　" + ftype + "のファイルを選択してください";
 			return false;
 		}
 
@@ -853,16 +854,18 @@ function LocalFileLoad(){
 					break;
 				case 2 ://ワーニングの場合、メッセージをつけて読み込む
 				case 3 ://エラーの場合、メッセージをつけて読み込む
-	    				document.test.txt.value = obj.msg + "\n" + obj.data;
+	    				document.test.txt.value = obj.data;
 					//アップロードボタンを表示しない	
 					document.getElementById("Lexcec_bt").style.display = "none";
 
 			}
 
-			//alert(ret);
+			//メッセージエリアに表示
+    			document.test.msg.value = obj.msg;
 
 			//*********************			
   		}
+
 	},false);
 
 
@@ -893,6 +896,7 @@ function LocalFileLoad(){
 
 	},false);
 }
+
 
 function LocalExcec(){
 	var buff = document.getElementById("txt").value;
@@ -1294,7 +1298,9 @@ function saveFile( outdir , fhead , fext , indata){
 		<!-- テキストファイル-->
 		<form name="test">
 			<p class="info">ファイルを選択して、内容を確認してください</p>	
+			<textarea name="msg" id="msg" rows="10" cols="100" wrap="off" readonly></textarea>
 			<textarea name="txt" id="txt" rows="10" cols="100" wrap="off" readonly></textarea>
+
 			<p id="upload_code"><span>文字化けする場合は、文字コードを変更してください。</span><label>文字コード<select id="upfencode" name="upfencode">
 					<!--option value="auto" selected>自動</option-->
 					<option value="utf8" selected>utf-8</option> 
