@@ -101,6 +101,8 @@ $data = "no,when,eventtitle,openTime,closeTime,where,place,whom,what,who,phone,e
 			}
 		}
 
+		//フィールドにエラーが無い場合、データのチェックを実行
+		if($error == 0){
 
 		//csvデータは　１から
 		for($i = 1 ; $i < count($dataArray) ; $i++){
@@ -190,6 +192,8 @@ $data = "no,when,eventtitle,openTime,closeTime,where,place,whom,what,who,phone,e
 			}
 
 		}
+
+		}	//end if
 
 
 		//**結果 をjsonで返す
@@ -559,8 +563,9 @@ function csvTextToArray($val){
 	for($m = 0 ; $m < count($sline) ; $m++){ 
 		$buff = explode(",",$sline[$m]);
 
-		if(strpos($buff[0],"//") === 0){
-			//コメント行は省く
+		//if(strpos($buff[0],"//") === 0){
+		if(strpos($buff[0],"//") === 0 || strlen($sline[$m]) === 0){
+			//コメント行と改行のみの行は省く
 			continue;
 		}
 
@@ -584,9 +589,13 @@ function csvTextToArray($val){
 			//print("fields:<br /><br />");
 		}else{
 			for($i = 0 ; $i < count($fields) ; $i++){
-				//データからダブルクォーテションを削除
-				$buff[$i] = str_replace('"' , '' , $buff[$i]);
-				$fdata[$cnt][$fields[$i]] = $buff[$i];
+				if(isset($buff[$i])){
+					//データからダブルクォーテションを削除
+					$buff[$i] = str_replace('"' , '' , $buff[$i]);
+					$fdata[$cnt][$fields[$i]] = $buff[$i];
+				}else{
+					$fdata[$cnt][$fields[$i]] = "";
+				}
 			}
 			//print_r($fdata[$cnt]);
 			//print("fdata:<br /><br />");

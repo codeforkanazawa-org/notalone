@@ -685,9 +685,21 @@ body.log_in #header_back,body.index #header_back{
 	border-radius:4px;
 	box-shadow:0 4px 40px rgba(0,0,0,0.3);
 }
+
+/*
 #LocalText textarea{
 	height:200px;
 }
+ #tex #msg に分割
+*/
+#tex{
+	height:150px;
+}
+#msg{
+	height:50px;
+}
+
+
 #LocalText .info{
 	padding:20px 0;
 }
