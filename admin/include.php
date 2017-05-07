@@ -203,7 +203,7 @@ function common_menu($ptn){
 	switch($ptn){
 		case 2 : 
 			print("
-			<a class='btn btn_modoru' href='/" . $SITE_dir . "index.html'>のとノットアローントップへ</a><a class='btn btn_negative' href='/" . $SITE_dir . "admin/log_out.php'>ログアウト</a>
+			<a class='btn btn_modoru' href='" . $SITE_dir . "index.html'>のとノットアローントップへ</a><a class='btn btn_negative' href='" . $SITE_dir . "admin/log_out.php'>ログアウト</a>
 			");
 			break;
 		case 1 :
