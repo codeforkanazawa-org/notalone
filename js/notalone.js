@@ -1382,8 +1382,11 @@ function set_bar_str(bar_text){
 			TagId = window.localStorage["TagId"].split(",");
 			for(var i = 0 ; i < TagId.length ; i++){
 				for(var s = 0 ; s < targetArray.length ; s++){
-					if(targetArray[s]['target_id'] == TagId[i]){
-						bar_text += targetArray[s]['target_label'];
+					if(targetArray[s][tar_id] == TagId[i]){
+						if(i > 0){
+							bar_text += "・";
+						}
+						bar_text += targetArray[s][tar_label];
 					}
 				}
 			}  
