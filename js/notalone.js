@@ -1374,11 +1374,19 @@ function set_bar_str(bar_text){
 		}
 		if(window.localStorage["LocName"]){
 			if(bar_text!==""){bar_text+="/"}
-			bar_text = window.localStorage["LocName"].split(",").join("・");
+			bar_text += window.localStorage["LocName"].split(",").join("・");
 		}
 		if(window.localStorage["TagId"]){
 			if(bar_text!==""){bar_text+="/"}
-			bar_text = window.localStorage["TagId"].split(",").join("・");
+			//bar_text = window.localStorage["TagId"].split(",").join("・");
+			TagId = window.localStorage["TagId"].split(",");
+			for(var i = 0 ; i < TagId.length ; i++){
+				for(var s = 0 ; s < targetArray.length ; s++){
+					if(targetArray[s]['target_id'] == TagId[i]){
+						bar_text += targetArray[s]['target_label'];
+					}
+				}
+			}  
 		}
 	}
 	if(bar_text===""){
@@ -1675,6 +1683,7 @@ function eventSetCalendar(cb){
 		var looked = 0;
 		for(var s = 0; s < targetArray.length ; s++){
 			if(eventArray[i][ev_cat] == targetArray[s][tar_id]){
+				edata['label']     = targetArray[s][tar_label];
 				edata['color']     = targetArray[s][tar_color];
 				edata['textColor'] = targetArray[s][tar_text];
 				looked = 1;
@@ -1758,9 +1767,18 @@ function eventSetCalendar(cb){
 		//area*************
 		//location位置情報の確認
 		if(loc == -1){
+			/*
 			if(ev[ev_area]){
 				evttitle += "<div class='tit_loc'>" + ev[ev_area] + "</div> ";
 			}
+			*/
+
+			//********
+			if(ev[ev_cat]){
+				evttitle += "<div class='tit_loc' style='background-color:"+ edata['color'] + ";'>" + edata['label'] + "</div> ";
+			}
+			//********
+
 		}else{
 			//地域名を表示しない仕様に変更
 			evttitle += "<div class='tit_loc' style='background-color:"+edata['color']+";'>" + locationArray[loc][loc_area] + "</div> ";
