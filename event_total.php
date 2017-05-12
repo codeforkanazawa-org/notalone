@@ -122,7 +122,7 @@ function init(){
 	login_check();
 
 	//*********
-	AccsessLevel = 3;
+	AccsessLevel = 2;
 	if(UserLevel < AccsessLevel){
 		alert("あなたは、この処理を実施する権限はありません");
 		return false;
