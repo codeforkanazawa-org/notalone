@@ -48,7 +48,34 @@ body.header_fixed #fix_header{
 	overflow: hidden;
 	height: 40px;
 }
+#top-back{
+	position:absolute;
+	left:0;
+	top:0;
+	height:40px;
+	font-weight:bold;
+	color:#999;
+	z-index: 2;
+	line-height:40px;
+	padding:0 0 0 10px;
+	font-size:13px;
+}
+#top-back:before{
+	display:inline-block;
+	content:"";
+	width:6px;
+	height:6px;
+	border:#999 solid 2px;
+	border-width:0 0 2px 2px;
+	-webkit-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
+	-o-transform: rotate(45deg);
+	-ms-transform: rotate(45deg);
+	transform: rotate(45deg);
+	vertical-align:middle;
+	margin:-2px 1px 0 0; 
 
+}
 #myCalendar{
 	position : fixed;
 	top  : 0;
@@ -333,7 +360,8 @@ body.header_fixed #fix_header{
 }
 
 #set_area{
-	visibility : hidden;
+	/*visibility : hidden;*/
+	display : none;
 	/*position : fixed;*/
 	position : absolute;
 	top  : 30px;
@@ -605,6 +633,19 @@ body.event_search .btn_next,input[type="submit"].btn_next:after,button.btn_next:
 body.event_search .btn input[type=file]{
 	display:none;
 }
+body.event_search .btn_top{
+	background:#555;
+}
+body.event_search .btn_prev_month,body.event_search .btn_next_month{
+	background:#a96848;
+}
+body.event_search .btn_prev_month:before{
+	contet:"←";	
+}
+body.event_search .btn_next_month:after{
+	contet:"→";
+	
+}
 body.event_search .bar{
 	display:block;
 	height:36px;
@@ -796,9 +837,17 @@ body.event_search #menu-back{
 	border-radius: 5px;
 	overflow: hidden;
 	padding: 0;
-	line-height: 1.6;
 	display: inline-block;
-	text-indent: 100px;
+	border: 0;
+	margin:0 1px 0 0;
+	background:#aaa;
+}
+.fc-event.overmax{
+	display:none;
+
+}
+.fc-event span{
+	display:none;
 }
 #calendar .fc-row{
 	height: auto!important;
@@ -869,7 +918,7 @@ body.event_search #menu-back{
 	float:left;
 	width:14.2857%;
 	box-sizing:border-box;
-	min-height: 32px;
+	height: 32px;
 }
 #calendar .fc-widget-content .fc-content-skeleton>table thead td{
 	border-left:rgba(129,86,64,0.3) 1px dotted;
@@ -890,11 +939,42 @@ body.event_search #menu-back{
 	border-left:none;
 }
 #calendar .fc-widget-content .fc-content-skeleton>table td.fc-event-container{
-	text-indent:20px;
-	padding:5px;
-	line-height:14px;
+	overflow: hidden;
+	/* text-overflow: ellipsis; */
+	/* white-space: nowrap; */
 }
-
+#calendar .fc-widget-content .fc-content-skeleton>table td.fc-event-container>div{
+	max-width:40px;
+	margin:0 auto;
+	text-align:right;
+	padding:5px;
+	line-height: 10px;
+	text-indent:15px;
+}
+#calendar .fc-widget-content .fc-content-skeleton>table td.fc-event-container>div .plus{
+	font-size:9px;
+	font-weight:bold;
+	color:#795548;
+}
+#calendar .fc-widget-content .fc-content-skeleton>table td.fc-event-container>div .plus:before{
+	content:"＋";
+}
+#calendar .fc-widget-content .fc-content-skeleton>table td.fc-event-container.e1>div,
+#calendar .fc-widget-content .fc-content-skeleton>table td.fc-event-container.e2>div,
+#calendar .fc-widget-content .fc-content-skeleton>table td.fc-event-container.e3>div,
+#calendar .fc-widget-content .fc-content-skeleton>table td.fc-event-container.e4>div
+{
+	text-align:center;
+}
+#calendar .fc-widget-content .fc-content-skeleton>table td.fc-event-container.e2>div,
+#calendar .fc-widget-content .fc-content-skeleton>table td.fc-event-container.e3>div,
+#calendar .fc-widget-content .fc-content-skeleton>table td.fc-event-container.e4>div
+{
+	text-indent:0;
+	padding-left:15px;
+	box-sizing:border-box;
+	text-align:left;
+}
 #calendar_wrap.on .fc-view-container{
 	display: block;
 }
@@ -1217,7 +1297,7 @@ body.event_single #events-title{
 }
 body.event_single .calendar-event-day{
 	border: 0;
-	padding: 0;
+	padding: 1px;
 	margin: 0;
 }
 body.event_single .calendar-event-wrap.single{
@@ -1243,7 +1323,22 @@ body.event_search #map_canvas{
 	bottom:0!important;
 }
 
-
+.bottom_month_btns{
+	overflow:hidden;
+}
+body .bottom_month_btns .btn{
+	display:block;
+	float:left;
+	margin:0;
+	width:50%;
+	padding:15px 0;
+	min-height:1em;
+	border-radius:0;
+	box-sizing:border-box;
+}
+body .bottom_month_btns .btn:first-child{
+	border-left:1px rgba(0,0,0,0.2) solid;
+}
 /*------------------------ ダイアログ */
 .common_dialog{
 	position: absolute;

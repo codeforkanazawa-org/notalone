@@ -1203,16 +1203,17 @@ function eventMap_visible(locationNo){
 
 
 
-        now_infowindow.setContent(html);
+	$('#map_area').css({
+		'display' : 'block',
+		'top'        : TopHeight
+	});	
+	google.maps.event.trigger(mapCanvas, 'resize');
+     now_infowindow.setContent(html);
 	//******
 
 	now_marker.setPosition(latlng);
 	mapCanvas.setCenter(latlng);
 
-	$('#map_area').css({
-		'display' : 'block',
-		'top'        : TopHeight
-	});	
 }
 
 function eventMap_hidden(){
@@ -1367,30 +1368,34 @@ function Area_setting(){
 function set_bar_str(bar_text){
 	if(!bar_text){
 		bar_text = "";
-		if(window.localStorage["AreaName"]){
-			bar_text = window.localStorage["AreaName"].split(",").join("・");
-		}else{
-			bar_text = "";
-		}
-		if(window.localStorage["LocName"]){
-			if(bar_text!==""){bar_text+="/"}
-			bar_text += window.localStorage["LocName"].split(",").join("・");
-		}
-		if(window.localStorage["TagId"]){
-			if(bar_text!==""){bar_text+="/"}
-			//bar_text = window.localStorage["TagId"].split(",").join("・");
-			TagId = window.localStorage["TagId"].split(",");
-			for(var i = 0 ; i < TagId.length ; i++){
-				for(var s = 0 ; s < targetArray.length ; s++){
-					if(targetArray[s][tar_id] == TagId[i]){
-						if(i > 0){
-							bar_text += "・";
+		if($('input[name="area_mode"]').prop('checked')){
+			if(window.localStorage["AreaName"]){
+				bar_text = window.localStorage["AreaName"].split(",").join("・");
+			}else{
+				bar_text = "";
+			}
+			if(window.localStorage["LocName"]){
+				if(bar_text!==""){bar_text+="/"}
+				bar_text += window.localStorage["LocName"].split(",").join("・");
+			}
+			if(window.localStorage["TagId"]){
+				if(bar_text!==""){bar_text+="/"}
+				//bar_text = window.localStorage["TagId"].split(",").join("・");
+				TagId = window.localStorage["TagId"].split(",");
+				for(var i = 0 ; i < TagId.length ; i++){
+					for(var s = 0 ; s < targetArray.length ; s++){
+						if(targetArray[s][tar_id] == TagId[i]){
+							if(i > 0){
+								bar_text += "・";
+							}
+							bar_text += targetArray[s][tar_label];
 						}
-						bar_text += targetArray[s][tar_label];
 					}
-				}
-			}  
+				}  
+			}
+		}else{
 		}
+	}else{
 	}
 	if(bar_text===""){
 		bar_text = "全てのイベント";
@@ -1398,7 +1403,7 @@ function set_bar_str(bar_text){
 	$("#set_bar .set_str").text(bar_text);
 }
 function setArea_hidden(){
-	$('#set_area').css('visibility' , 'hidden');
+	$('#set_area').css('display' , 'none');
 	$('body').removeClass("search_open");
 }
 
@@ -1406,7 +1411,7 @@ function setArea_visible(){
 	//topへスクルール
 	//$("html,body").animate({scrollTop:0},{duration: 1000});
 	$("body").addClass("search_open");
-	$('#set_area').css('visibility' , 'visible');
+	$('#set_area').css('display' , 'block').css('visibility' , 'visible');
 }
 
 //イベント地域条件で再表示
@@ -1433,6 +1438,7 @@ function checkArea_setting(sw){
 		$('input[name="area_mode"]').prop('checked',true);		
 	}else{
 		$('input[name="area_mode"]').prop('checked',false);
+		set_bar_str();
 	}
 
 	setArea_setting();
@@ -1934,7 +1940,44 @@ function eventSetCalendar(cb){
 	}
 
 	//連想配列でsourceを渡し、カレンダーにイベントを追加する	
-	$('#calendar').fullCalendar('addEventSource', source );
+	//$('#calendar').fullCalendar('addEventSource', source );
+	
+	//カレンダーにイベントを表示
+	var cal_day_nos = $("#calendar .fc-content-skeleton>table .fc-day-number");
+	cal_day_nos.each(function(i){
+		//.fc-event-container
+		var cal_day_no = $(this);
+		if(cal_day_no.hasClass("fc-other-month")){return;};
+		var tar = $("#day"+cal_day_no.text());
+		if(tar.length>0){
+			var crs = cal_day_no.closest("tr");
+			var idx = crs.find("td").index(cal_day_no.get(0));
+			var crs2 = crs.closest("table");
+			var event_box = crs2.find("tbody td").eq(idx);
+			var event_box_inner = $("<div></div>").appendTo(event_box);
+			var evts = tar.find(".calendar-event ");
+			var is_over_max = false;
+			var evts_max = 5;
+			event_box.addClass("fc-event-container").addClass("e"+evts.length);
+			if(evts.length>evts_max){
+				is_over_max = true;
+				event_box.addClass("overmax");
+			}
+			evts.each(function(ei){
+				var cev = $(this);
+				var cev_title = cev.find(".tit_title").text();
+				var cev_style = cev.find(".tit_loc").attr("style");
+				var maxclass = (is_over_max && evts_max-1<=ei) ? " overmax" : "";
+				if(is_over_max && evts_max-1 === ei){
+					event_box_inner.append('<span class="plus">'+(evts.length-evts_max+1)+'</span>');
+				}
+				if(!cev_style){ cev_style = ""; }
+				event_box_inner.append('<a class="fc-event'+maxclass+'" style="'+cev_style+'"><span>'+cev_title+'</span></a>');
+			});
+		}
+
+	});
+		
 
 
 	//callback化
@@ -1945,6 +1988,8 @@ function eventSetCalendar(cb){
 		cb();
 	});
 	//*********
+	
+	//$(".tit_loc")
 
 }
 
@@ -1999,13 +2044,11 @@ function evtScroll(callEvt){
 	var plus_y = 0;
 	if($("#header").length>0){
 		plus_y = $("#header").height()+$("#fix_header").height();
-		console.log("plus_y: "+plus_y);
 	}
 	//targetY+=plus_y;
-	console.log("targetY: "+targetY);
 	//int($("events-title").css("margin-top").split("px").join(""));
 	//スクロール実施
-	$("html,body").animate({scrollTop:targetY},{duration: 300});
+	$("html,body").animate({scrollTop:targetY-plus_y},{duration: 300});
 
 	//alert(callEvt);
 	//alert(targetY);

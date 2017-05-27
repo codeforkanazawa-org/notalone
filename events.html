@@ -29,7 +29,7 @@
 <link rel="stylesheet" href="js/jquery-ui-1.11.4.custom/jquery-ui.min.css">
 
 <link type="text/css" href="js/fullcalendar-2.4.0/fullcalendar.css" rel="stylesheet" />
-<link rel="stylesheet" href="css/notalone.css?ver=170416-3">
+<link rel="stylesheet" href="css/notalone.css?ver=170512">
 
 <link type="text/css" href="js/fullcalendar-2.4.0/fullcalendar.print.css" rel="stylesheet" media='print' />
 
@@ -46,8 +46,8 @@
 <!-- Include googlemaps api -->
 <script type="text/javascript" src="js/googlemap_api.js"></script>
 
-<script type="text/javascript" src="js/notalone.js?ver=170416-2"></script>
-<script type="text/javascript" src="js/notalone-event.js?ver=170416-2"></script>
+<script type="text/javascript" src="js/notalone.js?ver=170512"></script>
+<script type="text/javascript" src="js/notalone-event.js?ver=170512"></script>
 
 
 </head>
@@ -59,7 +59,8 @@
 
 <header id="header">
 	<div id="top-menu" onClick="top_index()"></div>
-	<h1><span>奥能登</span><span>イベント情報</span></h1>
+	<div id="top-back" onClick="top_index()">トップへ</div>
+	<h1><span>能登</span><span>イベント情報</span></h1>
 </header>
 <div id="fix_header">
 	<div id="set_wrap">
@@ -92,7 +93,15 @@
 	<div id="map_canvas">
 	</div>　
 </div>
-
+<!--
+<div class="bottom_month_btns">
+	<a class="btn btn_prev_month" href="/events.html?mon="></a>
+	<a class="btn btn_next_month" href="/events.html?mon="></a>
+</div>
+-->
+<div id="bottom_btns" class="btns">
+	<a class="btn btn_top">トップへもどる</a>
+</div>
 
 <!-- Page Checker (style display:none)-->
 <div id="thispage">events.html</div>
