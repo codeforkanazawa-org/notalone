@@ -5,6 +5,7 @@ jQuery(document).ready(function($){
 	var body = $("body");
 	
 	//FIXヘッダー
+	/*
 	var header = $("#fix_header");
 	var header_top = header.offset().top;
 	var is_fixed = false;
@@ -19,6 +20,7 @@ jQuery(document).ready(function($){
 			is_fixed = true;
 		}
 	});
+	*/
 	/*
 	function close_nav(){
 		
@@ -56,7 +58,7 @@ jQuery(document).ready(function($){
 		var idx2 = crs2.find("tbody tr").index(crs.get(0));
 		var day = crs2.find("thead tr").eq(idx2).find(".fc-day-number").eq(idx).text();
 		var tar = $("#day"+day);
-		var plusH = $("#fix_header").height();
+		var plusH = $("#fix_header").height()+$("#header").height();
 		//console.log("idx:"+idx+"  idx2:"+idx2+"  day:"+day);
 		$("html,body").animate({scrollTop:tar.offset().top-plusH},{duration: 300});
 		
