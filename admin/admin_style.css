@@ -1337,13 +1337,14 @@ body.log_in #header_back,body.index #header_back{
 	padding:0;
 }
 #cont_area_inner > .btns{
-	position:fixed;
-	left:40px;
-	bottom:40px;
-	right:40px;
-	background:rgba(230,230,230,0.9);
-	padding:8px;
-	border-radius:0 0 4px 4px
+	position: fixed;
+	left: 40px;
+	bottom: 40px;
+	right: 40px;
+	background: rgba(230, 230, 230, 0.9);
+	padding: 8px;
+	border-radius: 0 0 4px 4px;
+	z-index: 1;
 }
 #cont_area_inner > .btns input[type="button"]{
 	padding:12px;
@@ -1542,6 +1543,7 @@ body.log_in #header_back,body.index #header_back{
 	border: 1px solid #000;
 	margin: 10px 5px 0 0;
 }
+
 
 
 

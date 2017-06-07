@@ -625,6 +625,25 @@ function DataTemplate(mode,no,is_next){
 						buff += "<label>経度<input class='Mydata' type='text' id='Mydata_" + (i+2) + "' value='" + TempData[(i+2)] + "' ></label></div><div class='btns'><a class='btn btn2 btn_showmap'>地図で設定する</a></div></td>";
 				}else if(fields[i]==="lat"){
 				}else if(fields[i]==="lng"){
+				}else if(fields[i]==="user_pw"){
+					console.log("user_pw");
+						buff += "<td>";
+						buff += "<p style='font-size:12px;'>任意のパスワードを入力して控えをとった後、暗号化して保存してください</p></div>";
+						buff += "<input class='Mydata' type='text' id='Mydata_" + i + "' value='" + TempData[i] + "' >";
+					
+						var option = "<div class='optbox' style='text-align:right;'>";
+						option += "<input type='button' style='width:200px; background:#815640;' value='パスワードを新規に自動生成' onclick='makePass()' />";
+						option += "<input type='button' onclick='setCode()' style='width:100px' value='暗号化' />";
+						option += "<div style='display:none;'><input type='text'   name='keta' id='keta' size='2' value='8' />桁";
+						option += "<input type='hidden' name='kazu' id='kazu' size='1' value='1' />";
+						option += "<input type='checkbox' name='suuji' id='suuji' checked />数字";
+						option += "<input type='checkbox' name='small' id='small' checked />英語小文字";
+						option += "<input type='checkbox' name='big'   id='big' />英語大文字";
+						option += "</div></div>";
+
+						buff += option;
+						buff += "</td>";
+					
 				}else{
 					buff += "<td><input class='Mydata' type='text' id='Mydata_" + i + "' value='" + TempData[i] + "' ></td>";
 				}
