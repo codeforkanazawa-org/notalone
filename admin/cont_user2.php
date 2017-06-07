@@ -50,7 +50,7 @@ $DataString = csvDatabaseRead($db_Table,1);
 
 ?>
 
-<link rel="stylesheet" href="../css/csvdatabase2.css">
+<?php //<link rel="stylesheet" href="../css/csvdatabase2.css"> ?>
 
 <script type="text/javascript" src="../js/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="../js/csvdatabase2.js"></script>
@@ -101,7 +101,7 @@ var passFieldName = "user_pw";
 var passFieldNo = DataFieldNo(passFieldName);
 
 function setOption(){
-	var option = "<br /><br /><input type='button' onclick='setCode()' value='パスワードの暗号化' />";
+	var option = "<div class='optbox btns' style='display:none;'><input type='button' onclick='setCode()' value='パスワードの暗号化' />";
 	option += "　";
 	option += "<br /><input type='button' value='パスワードの生成' onclick='makePass()' />";
 	option += "<br /><input type='text'   name='keta' id='keta' size='2' value='8' />桁";
@@ -109,8 +109,10 @@ function setOption(){
 	option += "<input type='checkbox' name='suuji' id='suuji' checked />数字";
 	option += "<input type='checkbox' name='small' id='small' checked />英語小文字";
 	option += "<input type='checkbox' name='big'   id='big' />英語大文字";
+	option += "</div>";
 
-	return option;
+	//return option;
+	return "";
 }
 
 function setCode(){
