@@ -49,7 +49,7 @@ $DataString = csvDatabaseRead($db_Table,1);
 
 ?>
 
-<link rel="stylesheet" href="../css/csvdatabase2.css">
+<!--<link rel="stylesheet" href="../css/csvdatabase2.css">-->
 
 <script type="text/javascript" src="../js/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="../js/csvdatabase2.js"></script>
@@ -127,7 +127,8 @@ function locationInit(){
 }
 
 function setOption(){
-	var option  = "<br /><br /><input type='button' onclick='map_visible()' value='マップの表示' />　";
+	//var option  = "<br /><br /><input type='button' onclick='map_visible()' value='マップの表示' />　";
+	var option  = "";
 
 	return option;
 }
@@ -282,12 +283,14 @@ function showGoogleMap(initLat, initLng) {
 <div id="map_area">
 	<div id="map_canvas">
 	</div>
-	<input type="button" id="map_getlatlng" onClick="mapGetLatLng()" value="位置座標を取得する" />
-	　
-	<input type="text" id="searchAddr" value="" />
-	<input type="button" id="map_hidden" onClick="map_AddrToSearch()" value="住所で検索する" />
-	　
-	<input type="button" id="map_hidden" onClick="map_hidden()" value="マップを閉じる" />
+	<div class="btns">
+		<input type="button" id="map_getlatlng" onClick="mapGetLatLng()" value="位置座標を取得する" />
+
+		<input type="text" id="searchAddr" value="" />
+		<input type="button" id="map_hidden" onClick="map_AddrToSearch()" value="住所で検索する" />
+
+		<input type="button" id="map_hidden" onClick="map_hidden()" value="マップを閉じる" />
+	</div>
 </div>
 
 
