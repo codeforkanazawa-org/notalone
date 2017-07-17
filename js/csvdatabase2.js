@@ -621,10 +621,12 @@ function DataTemplate(mode,no,is_next){
 				if(fields[i]==="address"){
 					console.log("address");
 						buff += "<td><div><label>住所<input class='Mydata' type='text' id='Mydata_" + i + "' value='" + TempData[i] + "' ></label>";
-						buff += "<label>緯度<input class='Mydata' type='text' id='Mydata_" + (i+1) + "' value='" + TempData[(i+1)] + "' ></label>";
-						buff += "<label>経度<input class='Mydata' type='text' id='Mydata_" + (i+2) + "' value='" + TempData[(i+2)] + "' ></label></div><div class='btns'><a class='btn btn2 btn_showmap'>地図で設定する</a></div></td>";
+						buff += "<label id='adress_lat'>緯度<input class='Mydata' type='text' id='Mydata_" + (i+1) + "' value='" + TempData[(i+1)] + "' ></label>";
+						buff += "<label id='adress_lng'>経度<input class='Mydata' type='text' id='Mydata_" + (i+2) + "' value='" + TempData[(i+2)] + "' ></label></div><div class='btns'><a class='btn btn2 btn_showmap'>地図で設定する</a></div></td>";
 				}else if(fields[i]==="lat"){
+						buff += "<td id='lat_val' style='display:none;'><span class='id'>Mydata_"+i+"</span><span class='value'>"+TempData[i]+"<span></td>";
 				}else if(fields[i]==="lng"){
+						buff += "<td id='lng_val' style='display:none;'><span class='id'>Mydata_"+i+"</span><span class='value'>"+TempData[i]+"<span></td>";
 				}else if(fields[i]==="user_pw"){
 					console.log("user_pw");
 						buff += "<td>";
@@ -718,7 +720,12 @@ function DataTemplate(mode,no,is_next){
 	if($( "#cont_area .row_when input" ).length>0){ $( "#cont_area .row_when input" ).datepicker(); }
 	$(".row_tag1 select").val($(".row_tag1 select").attr("data-value"));
 	$(".row_where select").val($(".row_where select").attr("data-value"));
-
+	if($( "#cont_area #adress_lat input" ).length>0){
+		$( "#cont_area #adress_lat input" ).attr("id",$( "#lat_val .id" ).text());
+		$( "#cont_area #adress_lat input" ).val($( "#lat_val .value" ).text());
+		$( "#cont_area #adress_lng input" ).attr("id",$( "#lng_val .id" ).text());
+		$( "#cont_area #adress_lng input" ).val($( "#lng_val .value" ).text());
+	}
 	set_cont_area_event();
 	
 	//**** 入力補助エリアがあるならば表示する
